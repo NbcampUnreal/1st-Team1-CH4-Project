@@ -2,12 +2,28 @@
 
 
 #include "Traps/TrapBase.h"
+#include "Components/SphereComponent.h"
+#include "GameFramework/Character.h"
 
 // Sets default values
 ATrapBase::ATrapBase()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	// Root Component(Scene Component)
+	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(SceneComp);
+
+	// Box Component
+	SphereColliderComp = CreateDefaultSubobject<USphereComponent>(TEXT("BoxCollider"));
+	SphereColliderComp->SetupAttachment(SceneComp);
+	SphereColliderComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	SphereColliderComp->OnComponentBeginOverlap.AddDynamic(this, &ATrapBase::OnCharacterOverlap);
+	SphereColliderComp->OnComponentEndOverlap.AddDynamic(this, &ATrapBase::OnCharacterEndOverlap);
+
+	// Static Mesh Component
+	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	StaticMeshComp->SetupAttachment(SceneComp);
+
+	bReplicates = true;
 
 }
 
@@ -18,10 +34,20 @@ void ATrapBase::BeginPlay()
 	
 }
 
-// Called every frame
-void ATrapBase::Tick(float DeltaTime)
+void ATrapBase::OnCharacterOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	Super::Tick(DeltaTime);
+	ACharacter* Charaacter = Cast<ACharacter>(OtherActor);
+	if (Charaacter)
+	{
+		OperateTrap(Charaacter);
+	}
+}
 
+void ATrapBase::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+}
+
+void ATrapBase::OperateTrap(ACharacter* Target)
+{
 }
 

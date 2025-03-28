@@ -56,6 +56,6 @@ void ABlockBase::ApplyEffect(ACharacter* Target)
 
 void ABlockBase::DestoryBlock()
 {
-	Destroy();
+	//Destroy();
 }
 
