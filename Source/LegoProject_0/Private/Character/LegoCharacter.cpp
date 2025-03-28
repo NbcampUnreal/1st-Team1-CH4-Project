@@ -15,7 +15,7 @@ ALegoCharacter::ALegoCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.bCanEverTick = true;
+	bUseControllerRotationYaw = true;
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArmComp->SetupAttachment(RootComponent);
 	SpringArmComp->TargetArmLength = 300.0f;
@@ -34,14 +34,16 @@ void ALegoCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bIsPlacingMode = false; // 기본은 일반 모드
+
 	APlayerController* PC = Cast<APlayerController>(GetController());
 	if (PC)
 	{
-		PC->bShowMouseCursor = true;
-		PC->bEnableClickEvents = true;
-		PC->bEnableMouseOverEvents = true;
+		PC->bShowMouseCursor = false;
+		PC->SetInputMode(FInputModeGameOnly());
 	}
 }
+
 
 
 // Called every frame
@@ -97,7 +99,10 @@ void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 			{
 				EnhancedInput->BindAction(PlayerController->RotatePreviewBlockAction, ETriggerEvent::Triggered, this, &ALegoCharacter::RotatePreviewBlock);
 			}
-
+			if (PlayerController->FKeyAction)
+			{
+				EnhancedInput->BindAction(PlayerController->FKeyAction, ETriggerEvent::Triggered, this, &ALegoCharacter::PlayFKeyAnimation);
+			}
 		}
 	}
 
@@ -156,6 +161,7 @@ void ALegoCharacter::RotatePreviewBlock(const FInputActionValue& Value)
 
 void ALegoCharacter::StartPlacingBlock(const FInputActionValue& value)
 {
+	UE_LOG(LogTemp, Warning, TEXT("🔵 Q 키 눌러서 StartPlacingBlock 호출됨"));
 	if (!PreviewBlock && PreviewBlockClass)
 	{
 		FActorSpawnParameters Params;
@@ -173,6 +179,7 @@ void ALegoCharacter::StartPlacingBlock(const FInputActionValue& value)
 
 
 
+
 void ALegoCharacter::UpdatePreviewBlock()
 {
 	if (!PreviewBlock) return;
@@ -185,9 +192,6 @@ void ALegoCharacter::UpdatePreviewBlock()
 		if (Hit.bBlockingHit)
 		{
 			FVector HitLocation = Hit.ImpactPoint;
-
-			// 💡 디버그 스피어 그리기
-			DrawDebugSphere(GetWorld(), HitLocation, 10.f, 12, FColor::Green, false, 1.0f);
 
 			PreviewBlock->SetActorLocation(HitLocation);
 		}
@@ -248,6 +252,35 @@ void ALegoCharacter::SelectBlock3(const FInputActionValue& value)
 		{
 			PreviewBlock->Destroy();
 			PreviewBlock = nullptr;
+		}
+	}
+}
+
+void ALegoCharacter::PlayFKeyAnimation(const FInputActionValue& Value)
+{
+	if (FKeyMontage && GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(FKeyMontage);
+		UE_LOG(LogTemp, Warning, TEXT("F key pressed - Montage Played"));
+	}
+}
+
+void ALegoCharacter::TogglePlacementMode()
+{
+	bIsPlacingMode = !bIsPlacingMode;
+
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (PC)
+	{
+		if (bIsPlacingMode)
+		{
+			PC->bShowMouseCursor = true;
+			PC->SetInputMode(FInputModeGameAndUI()); // 커서 보이고 시점 회전 안 됨
+		}
+		else
+		{
+			PC->bShowMouseCursor = false;
+			PC->SetInputMode(FInputModeGameOnly()); // 시점 회전 가능
 		}
 	}
 }

@@ -42,6 +42,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	UInputAction* RotatePreviewBlockAction;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	class UInputAction* FKeyAction;
+
+
 protected:
 	virtual void BeginPlay() override;
 };
