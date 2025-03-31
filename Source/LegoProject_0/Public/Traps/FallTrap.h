@@ -15,5 +15,5 @@ class LEGOPROJECT_0_API AFallTrap : public ATrapBase
 	GENERATED_BODY()
 	
 public:
-	virtual void OperateTrap(ACharacter* Target) override;
+	virtual void ActiveTrap(ACharacter* Target) override;
 };

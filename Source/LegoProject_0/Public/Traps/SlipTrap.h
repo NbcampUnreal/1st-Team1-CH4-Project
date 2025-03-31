@@ -19,9 +19,14 @@ public:
 	ASlipTrap();
 protected:
 	// 물리 머티리얼 (미끄러운 표면)
-	UPROPERTY(EditAnywhere, Category = "Slippery")
-	UPhysicalMaterial* SlipperyMaterial;
+	UPROPERTY(EditAnywhere, Category = "GameDesignSettings")
+	float SlipTrapGroundFriction;
+
+	float OriginGroundFriction;
+	float OriginBreakingDecelerationWalking;
+
 public:
 	virtual void BeginPlay() override;
-	virtual void OperateTrap(ACharacter* Target) override;
+	virtual void ActiveTrap(ACharacter* Target) override;
+	virtual void DeactiveTrap(ACharacter* Target) override;
 };

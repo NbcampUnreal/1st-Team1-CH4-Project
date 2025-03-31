@@ -17,14 +17,14 @@ AExplosionTrap::AExplosionTrap()
     RadialForceComp->ImpulseStrength = 1500.0f;
 }
 
-void AExplosionTrap::OperateTrap(ACharacter* Target)
+void AExplosionTrap::ActiveTrap(ACharacter* Target)
 {
     // 폭발 효과 발생
     RadialForceComp->FireImpulse();
 
     // 폭발 범위 내의 캐릭터 감지
     TArray<AActor*> OverlappingActors;
-    SphereColliderComp->GetOverlappingActors(OverlappingActors);
+    CollisionComponent->GetOverlappingActors(OverlappingActors);
 
     for (AActor* Actor : OverlappingActors)
     {

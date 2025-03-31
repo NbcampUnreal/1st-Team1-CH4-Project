@@ -4,6 +4,7 @@
 #include "Traps/TrapBase.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
+#include "Components/BoxComponent.h"
 
 // Sets default values
 ATrapBase::ATrapBase()
@@ -12,12 +13,8 @@ ATrapBase::ATrapBase()
 	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(SceneComp);
 
-	// Box Component
-	SphereColliderComp = CreateDefaultSubobject<USphereComponent>(TEXT("BoxCollider"));
-	SphereColliderComp->SetupAttachment(SceneComp);
-	SphereColliderComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-	SphereColliderComp->OnComponentBeginOverlap.AddDynamic(this, &ATrapBase::OnCharacterOverlap);
-	SphereColliderComp->OnComponentEndOverlap.AddDynamic(this, &ATrapBase::OnCharacterEndOverlap);
+	// Collision Component
+	CollisionComponent = nullptr;
 
 	// Static Mesh Component
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
@@ -34,20 +31,60 @@ void ATrapBase::BeginPlay()
 	
 }
 
-void ATrapBase::OnCharacterOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ATrapBase::OnTrapOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	ACharacter* Charaacter = Cast<ACharacter>(OtherActor);
 	if (Charaacter)
 	{
-		OperateTrap(Charaacter);
+		ActiveTrap(Charaacter);
 	}
 }
 
-void ATrapBase::OnCharacterEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ATrapBase::OnTrapEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	ACharacter* Charaacter = Cast<ACharacter>(OtherActor);
+	if (Charaacter)
+	{
+		DeactiveTrap(Charaacter);
+	}
 }
 
-void ATrapBase::OperateTrap(ACharacter* Target)
+void ATrapBase::ActiveTrap(ACharacter* Target)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Overlap!!!!"));
+}
+
+void ATrapBase::DeactiveTrap(ACharacter* Target)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("End Overlap!!!!"));
+}
+
+void ATrapBase::InitCollision(bool bUseCollision, bool bIsBox)
+{
+	if (!bUseCollision)
+	{
+		CollisionComponent = nullptr;
+		return;
+	}
+
+	if (bIsBox)
+	{
+		UBoxComponent* Box = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
+		CollisionComponent = Box;
+	}
+	else
+	{
+		USphereComponent* Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
+		CollisionComponent = Sphere;
+	}
+
+	if (CollisionComponent)
+	{
+		CollisionComponent->SetupAttachment(RootComponent);
+
+		CollisionComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ATrapBase::OnTrapOverlap);
+		CollisionComponent->OnComponentEndOverlap.AddDynamic(this, &ATrapBase::OnTrapEndOverlap);
+	}
 }
 

@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "TrapBase.generated.h"
 
-class USphereComponent;
+class UShapeComponent;
 
 UCLASS()
 class LEGOPROJECT_0_API ATrapBase : public AActor
@@ -21,7 +21,7 @@ public:
 	USceneComponent* SceneComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	USphereComponent* SphereColliderComp;
+	UShapeComponent* CollisionComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* StaticMeshComp;
@@ -32,7 +32,7 @@ protected:
 public:
 
 	UFUNCTION()
-	virtual void OnCharacterOverlap(
+	virtual void OnTrapOverlap(
 		UPrimitiveComponent* OverlappedComp,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
@@ -41,12 +41,15 @@ public:
 		const FHitResult& SweepResult);
 
 	UFUNCTION()
-	virtual void OnCharacterEndOverlap(
+	virtual void OnTrapEndOverlap(
 		UPrimitiveComponent* OverlappedComp,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex);
 
-	virtual void OperateTrap(ACharacter* Target);
+	virtual void ActiveTrap(ACharacter* Target);
+	virtual void DeactiveTrap(ACharacter* Target);
+
+	void InitCollision(bool bUseCollision, bool bIsBox);
 
 };

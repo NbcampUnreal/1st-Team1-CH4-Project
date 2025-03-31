@@ -27,6 +27,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Explosion")
 	float ExplosionRadius = 500.0f;
 
-	virtual void OperateTrap(ACharacter* Target) override;
+	virtual void ActiveTrap(ACharacter* Target) override;
 	
 };
