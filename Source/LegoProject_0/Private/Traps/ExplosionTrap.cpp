@@ -14,6 +14,7 @@ AExplosionTrap::AExplosionTrap()
     RadialForceComp->Radius = ExplosionRadius;
     RadialForceComp->bImpulseVelChange = true; // 순간적인 힘 가함
     RadialForceComp->bIgnoreOwningActor = true; // 자기 자신은 영향 받지 않음
+    RadialForceComp->ImpulseStrength = 1500.0f;
 }
 
 void AExplosionTrap::OperateTrap(ACharacter* Target)
