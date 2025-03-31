@@ -51,11 +51,13 @@ void ATrapBase::OnTrapEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* Ot
 
 void ATrapBase::ActiveTrap(ACharacter* Target)
 {
+	// Test
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Overlap!!!!"));
 }
 
 void ATrapBase::DeactiveTrap(ACharacter* Target)
 {
+	// Test
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("End Overlap!!!!"));
 }
 
