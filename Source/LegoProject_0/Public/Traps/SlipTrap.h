@@ -18,8 +18,7 @@ class LEGOPROJECT_0_API ASlipTrap : public ATrapBase
 public:
 	ASlipTrap();
 protected:
-	// 물리 머티리얼 (미끄러운 표면)
-	UPROPERTY(EditAnywhere, Category = "GameDesignSettings")
+	UPROPERTY(EditDefaultsOnly, Category = "GameDesignSettings")
 	float SlipTrapGroundFriction;
 
 	float OriginGroundFriction;

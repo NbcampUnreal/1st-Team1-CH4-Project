@@ -21,10 +21,10 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	URadialForceComponent* RadialForceComp;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Explosion")
-	float ExplosionForce = 2000.0f;
+	UPROPERTY(EditDefaultsOnly, Category = "GameDesignSettings")
+	float ExplosionForce = 1500.0f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Explosion")
+	UPROPERTY(EditDefaultsOnly, Category = "GameDesignSettings")
 	float ExplosionRadius = 500.0f;
 
 	virtual void ActiveTrap(ACharacter* Target) override;
