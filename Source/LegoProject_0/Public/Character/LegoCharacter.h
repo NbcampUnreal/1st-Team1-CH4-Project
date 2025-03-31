@@ -26,6 +26,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Block")
 	TSubclassOf<AActor> PlaceBlockClass;
 
+	float PreviewPivotToBottom = 0.f;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -76,6 +78,9 @@ public:
 
 	// 모드 전환 함수
 	void TogglePlacementMode();
+
+
+
 
 private:
 	AActor* PreviewBlock;
