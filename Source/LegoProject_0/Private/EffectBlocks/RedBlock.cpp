@@ -10,7 +10,7 @@ ARedBlock::ARedBlock()
 	EffectDuration = 5.0f;
 	BlockLifeTime = 5.0f;
 	SpeedBoostValue = 1.2f;
-	ImpulseValue = 500.0f;
+	ImpulseValue = 2000.0f;
 }
 
 void ARedBlock::ApplyEffect(ACharacter* Target)
@@ -26,7 +26,10 @@ void ARedBlock::ApplyEffect(ACharacter* Target)
 				float OriginalSpeed = MovementComp->MaxWalkSpeed;
 				float NewSpeed = OriginalSpeed * SpeedBoostValue;
 
-				MovementComp->AddImpulse(PlayerCharacter->GetVelocity().GetSafeNormal() * ImpulseValue);
+				// LaunchCharacter를 사용하여 앞으로 밀어줌
+				FVector LaunchDirection = PlayerCharacter->GetActorForwardVector() * ImpulseValue;
+				PlayerCharacter->LaunchCharacter(LaunchDirection, true, true);
+				
 				MovementComp->MaxWalkSpeed = NewSpeed;
 
 				FTimerHandle EffectTimerHandle;
