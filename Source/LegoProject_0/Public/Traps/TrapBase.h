@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "TrapBase.generated.h"
 
+class UShapeComponent;
+
 UCLASS()
 class LEGOPROJECT_0_API ATrapBase : public AActor
 {
@@ -15,12 +17,39 @@ public:
 	// Sets default values for this actor's properties
 	ATrapBase();
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	USceneComponent* SceneComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UShapeComponent* CollisionComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UStaticMeshComponent* StaticMeshComp;
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+public:
+
+	UFUNCTION()
+	virtual void OnTrapOverlap(
+		UPrimitiveComponent* OverlappedComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+
+	UFUNCTION()
+	virtual void OnTrapEndOverlap(
+		UPrimitiveComponent* OverlappedComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex);
+
+	virtual void ActiveTrap(ACharacter* Target);
+	virtual void DeactiveTrap(ACharacter* Target);
+
+	void InitCollision(bool bUseCollision, bool bIsBox);
 
 };

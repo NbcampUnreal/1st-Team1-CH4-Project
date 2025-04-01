@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Animation/AnimMontage.h" 
 #include "LegoCharacter.generated.h"
 
 
@@ -24,6 +25,8 @@ public:
 	TSubclassOf<AActor> PreviewBlockClass;
 	UPROPERTY(EditDefaultsOnly, Category = "Block")
 	TSubclassOf<AActor> PlaceBlockClass;
+
+	float PreviewPivotToBottom = 0.f;
 
 protected:
 	virtual void BeginPlay() override;
@@ -62,6 +65,23 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block")
 	TArray<TSubclassOf<AActor>> BlockClasses;
+
+	UFUNCTION()
+	void PlayFKeyAnimation(const FInputActionValue& Value);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	UAnimMontage* FKeyMontage;
+
+
+	// 모드 구분용 변수
+	bool bIsPlacingMode;
+
+	// 모드 전환 함수
+	void TogglePlacementMode();
+
+
+
+
 private:
 	AActor* PreviewBlock;
 	void UpdatePreviewBlock();
