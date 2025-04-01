@@ -23,15 +23,20 @@ void ARedBlock::ApplyEffect(ACharacter* Target)
 			UCharacterMovementComponent* MovementComp = PlayerCharacter->GetCharacterMovement();
 			if (MovementComp)
 			{
+				// 기본 속도 저장
 				float OriginalSpeed = MovementComp->MaxWalkSpeed;
+
+				// 새로운 속도
 				float NewSpeed = OriginalSpeed * SpeedBoostValue;
 
 				// LaunchCharacter를 사용하여 앞으로 밀어줌
 				FVector LaunchDirection = PlayerCharacter->GetActorForwardVector() * ImpulseValue;
 				PlayerCharacter->LaunchCharacter(LaunchDirection, true, true);
 				
+				// 새로운 속도 적용
 				MovementComp->MaxWalkSpeed = NewSpeed;
 
+				// 일정 시간 새로운 속도를 유지하다 원래대로 돌리기
 				FTimerHandle EffectTimerHandle;
 				GetWorld()->GetTimerManager().SetTimer(EffectTimerHandle, [PlayerCharacter, OriginalSpeed]()
 					{
@@ -40,7 +45,7 @@ void ARedBlock::ApplyEffect(ACharacter* Target)
 							UCharacterMovementComponent* ResetMovementComp = PlayerCharacter->GetCharacterMovement();
 							if (ResetMovementComp)
 							{
-								ResetMovementComp->MaxWalkSpeed = OriginalSpeed;
+								ResetMovementComp->MaxWalkSpeed = OriginalSpeed; // 원래 속도
 							}
 						}
 					}, EffectDuration, false);

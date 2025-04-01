@@ -5,6 +5,8 @@
 #include "PhysicsEngine/RadialForceComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 AExplosionTrap::AExplosionTrap()
 {
@@ -22,9 +24,38 @@ AExplosionTrap::AExplosionTrap()
 
 void AExplosionTrap::ActiveTrap(ACharacter* Target)
 {
+    // 폭탄의 메쉬를 비활성화하여 보이지 않게 하기
+    if (StaticMeshComp)
+    {
+        StaticMeshComp->SetVisibility(false);  // 메쉬 숨기기
+        StaticMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);  // 충돌 비활성화
+    }
+    InitCollision(false, false); // 충돌 비활성화
+
+    // 폭발 효과 발생 (Niagara System 추가)
+    if (ExplosionNiagaraSystem)
+    {
+        // 폭발 위치에 Niagara System 스폰
+        UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+            GetWorld(),
+            ExplosionNiagaraSystem,
+            GetActorLocation(),
+            GetActorRotation()
+        );
+
+        // Niagara 이펙트 종료 후 트랩 객체를 제거하도록 설정
+        if (NiagaraComponent)
+        {
+            NiagaraComponent->OnSystemFinished.AddDynamic(this, &AExplosionTrap::OnExplosionFinished);
+        }
+    }
+
     // 폭발 효과 발생
     RadialForceComp->FireImpulse();
+}
 
-    // 폭탄 제거
+void AExplosionTrap::OnExplosionFinished(UNiagaraComponent* FinishedComponent)
+{
+    // 트랩 객체를 삭제
     Destroy();
 }
