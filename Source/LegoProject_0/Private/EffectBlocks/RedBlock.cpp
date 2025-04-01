@@ -1,56 +1,88 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "EffectBlocks/RedBlock.h"
+#include "Character/LegoCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/Character.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 
 ARedBlock::ARedBlock()
 {
 	EffectDuration = 5.0f;
 	BlockLifeTime = 5.0f;
 	SpeedBoostValue = 1.2f;
-	ImpulseValue = 2000.0f;
+	ImpulseValue = 500.0f;
 }
 
 void ARedBlock::ApplyEffect(ACharacter* Target)
 {
-	if (HasAuthority())
+	if (!HasAuthority()) return;
+
+	if (!Target) return;
+
+	ACharacter* PlayerCharacter = Cast<ACharacter>(Target);
+	if (!PlayerCharacter) return;
+
+	UCharacterMovementComponent* MovementComp = PlayerCharacter->GetCharacterMovement();
+	if (!MovementComp) return;
+
+	float OriginalSpeed = MovementComp->MaxWalkSpeed;
+	float NewSpeed = OriginalSpeed * SpeedBoostValue;
+
+	// üöÄ ÏÜçÎèÑ ÏÉÅÏäπ + ÏûÑÌéÑÏä§
+	MovementComp->AddImpulse(PlayerCharacter->GetVelocity().GetSafeNormal() * ImpulseValue);
+	MovementComp->MaxWalkSpeed = NewSpeed;
+
+	// ‚úÖ Ï∫êÎ¶≠ÌÑ∞Ïóê FX Î∂ôÏó¨ÏÑú Ïã§Ìñâ
+	if (ALegoCharacter* LegoChar = Cast<ALegoCharacter>(PlayerCharacter))
 	{
-		ACharacter* PlayerCharacter = Cast<ACharacter>(Target);
-		if (PlayerCharacter)
+		if (LegoChar->SpeedFXTemplate)
 		{
-			UCharacterMovementComponent* MovementComp = PlayerCharacter->GetCharacterMovement();
-			if (MovementComp)
+			UNiagaraComponent* TempFX = UNiagaraFunctionLibrary::SpawnSystemAttached(
+				LegoChar->SpeedFXTemplate,
+				LegoChar->CameraComp,
+				NAME_None,
+				FVector(250.0f, 0.f, -30.f),       // ‚úÖ Îçî ÏïûÏóêÏÑú ÏãúÏûë
+				FRotator(-90.f, 180.f, 0.f),      // ‚úÖ ÏúÑ‚ÜíÏïû Î∞©Ìñ• ÌöåÏ†Ñ
+				EAttachLocation::KeepRelativeOffset,
+				true
+			);
+
+
+			if (TempFX)
 			{
-				// ±‚∫ª º”µµ ¿˙¿Â
-				float OriginalSpeed = MovementComp->MaxWalkSpeed;
+				UE_LOG(LogTemp, Warning, TEXT("üöÄ Niagara Spawned"));
 
-				// ªı∑ŒøÓ º”µµ
-				float NewSpeed = OriginalSpeed * SpeedBoostValue;
+				TempFX->SetWorldScale3D(FVector(2.f));
+				TempFX->SetActive(true, true);
+				TempFX->Activate(true);
 
-				// LaunchCharacter∏¶ ªÁøÎ«œø© æ’¿∏∑Œ π–æÓ¡‹
-				FVector LaunchDirection = PlayerCharacter->GetActorForwardVector() * ImpulseValue;
-				PlayerCharacter->LaunchCharacter(LaunchDirection, true, true);
-				
-				// ªı∑ŒøÓ º”µµ ¿˚øÎ
-				MovementComp->MaxWalkSpeed = NewSpeed;
-
-				// ¿œ¡§ Ω√∞£ ªı∑ŒøÓ º”µµ∏¶ ¿Ø¡ˆ«œ¥Ÿ ø¯∑°¥Î∑Œ µπ∏Æ±‚
-				FTimerHandle EffectTimerHandle;
-				GetWorld()->GetTimerManager().SetTimer(EffectTimerHandle, [PlayerCharacter, OriginalSpeed]()
+				FTimerHandle FXTimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(FXTimerHandle, [TempFX]()
 					{
-						if (PlayerCharacter)
+						if (TempFX)
 						{
-							UCharacterMovementComponent* ResetMovementComp = PlayerCharacter->GetCharacterMovement();
-							if (ResetMovementComp)
-							{
-								ResetMovementComp->MaxWalkSpeed = OriginalSpeed; // ø¯∑° º”µµ
-							}
+							TempFX->DestroyComponent();
+							UE_LOG(LogTemp, Warning, TEXT("üßπ Niagara Destroyed"));
 						}
 					}, EffectDuration, false);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("‚ùå Niagara FAILED to spawn!"));
 			}
 		}
 	}
 
+	// ‚è±Ô∏è ÏÜçÎèÑ ÏõêÎ≥µ
+	FTimerHandle EffectTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(EffectTimerHandle, [PlayerCharacter, OriginalSpeed]()
+		{
+			if (PlayerCharacter)
+			{
+				UCharacterMovementComponent* ResetMovement = PlayerCharacter->GetCharacterMovement();
+				if (ResetMovement)
+				{
+					ResetMovement->MaxWalkSpeed = OriginalSpeed;
+				}
+			}
+		}, EffectDuration, false);
 }
