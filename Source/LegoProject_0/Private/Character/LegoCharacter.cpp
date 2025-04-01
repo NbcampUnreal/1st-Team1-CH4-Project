@@ -5,6 +5,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
+#include "NiagaraFunctionLibrary.h"
 #include "DrawDebugHelpers.h"
 
 // Sets default values
@@ -36,13 +37,43 @@ void ALegoCharacter::BeginPlay()
 		PC->bShowMouseCursor = false;
 		PC->SetInputMode(FInputModeGameOnly());
 	}
+	if (SpeedFXTemplate && CameraComp)
+	{
+		SpeedFX = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			SpeedFXTemplate,
+			CameraComp,
+			NAME_None,
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			EAttachLocation::SnapToTarget,
+			true
+		);
+
+		SpeedFX->Deactivate(); 
+	}
 }
 
 void ALegoCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 	UpdatePreviewBlock();
+
+	if (CameraComp)
+	{
+		const float Speed = GetVelocity().Size();
+		const float TargetFOV = FMath::GetMappedRangeValueClamped(
+			FVector2D(300.f, 600.f),   
+			FVector2D(90.f, 95.f),      
+			Speed
+		);
+
+
+		const float NewFOV = FMath::FInterpTo(CameraComp->FieldOfView, TargetFOV, DeltaTime, 5.f);
+		CameraComp->SetFieldOfView(NewFOV);
+	}
 }
+
 
 void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

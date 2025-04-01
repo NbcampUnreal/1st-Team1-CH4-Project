@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Animation/AnimMontage.h" 
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "LegoCharacter.generated.h"
 
 
@@ -27,6 +29,16 @@ public:
 	TSubclassOf<AActor> PlaceBlockClass;
 
 	float PreviewPivotToBottom = 0.f;
+
+
+	// Niagara 이펙트 시스템 (블루프린트에서 연결용)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
+	UNiagaraSystem* SpeedFXTemplate;
+
+	// Niagara 이펙트를 캐릭터에 붙여 놓을 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FX")
+	UNiagaraComponent* SpeedFX;
+
 
 protected:
 	virtual void BeginPlay() override;
