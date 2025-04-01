@@ -72,6 +72,9 @@ public:
 	UFUNCTION()
 	void RotatePreviewBlock(const FInputActionValue& Value);
 
+	UFUNCTION()
+	void DeleteBlock(const FInputActionValue& Value);
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Block")
 	int32 SelectedBlockIndex = 0;
 

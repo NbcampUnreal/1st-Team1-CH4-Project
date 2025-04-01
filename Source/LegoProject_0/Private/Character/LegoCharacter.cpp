@@ -105,6 +105,11 @@ void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 				EnhancedInput->BindAction(PlayerController->RotatePreviewBlockAction, ETriggerEvent::Triggered, this, &ALegoCharacter::RotatePreviewBlock);
 			if (PlayerController->FKeyAction)
 				EnhancedInput->BindAction(PlayerController->FKeyAction, ETriggerEvent::Triggered, this, &ALegoCharacter::PlayFKeyAnimation);
+			if (PlayerController->DeleteBlockAction)
+			{
+				EnhancedInput->BindAction(PlayerController->DeleteBlockAction, ETriggerEvent::Started, this, &ALegoCharacter::DeleteBlock);
+			}
+
 		}
 	}
 }
@@ -291,3 +296,28 @@ void ALegoCharacter::TogglePlacementMode()
 		}
 	}
 }
+
+
+void ALegoCharacter::DeleteBlock(const FInputActionValue& Value)
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC) return;
+
+	FHitResult HitResult;
+	if (PC->GetHitResultUnderCursor(ECC_Visibility, false, HitResult))
+	{
+		AActor* HitActor = HitResult.GetActor();
+		if (HitActor)
+		{
+			const FString Name = HitActor->GetName();
+
+			if (Name.Contains(TEXT("Block1")) || Name.Contains(TEXT("Block2")) || Name.Contains(TEXT("Block3")))
+			{
+				HitActor->Destroy();
+				UE_LOG(LogTemp, Warning, TEXT("🧱 블록 삭제됨: %s"), *Name);
+			}
+		}
+	}
+}
+
+
