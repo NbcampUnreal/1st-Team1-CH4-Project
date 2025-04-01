@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Animation/AnimMontage.h" 
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "Camera/CameraComponent.h"  
 #include "LegoCharacter.generated.h"
 
 
@@ -27,6 +30,15 @@ public:
 	TSubclassOf<AActor> PlaceBlockClass;
 
 	float PreviewPivotToBottom = 0.f;
+
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
+	UNiagaraSystem* SpeedFXTemplate;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FX")
+	UNiagaraComponent* SpeedFX;
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -59,6 +71,9 @@ public:
 
 	UFUNCTION()
 	void RotatePreviewBlock(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void DeleteBlock(const FInputActionValue& Value);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Block")
 	int32 SelectedBlockIndex = 0;

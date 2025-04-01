@@ -5,6 +5,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
+#include "NiagaraFunctionLibrary.h"
 #include "DrawDebugHelpers.h"
 
 // Sets default values
@@ -36,13 +37,43 @@ void ALegoCharacter::BeginPlay()
 		PC->bShowMouseCursor = false;
 		PC->SetInputMode(FInputModeGameOnly());
 	}
+	if (SpeedFXTemplate && CameraComp)
+	{
+		SpeedFX = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			SpeedFXTemplate,
+			CameraComp,
+			NAME_None,
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			EAttachLocation::SnapToTarget,
+			true
+		);
+
+		SpeedFX->Deactivate(); 
+	}
 }
 
 void ALegoCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 	UpdatePreviewBlock();
+
+	if (CameraComp)
+	{
+		const float Speed = GetVelocity().Size();
+		const float TargetFOV = FMath::GetMappedRangeValueClamped(
+			FVector2D(300.f, 600.f),   
+			FVector2D(90.f, 95.f),      
+			Speed
+		);
+
+
+		const float NewFOV = FMath::FInterpTo(CameraComp->FieldOfView, TargetFOV, DeltaTime, 5.f);
+		CameraComp->SetFieldOfView(NewFOV);
+	}
 }
+
 
 void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -74,6 +105,11 @@ void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 				EnhancedInput->BindAction(PlayerController->RotatePreviewBlockAction, ETriggerEvent::Triggered, this, &ALegoCharacter::RotatePreviewBlock);
 			if (PlayerController->FKeyAction)
 				EnhancedInput->BindAction(PlayerController->FKeyAction, ETriggerEvent::Triggered, this, &ALegoCharacter::PlayFKeyAnimation);
+			if (PlayerController->DeleteBlockAction)
+			{
+				EnhancedInput->BindAction(PlayerController->DeleteBlockAction, ETriggerEvent::Started, this, &ALegoCharacter::DeleteBlock);
+			}
+
 		}
 	}
 }
@@ -260,3 +296,28 @@ void ALegoCharacter::TogglePlacementMode()
 		}
 	}
 }
+
+
+void ALegoCharacter::DeleteBlock(const FInputActionValue& Value)
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC) return;
+
+	FHitResult HitResult;
+	if (PC->GetHitResultUnderCursor(ECC_Visibility, false, HitResult))
+	{
+		AActor* HitActor = HitResult.GetActor();
+		if (HitActor)
+		{
+			const FString Name = HitActor->GetName();
+
+			if (Name.Contains(TEXT("Block1")) || Name.Contains(TEXT("Block2")) || Name.Contains(TEXT("Block3")))
+			{
+				HitActor->Destroy();
+				UE_LOG(LogTemp, Warning, TEXT("🧱 블록 삭제됨: %s"), *Name);
+			}
+		}
+	}
+}
+
+
