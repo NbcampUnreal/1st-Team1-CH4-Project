@@ -25,23 +25,24 @@ AExplosionTrap::AExplosionTrap()
 void AExplosionTrap::ActiveTrap(ACharacter* Target)
 {
     // 폭탄의 메쉬를 비활성화하여 보이지 않게 하기
-    if (StaticMeshComp)  // 메쉬가 존재하는 경우
+    if (StaticMeshComp)
     {
         StaticMeshComp->SetVisibility(false);  // 메쉬 숨기기
         StaticMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);  // 충돌 비활성화
     }
-    InitCollision(false, false);
+    InitCollision(false, false); // 충돌 비활성화
 
     // 폭발 효과 발생 (Niagara System 추가)
-    if (ExplosionNiagaraSystem) // Niagara 시스템이 존재하는지 확인
+    if (ExplosionNiagaraSystem)
     {
         // 폭발 위치에 Niagara System 스폰
         UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
             GetWorld(),
-            ExplosionNiagaraSystem, // 준비한 Niagara System
-            GetActorLocation(),     // 폭발 위치 (트랩의 위치)
-            GetActorRotation()      // 트랩의 회전 (필요시 변경 가능)
+            ExplosionNiagaraSystem,
+            GetActorLocation(),
+            GetActorRotation()
         );
+
         // Niagara 이펙트 종료 후 트랩 객체를 제거하도록 설정
         if (NiagaraComponent)
         {
@@ -51,9 +52,6 @@ void AExplosionTrap::ActiveTrap(ACharacter* Target)
 
     // 폭발 효과 발생
     RadialForceComp->FireImpulse();
-
-    // 폭탄 제거
-    //Destroy();
 }
 
 void AExplosionTrap::OnExplosionFinished(UNiagaraComponent* FinishedComponent)
