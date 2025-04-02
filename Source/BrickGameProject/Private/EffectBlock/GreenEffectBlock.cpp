@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "EffectBlocks/GreenBlock.h"
+#include "EffectBlock/GreenEffectBlock.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Character.h"
 #include "Components/ArrowComponent.h"
 
-AGreenBlock::AGreenBlock()
+AGreenEffectBlock::AGreenEffectBlock()
 {
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
 	ArrowComponent->SetupAttachment(RootComponent); // ·çÆ®¿¡ ºÎÂø
@@ -15,7 +15,7 @@ AGreenBlock::AGreenBlock()
 	JumpBoostValue = 1.5f;
 }
 
-void AGreenBlock::ApplyEffect(ACharacter* Target)
+void AGreenEffectBlock::ApplyEffect(ACharacter* Target)
 {
 	ACharacter* PlayerCharacter = Cast<ACharacter>(Target);
 	if (PlayerCharacter)

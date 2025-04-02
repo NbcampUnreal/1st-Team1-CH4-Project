@@ -3,22 +3,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EffectBlocks/BlockBase.h"
-#include "RedBlock.generated.h"
+#include "EffectBlock/EffectBlockBase.h"
+#include "BlueEffectBlock.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
-class BRICKGAMEPROJECT_API ARedBlock : public ABlockBase
+class BRICKGAMEPROJECT_API ABlueEffectBlock : public AEffectBlockBase
 {
 	GENERATED_BODY()
-	
-public:
-	ARedBlock();
 
-	float SpeedBoostValue;
-	float ImpulseValue;
+public:
+	ABlueEffectBlock();
+
+	float InvincibilityTime;
 	float EffectDuration;
 
 	virtual void ApplyEffect(ACharacter* Target) override;

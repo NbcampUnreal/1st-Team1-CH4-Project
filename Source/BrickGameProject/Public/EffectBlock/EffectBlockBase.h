@@ -4,22 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "BlockBase.generated.h"
+#include "EffectBlockBase.generated.h"
 
 class UBoxComponent;
 
 UCLASS()
-class BRICKGAMEPROJECT_API ABlockBase : public AActor
+class BRICKGAMEPROJECT_API AEffectBlockBase : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
-	ABlockBase();
+	AEffectBlockBase();
 	UPROPERTY(VisibleAnywhere, Category = "Root")
 	USceneComponent* SceneComp;
 
-	UPROPERTY(VisibleAnywhere, Category="Collision")
+	UPROPERTY(VisibleAnywhere, Category = "Collision")
 	UBoxComponent* BoxColliderComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")

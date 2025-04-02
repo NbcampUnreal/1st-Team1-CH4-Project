@@ -3,18 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EffectBlocks/BlockBase.h"
-#include "GreenBlock.generated.h"
+#include "EffectBlock/EffectBlockBase.h"
+#include "GreenEffectBlock.generated.h"
 
 class UArrowComponent;
-
+/**
+ *
+ */
 UCLASS()
-class BRICKGAMEPROJECT_API AGreenBlock : public ABlockBase
+class BRICKGAMEPROJECT_API AGreenEffectBlock : public AEffectBlockBase
 {
 	GENERATED_BODY()
-	
+
 public:
-	AGreenBlock();
+	AGreenEffectBlock();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UArrowComponent* ArrowComponent;
