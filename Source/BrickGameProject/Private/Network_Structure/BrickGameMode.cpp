@@ -1,6 +1,6 @@
-#include "BrickGameMode.h"
-#include "BricCharacter.h"
-#include "BricPlayerController.h"
+#include "Network_Structure/BrickGameMode.h"
+#include "Character/BricCharacter.h"
+#include "Character/BricPlayerController.h"
 
 ABrickGameMode::ABrickGameMode()
 	: MaxPlayerCount(4)

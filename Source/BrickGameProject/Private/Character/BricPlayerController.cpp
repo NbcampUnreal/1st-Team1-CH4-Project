@@ -1,6 +1,6 @@
-#include "BricCharacter.h"
+#include "Character/BricPlayerController.h"
+#include "Character/BricCharacter.h"
 #include "EnhancedInputSubsystems.h"
-#include "BricPlayerController.h"
 
 ABricPlayerController::ABricPlayerController()
 	:InputMappingContext(nullptr),

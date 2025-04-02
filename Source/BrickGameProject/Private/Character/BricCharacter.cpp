@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "Character/BricCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -7,8 +7,8 @@
 #include "Engine/World.h"
 #include "NiagaraFunctionLibrary.h"
 #include "DrawDebugHelpers.h"
-#include "BricPlayerController.h"
-#include "BricCharacter.h"
+#include "Character/BricPlayerController.h"
+
 
 // Sets default values
 ABricCharacter::ABricCharacter()
