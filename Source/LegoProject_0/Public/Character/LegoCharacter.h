@@ -57,8 +57,6 @@ public:
 	void Look(const FInputActionValue& value);
 	UFUNCTION()
 	void StartPlacingBlock(const FInputActionValue& value);
-	UFUNCTION()
-	void ConfirmPlacingBlock(const FInputActionValue& value);
 
 	UFUNCTION()
 	void SelectBlock1(const FInputActionValue& value);
@@ -74,6 +72,9 @@ public:
 
 	UFUNCTION()
 	void DeleteBlock(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void OnLeftClick(const FInputActionValue& Value);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Block")
 	int32 SelectedBlockIndex = 0;
@@ -93,8 +94,6 @@ public:
 
 	// 모드 전환 함수
 	void TogglePlacementMode();
-
-
 
 
 private:

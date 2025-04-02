@@ -11,7 +11,8 @@ ALegoPlayerController::ALegoPlayerController()
 	LookAction(nullptr),
 	StartPlaceBlockAction(nullptr),
 	ConfirmPlaceBlockAction(nullptr),
-	RotatePreviewBlockAction(nullptr)
+	RotatePreviewBlockAction(nullptr),
+	LeftClickAction(nullptr)
 {
 }
 

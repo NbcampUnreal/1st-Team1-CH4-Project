@@ -8,11 +8,11 @@
 #include "NiagaraFunctionLibrary.h"
 #include "DrawDebugHelpers.h"
 
-// Sets default values
 ALegoCharacter::ALegoCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bUseControllerRotationYaw = true;
+
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArmComp->SetupAttachment(RootComponent);
 	SpringArmComp->TargetArmLength = 300.0f;
@@ -29,7 +29,6 @@ ALegoCharacter::ALegoCharacter()
 void ALegoCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	bIsPlacingMode = false;
 
 	APlayerController* PC = Cast<APlayerController>(GetController());
 	if (PC)
@@ -37,43 +36,17 @@ void ALegoCharacter::BeginPlay()
 		PC->bShowMouseCursor = false;
 		PC->SetInputMode(FInputModeGameOnly());
 	}
-	if (SpeedFXTemplate && CameraComp)
-	{
-		SpeedFX = UNiagaraFunctionLibrary::SpawnSystemAttached(
-			SpeedFXTemplate,
-			CameraComp,
-			NAME_None,
-			FVector::ZeroVector,
-			FRotator::ZeroRotator,
-			EAttachLocation::SnapToTarget,
-			true
-		);
-
-		SpeedFX->Deactivate(); 
-	}
 }
 
 void ALegoCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UpdatePreviewBlock();
-
-	if (CameraComp)
+	if (PreviewBlock)
 	{
-		const float Speed = GetVelocity().Size();
-		const float TargetFOV = FMath::GetMappedRangeValueClamped(
-			FVector2D(300.f, 600.f),   
-			FVector2D(90.f, 95.f),      
-			Speed
-		);
-
-
-		const float NewFOV = FMath::FInterpTo(CameraComp->FieldOfView, TargetFOV, DeltaTime, 5.f);
-		CameraComp->SetFieldOfView(NewFOV);
+		UpdatePreviewBlock();
 	}
 }
-
 
 void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -82,34 +55,16 @@ void ALegoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	{
 		if (ALegoPlayerController* PlayerController = Cast<ALegoPlayerController>(GetController()))
 		{
-			if (PlayerController->MoveAction)
-				EnhancedInput->BindAction(PlayerController->MoveAction, ETriggerEvent::Triggered, this, &ALegoCharacter::Move);
-			if (PlayerController->JumpAction)
-			{
-				EnhancedInput->BindAction(PlayerController->JumpAction, ETriggerEvent::Triggered, this, &ALegoCharacter::StartJump);
-				EnhancedInput->BindAction(PlayerController->JumpAction, ETriggerEvent::Completed, this, &ALegoCharacter::StopJump);
-			}
-			if (PlayerController->LookAction)
-				EnhancedInput->BindAction(PlayerController->LookAction, ETriggerEvent::Triggered, this, &ALegoCharacter::Look);
-			if (PlayerController->StartPlaceBlockAction)
-				EnhancedInput->BindAction(PlayerController->StartPlaceBlockAction, ETriggerEvent::Started, this, &ALegoCharacter::StartPlacingBlock);
-			if (PlayerController->ConfirmPlaceBlockAction)
-				EnhancedInput->BindAction(PlayerController->ConfirmPlaceBlockAction, ETriggerEvent::Started, this, &ALegoCharacter::ConfirmPlacingBlock);
-			if (PlayerController->Block1Action)
-				EnhancedInput->BindAction(PlayerController->Block1Action, ETriggerEvent::Triggered, this, &ALegoCharacter::SelectBlock1);
-			if (PlayerController->Block2Action)
-				EnhancedInput->BindAction(PlayerController->Block2Action, ETriggerEvent::Triggered, this, &ALegoCharacter::SelectBlock2);
-			if (PlayerController->Block3Action)
-				EnhancedInput->BindAction(PlayerController->Block3Action, ETriggerEvent::Triggered, this, &ALegoCharacter::SelectBlock3);
-			if (PlayerController->RotatePreviewBlockAction)
-				EnhancedInput->BindAction(PlayerController->RotatePreviewBlockAction, ETriggerEvent::Triggered, this, &ALegoCharacter::RotatePreviewBlock);
-			if (PlayerController->FKeyAction)
-				EnhancedInput->BindAction(PlayerController->FKeyAction, ETriggerEvent::Triggered, this, &ALegoCharacter::PlayFKeyAnimation);
-			if (PlayerController->DeleteBlockAction)
-			{
-				EnhancedInput->BindAction(PlayerController->DeleteBlockAction, ETriggerEvent::Started, this, &ALegoCharacter::DeleteBlock);
-			}
-
+			EnhancedInput->BindAction(PlayerController->MoveAction, ETriggerEvent::Triggered, this, &ALegoCharacter::Move);
+			EnhancedInput->BindAction(PlayerController->JumpAction, ETriggerEvent::Triggered, this, &ALegoCharacter::StartJump);
+			EnhancedInput->BindAction(PlayerController->JumpAction, ETriggerEvent::Completed, this, &ALegoCharacter::StopJump);
+			EnhancedInput->BindAction(PlayerController->LookAction, ETriggerEvent::Triggered, this, &ALegoCharacter::Look);
+			EnhancedInput->BindAction(PlayerController->Block1Action, ETriggerEvent::Triggered, this, &ALegoCharacter::SelectBlock1);
+			EnhancedInput->BindAction(PlayerController->Block2Action, ETriggerEvent::Triggered, this, &ALegoCharacter::SelectBlock2);
+			EnhancedInput->BindAction(PlayerController->Block3Action, ETriggerEvent::Triggered, this, &ALegoCharacter::SelectBlock3);
+			EnhancedInput->BindAction(PlayerController->RotatePreviewBlockAction, ETriggerEvent::Triggered, this, &ALegoCharacter::RotatePreviewBlock);
+			EnhancedInput->BindAction(PlayerController->DeleteBlockAction, ETriggerEvent::Started, this, &ALegoCharacter::DeleteBlock);
+			EnhancedInput->BindAction(PlayerController->LeftClickAction, ETriggerEvent::Started, this, &ALegoCharacter::OnLeftClick);
 		}
 	}
 }
@@ -181,54 +136,12 @@ void ALegoCharacter::UpdatePreviewBlock()
 		{
 			FVector Origin, Extent;
 			PreviewBlock->GetActorBounds(true, Origin, Extent);
-
 			FVector Adjusted = Hit.ImpactPoint;
-			Adjusted.Z += Extent.Z; // 정확히 바닥 위에 배치
+			Adjusted.Z += Extent.Z;
 			PreviewBlock->SetActorLocation(Adjusted);
 		}
 	}
 }
-
-void ALegoCharacter::ConfirmPlacingBlock(const FInputActionValue& value)
-{
-	if (PreviewBlock && BlockClasses.IsValidIndex(SelectedBlockIndex))
-	{
-		FVector Origin, Extent;
-		PreviewBlock->GetActorBounds(false, Origin, Extent);
-
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(this);
-		Params.AddIgnoredActor(PreviewBlock);
-
-		TArray<UPrimitiveComponent*> PrimComponents;
-		PreviewBlock->GetComponents<UPrimitiveComponent>(PrimComponents);
-		for (UPrimitiveComponent* PrimComp : PrimComponents)
-		{
-			Params.AddIgnoredComponent(PrimComp);
-		}
-
-		bool bOverlaps = GetWorld()->OverlapAnyTestByChannel(
-			Origin, FQuat::Identity, ECC_WorldStatic,
-			FCollisionShape::MakeBox(Extent), Params
-		);
-
-		if (bOverlaps)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("🚫 겹쳐서 블록을 놓을 수 없습니다!"));
-			return;
-		}
-
-		// ✅ 진짜 바닥 위치 계산
-		FVector SpawnLocation = Origin - FVector(0, 0, Extent.Z);
-		FRotator SpawnRotation = PreviewBlock->GetActorRotation();
-
-		GetWorld()->SpawnActor<AActor>(BlockClasses[SelectedBlockIndex], SpawnLocation, SpawnRotation);
-
-		PreviewBlock->Destroy();
-		PreviewBlock = nullptr;
-	}
-}
-
 
 void ALegoCharacter::SelectBlock1(const FInputActionValue& value)
 {
@@ -240,6 +153,8 @@ void ALegoCharacter::SelectBlock1(const FInputActionValue& value)
 			PreviewBlock->Destroy();
 			PreviewBlock = nullptr;
 		}
+		FInputActionValue Dummy;
+		StartPlacingBlock(Dummy);
 	}
 }
 
@@ -253,6 +168,8 @@ void ALegoCharacter::SelectBlock2(const FInputActionValue& value)
 			PreviewBlock->Destroy();
 			PreviewBlock = nullptr;
 		}
+		FInputActionValue Dummy;
+		StartPlacingBlock(Dummy);
 	}
 }
 
@@ -266,37 +183,47 @@ void ALegoCharacter::SelectBlock3(const FInputActionValue& value)
 			PreviewBlock->Destroy();
 			PreviewBlock = nullptr;
 		}
+		FInputActionValue Dummy;
+		StartPlacingBlock(Dummy);
 	}
 }
 
-void ALegoCharacter::PlayFKeyAnimation(const FInputActionValue& Value)
+void ALegoCharacter::OnLeftClick(const FInputActionValue& Value)
 {
-	if (FKeyMontage && GetMesh() && GetMesh()->GetAnimInstance())
-	{
-		GetMesh()->GetAnimInstance()->Montage_Play(FKeyMontage);
-		UE_LOG(LogTemp, Warning, TEXT("F key pressed - Montage Played"));
-	}
-}
+	if (!PreviewBlock || !BlockClasses.IsValidIndex(SelectedBlockIndex)) return;
 
-void ALegoCharacter::TogglePlacementMode()
-{
-	bIsPlacingMode = !bIsPlacingMode;
-	APlayerController* PC = Cast<APlayerController>(GetController());
-	if (PC)
-	{
-		if (bIsPlacingMode)
-		{
-			PC->bShowMouseCursor = true;
-			PC->SetInputMode(FInputModeGameAndUI());
-		}
-		else
-		{
-			PC->bShowMouseCursor = false;
-			PC->SetInputMode(FInputModeGameOnly());
-		}
-	}
-}
+	FVector Origin, Extent;
+	PreviewBlock->GetActorBounds(false, Origin, Extent);
 
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(PreviewBlock);
+
+	TArray<UPrimitiveComponent*> PrimComponents;
+	PreviewBlock->GetComponents<UPrimitiveComponent>(PrimComponents);
+	for (UPrimitiveComponent* PrimComp : PrimComponents)
+	{
+		Params.AddIgnoredComponent(PrimComp);
+	}
+
+	bool bOverlaps = GetWorld()->OverlapAnyTestByChannel(
+		Origin, FQuat::Identity, ECC_WorldStatic,
+		FCollisionShape::MakeBox(Extent), Params
+	);
+
+	if (bOverlaps)
+	{
+		return;
+	}
+
+	FVector SpawnLocation = Origin - FVector(0, 0, Extent.Z);
+	FRotator SpawnRotation = PreviewBlock->GetActorRotation();
+
+	GetWorld()->SpawnActor<AActor>(BlockClasses[SelectedBlockIndex], SpawnLocation, SpawnRotation);
+
+	PreviewBlock->Destroy();
+	PreviewBlock = nullptr;
+}
 
 void ALegoCharacter::DeleteBlock(const FInputActionValue& Value)
 {
@@ -310,14 +237,18 @@ void ALegoCharacter::DeleteBlock(const FInputActionValue& Value)
 		if (HitActor)
 		{
 			const FString Name = HitActor->GetName();
-
 			if (Name.Contains(TEXT("Block1")) || Name.Contains(TEXT("Block2")) || Name.Contains(TEXT("Block3")))
 			{
 				HitActor->Destroy();
-				UE_LOG(LogTemp, Warning, TEXT("🧱 블록 삭제됨: %s"), *Name);
 			}
 		}
 	}
 }
-
-
+void ALegoCharacter::PlayFKeyAnimation(const FInputActionValue& Value)
+{
+	if (FKeyMontage && GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(FKeyMontage);
+		UE_LOG(LogTemp, Warning, TEXT("F key pressed - Montage Played"));
+	}
+}

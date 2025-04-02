@@ -47,6 +47,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	class UInputAction* FKeyAction;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	class UInputAction* LeftClickAction;
+
+
+
 
 protected:
 	virtual void BeginPlay() override;
