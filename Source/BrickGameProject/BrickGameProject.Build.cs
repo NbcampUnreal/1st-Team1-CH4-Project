@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class LegoProject_0 : ModuleRules
+public class BrickGameProject : ModuleRules
 {
-	public LegoProject_0(ReadOnlyTargetRules Target) : base(Target)
+	public BrickGameProject(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
