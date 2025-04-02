@@ -3,13 +3,13 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class LegoProject_0Target : TargetRules
+public class BrickGameProjectTarget : TargetRules
 {
-	public LegoProject_0Target(TargetInfo Target) : base(Target)
+	public BrickGameProjectTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V5;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_4;
-		ExtraModuleNames.Add("LegoProject_0");
+		ExtraModuleNames.Add("BrickGameProject");
 	}
 }

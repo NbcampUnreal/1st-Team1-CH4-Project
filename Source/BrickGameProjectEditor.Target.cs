@@ -3,13 +3,13 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class LegoProject_0EditorTarget : TargetRules
+public class BrickGameProjectEditorTarget : TargetRules
 {
-	public LegoProject_0EditorTarget( TargetInfo Target) : base(Target)
+	public BrickGameProjectEditorTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V5;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_4;
-		ExtraModuleNames.Add("LegoProject_0");
+		ExtraModuleNames.Add("BrickGameProject");
 	}
 }
