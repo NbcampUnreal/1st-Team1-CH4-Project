@@ -91,6 +91,7 @@ public:
 	// 모드 구분용 변수
 	bool bIsPlacingMode;
 
+	// 모드 전환 함수
 
 
 

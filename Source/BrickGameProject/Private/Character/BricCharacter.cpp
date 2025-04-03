@@ -30,6 +30,7 @@ ABricCharacter::ABricCharacter()
 	PreviewPivotToBottom = 0.0f;
 
 
+
 }
 
 // Called when the game starts or when spawned
