@@ -8,6 +8,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "DrawDebugHelpers.h"
 #include "Character/BricPlayerController.h"
+#include "Network_Structure/BrickGamePlayerController.h"
 
 
 // Sets default values
@@ -66,18 +67,18 @@ void ABricCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		if (ABricPlayerController* PlayerController = Cast<ABricPlayerController>(GetController()))
+		if (ABrickGamePlayerController* PlayerController = Cast<ABrickGamePlayerController>(GetController()))
 		{
-			EnhancedInput->BindAction(PlayerController->MoveAction, ETriggerEvent::Triggered, this, &ABricCharacter::Move);
-			EnhancedInput->BindAction(PlayerController->JumpAction, ETriggerEvent::Triggered, this, &ABricCharacter::StartJump);
-			EnhancedInput->BindAction(PlayerController->JumpAction, ETriggerEvent::Completed, this, &ABricCharacter::StopJump);
-			EnhancedInput->BindAction(PlayerController->LookAction, ETriggerEvent::Triggered, this, &ABricCharacter::Look);
-			EnhancedInput->BindAction(PlayerController->Block1Action, ETriggerEvent::Triggered, this, &ABricCharacter::SelectBlock1);
-			EnhancedInput->BindAction(PlayerController->Block2Action, ETriggerEvent::Triggered, this, &ABricCharacter::SelectBlock2);
-			EnhancedInput->BindAction(PlayerController->Block3Action, ETriggerEvent::Triggered, this, &ABricCharacter::SelectBlock3);
-			EnhancedInput->BindAction(PlayerController->RotatePreviewBlockAction, ETriggerEvent::Triggered, this, &ABricCharacter::RotatePreviewBlock);
-			EnhancedInput->BindAction(PlayerController->DeleteBlockAction, ETriggerEvent::Started, this, &ABricCharacter::DeleteBlock);
-			EnhancedInput->BindAction(PlayerController->LeftClickAction, ETriggerEvent::Started, this, &ABricCharacter::OnLeftClick);
+			EnhancedInput->BindAction(PlayerController->GetMoveAction(), ETriggerEvent::Triggered, this, &ABricCharacter::Move);
+			EnhancedInput->BindAction(PlayerController->GetJumpAction(), ETriggerEvent::Triggered, this, &ABricCharacter::StartJump);
+			EnhancedInput->BindAction(PlayerController->GetJumpAction(), ETriggerEvent::Completed, this, &ABricCharacter::StopJump);
+			EnhancedInput->BindAction(PlayerController->GetLookAction(), ETriggerEvent::Triggered, this, &ABricCharacter::Look);
+			EnhancedInput->BindAction(PlayerController->GetBlock1Action(), ETriggerEvent::Triggered, this, &ABricCharacter::SelectBlock1);
+			EnhancedInput->BindAction(PlayerController->GetBlock2Action(), ETriggerEvent::Triggered, this, &ABricCharacter::SelectBlock2);
+			EnhancedInput->BindAction(PlayerController->GetBlock3Action(), ETriggerEvent::Triggered, this, &ABricCharacter::SelectBlock3);
+			EnhancedInput->BindAction(PlayerController->GetRotatePreviewBlockAction(), ETriggerEvent::Triggered, this, &ABricCharacter::RotatePreviewBlock);
+			EnhancedInput->BindAction(PlayerController->GetDeleteBlockAction(), ETriggerEvent::Started, this, &ABricCharacter::DeleteBlock);
+			EnhancedInput->BindAction(PlayerController->GetFKeyAction(), ETriggerEvent::Started, this, &ABricCharacter::OnLeftClick);
 		}
 	}
 

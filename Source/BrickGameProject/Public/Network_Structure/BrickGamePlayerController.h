@@ -2,8 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "EGameTeam.h"
 #include "BrickGamePlayerController.generated.h"
 
+class ABrickGamePlayerState;
 class UInputMappingContext;
 class UInputAction;
 
@@ -14,6 +16,17 @@ class BRICKGAMEPROJECT_API ABrickGamePlayerController : public APlayerController
 
 public:
 	ABrickGamePlayerController();
+
+	virtual void BeginPlay() override;
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetTeam(EGameTeam Team);
+	UFUNCTION(Server, Reliable)
+	void Server_SetReady(bool bReady);
+
+	ABrickGamePlayerState* GetBrickGamePlayerState() const;
+
+protected:
 	//IMC
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	UInputMappingContext* InputMappingContext;
@@ -47,6 +60,31 @@ public:
 	class UInputAction* FKeyAction;
 
 
-protected:
-	virtual void BeginPlay() override;
+public:
+	//getters
+	UInputMappingContext* GetInputMappingContext() const { return InputMappingContext; }
+	UInputAction* GetMoveAction() const { return MoveAction; }
+	UInputAction* GetJumpAction() const { return JumpAction; }
+	UInputAction* GetLookAction() const { return LookAction; }
+	UInputAction* GetStartPlaceBlockAction() const { return StartPlaceBlockAction; }
+	UInputAction* GetConfirmPlaceBlockAction() const { return ConfirmPlaceBlockAction; }
+	UInputAction* GetBlock1Action() const { return Block1Action; }
+	UInputAction* GetBlock2Action() const { return Block2Action; }
+	UInputAction* GetBlock3Action() const { return Block3Action; }
+	UInputAction* GetRotatePreviewBlockAction() const { return RotatePreviewBlockAction; }
+	UInputAction* GetDeleteBlockAction() const { return DeleteBlockAction; }
+	UInputAction* GetFKeyAction() const { return FKeyAction; }
+	//setters
+	void SetInputMappingContext(UInputMappingContext* NewContext) { InputMappingContext = NewContext; }
+	void SetMoveAction(UInputAction* NewAction) { MoveAction = NewAction; }
+	void SetJumpAction(UInputAction* NewAction) { JumpAction = NewAction; }
+	void SetLookAction(UInputAction* NewAction) { LookAction = NewAction; }
+	void SetStartPlaceBlockAction(UInputAction* NewAction) { StartPlaceBlockAction = NewAction; }
+	void SetConfirmPlaceBlockAction(UInputAction* NewAction) { ConfirmPlaceBlockAction = NewAction; }
+	void SetBlock1Action(UInputAction* NewAction) { Block1Action = NewAction; }
+	void SetBlock2Action(UInputAction* NewAction) { Block2Action = NewAction; }
+	void SetBlock3Action(UInputAction* NewAction) { Block3Action = NewAction; }
+	void SetRotatePreviewBlockAction(UInputAction* NewAction) { RotatePreviewBlockAction = NewAction; }
+	void SetDeleteBlockAction(UInputAction* NewAction) { DeleteBlockAction = NewAction; }
+	void SetFKeyAction(UInputAction* NewAction) { FKeyAction = NewAction; }
 };
