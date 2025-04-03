@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "FloorButton.generated.h"
 
-class UBoxComponent;
+class UCapsuleComponent;
 class AFloorButtonSet;
 
 UCLASS()
@@ -18,8 +18,14 @@ public:
 	// Sets default values for this actor's properties
 	AFloorButton();
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	USceneComponent* SceneComp;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
-	UBoxComponent* TriggerVolume;
+	UCapsuleComponent* CapsuleComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UStaticMeshComponent* StaticMeshComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Switch")
 	AFloorButtonSet* ButtonSet;
@@ -28,10 +34,20 @@ public:
 	TArray<ACharacter*> OverlappingPlayers;
 
 	UFUNCTION()
-	void OnOverlapBegin(class AActor* OverlappedActor, class AActor* OtherActor);
+	void OnOverlapBegin(
+		UPrimitiveComponent* OverlappedComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void OnOverlapEnd(class AActor* OverlappedActor, class AActor* OtherActor);
+	void OnOverlapEnd(
+		UPrimitiveComponent* OverlappedComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex);
 
-
+	void UpdateButtonState();
 };
