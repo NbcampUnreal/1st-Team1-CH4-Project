@@ -18,8 +18,6 @@ ARedEffectBlock::ARedEffectBlock()
 
 void ARedEffectBlock::ApplyEffect(ACharacter* Target)
 {
-	if (!HasAuthority()) return;
-
 	if (!Target) return;
 
 	ACharacter* PlayerCharacter = Cast<ACharacter>(Target);
@@ -77,12 +75,13 @@ void ARedEffectBlock::ApplyEffect(ACharacter* Target)
 	//}
 
 	// 속도 원복
+	TWeakObjectPtr<ACharacter> WeakPlayerCharacter = PlayerCharacter; // 안전한 참조를 위함
 	FTimerHandle EffectTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(EffectTimerHandle, [PlayerCharacter, OriginalSpeed]()
+	GetWorld()->GetTimerManager().SetTimer(EffectTimerHandle, [WeakPlayerCharacter, OriginalSpeed]()
 		{
-			if (PlayerCharacter)
+			if (WeakPlayerCharacter.IsValid())
 			{
-				UCharacterMovementComponent* ResetMovement = PlayerCharacter->GetCharacterMovement();
+				UCharacterMovementComponent* ResetMovement = WeakPlayerCharacter->GetCharacterMovement();
 				if (ResetMovement)
 				{
 					ResetMovement->MaxWalkSpeed = OriginalSpeed;
