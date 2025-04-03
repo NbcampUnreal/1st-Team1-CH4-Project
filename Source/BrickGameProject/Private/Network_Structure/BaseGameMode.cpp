@@ -1,6 +1,6 @@
 #include "Network_Structure/BaseGameMode.h"
 #include "Network_Structure/BaseGameState.h"
-#include "Character/LegoPlayerController.h"
+#include "Character/BricPlayerController.h"
 #include "Net/UnrealNetwork.h"
 
 ABaseGameMode::ABaseGameMode()

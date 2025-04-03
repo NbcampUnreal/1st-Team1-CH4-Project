@@ -47,6 +47,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	class UInputAction* LeftClickAction;
+
 protected:
 	virtual void BeginPlay() override;
 
