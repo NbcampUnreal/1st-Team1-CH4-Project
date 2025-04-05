@@ -85,34 +85,50 @@ protected:
 	UInputAction* DeleteBlockAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	class UInputAction* FKeyAction;
+	UInputAction* HoldFAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	class UInputAction* LeftClickAction;
 
 
 public:
-	//getters
+	//getter, setter
 	UInputMappingContext* GetInputMappingContext() const { return InputMappingContext; }
-	UInputAction* GetMoveAction() const { return MoveAction; }
-	UInputAction* GetJumpAction() const { return JumpAction; }
-	UInputAction* GetLookAction() const { return LookAction; }
-	UInputAction* GetStartPlaceBlockAction() const { return StartPlaceBlockAction; }
-	UInputAction* GetConfirmPlaceBlockAction() const { return ConfirmPlaceBlockAction; }
-	UInputAction* GetBlock1Action() const { return Block1Action; }
-	UInputAction* GetBlock2Action() const { return Block2Action; }
-	UInputAction* GetBlock3Action() const { return Block3Action; }
-	UInputAction* GetRotatePreviewBlockAction() const { return RotatePreviewBlockAction; }
-	UInputAction* GetDeleteBlockAction() const { return DeleteBlockAction; }
-	UInputAction* GetFKeyAction() const { return FKeyAction; }
-	//setters
 	void SetInputMappingContext(UInputMappingContext* NewContext) { InputMappingContext = NewContext; }
+
+	UInputAction* GetMoveAction() const { return MoveAction; }
 	void SetMoveAction(UInputAction* NewAction) { MoveAction = NewAction; }
+
+	UInputAction* GetJumpAction() const { return JumpAction; }
 	void SetJumpAction(UInputAction* NewAction) { JumpAction = NewAction; }
+
+	UInputAction* GetLookAction() const { return LookAction; }
 	void SetLookAction(UInputAction* NewAction) { LookAction = NewAction; }
+
+	UInputAction* GetStartPlaceBlockAction() const { return StartPlaceBlockAction; }
 	void SetStartPlaceBlockAction(UInputAction* NewAction) { StartPlaceBlockAction = NewAction; }
+
+	UInputAction* GetConfirmPlaceBlockAction() const { return ConfirmPlaceBlockAction; }
 	void SetConfirmPlaceBlockAction(UInputAction* NewAction) { ConfirmPlaceBlockAction = NewAction; }
+
+	UInputAction* GetBlock1Action() const { return Block1Action; }
 	void SetBlock1Action(UInputAction* NewAction) { Block1Action = NewAction; }
+
+	UInputAction* GetBlock2Action() const { return Block2Action; }
 	void SetBlock2Action(UInputAction* NewAction) { Block2Action = NewAction; }
+
+	UInputAction* GetBlock3Action() const { return Block3Action; }
 	void SetBlock3Action(UInputAction* NewAction) { Block3Action = NewAction; }
+
+	UInputAction* GetRotatePreviewBlockAction() const { return RotatePreviewBlockAction; }
 	void SetRotatePreviewBlockAction(UInputAction* NewAction) { RotatePreviewBlockAction = NewAction; }
+
+	UInputAction* GetDeleteBlockAction() const { return DeleteBlockAction; }
 	void SetDeleteBlockAction(UInputAction* NewAction) { DeleteBlockAction = NewAction; }
-	void SetFKeyAction(UInputAction* NewAction) { FKeyAction = NewAction; }
+
+	UInputAction* GetHoldFAction() const { return HoldFAction; }
+	void SetHoldFAction(UInputAction* NewAction) { HoldFAction = NewAction; }
+
+	UInputAction* GetLeftClickAction() const { return LeftClickAction; }
+	void SetLeftClickAction(UInputAction* NewAction) { LeftClickAction = NewAction; }
 };

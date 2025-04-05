@@ -19,7 +19,8 @@ ABrickGamePlayerController::ABrickGamePlayerController()
 	, Block2Action(nullptr)
 	, Block3Action(nullptr)
 	, DeleteBlockAction(nullptr)
-	, FKeyAction(nullptr)
+	, HoldFAction(nullptr)
+	, LeftClickAction(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -27,54 +28,33 @@ ABrickGamePlayerController::ABrickGamePlayerController()
 void ABrickGamePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	const ENetMode NetMode = GetNetMode();
-	FString NetModeStr;
-	switch (NetMode)
+
+	if (HasAuthority())
 	{
-	case NM_Standalone:      NetModeStr = TEXT("Standalone"); break;
-	case NM_ListenServer:    NetModeStr = TEXT("ListenServer"); break;
-	case NM_DedicatedServer: NetModeStr = TEXT("DedicatedServer"); break;
-	case NM_Client:          NetModeStr = TEXT("Client"); break;
-	}
-	UE_LOG(LogTemp, Warning, TEXT("NetMode: %s"), *NetModeStr);
-	UE_LOG(LogTemp, Warning, TEXT("HasAuthority: %s"), HasAuthority() ? TEXT("true") : TEXT("false"));
-	UE_LOG(LogTemp, Warning, TEXT("IsLocalController: %s"), IsLocalController() ? TEXT("true") : TEXT("false"));
-	FString aRole = HasAuthority() ? TEXT("Server") : TEXT("Client");
-	FString aLocal = IsLocalPlayerController() ? TEXT("Local") : TEXT("Remote");
-
-	FString Msg = FString::Printf(TEXT("[DEBUG] %s | %s"), *aRole, *aLocal);
-
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *Msg);
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, Msg);
-	}
-
-	if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
 		{
-			if (InputMappingContext)
+			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
 			{
-				Subsystem->AddMappingContext(InputMappingContext, 0);
+				if (InputMappingContext)
+				{
+					Subsystem->AddMappingContext(InputMappingContext, 0);
+				}
+			}
+		}
+		if (IsLocalPlayerController())
+		{
+			FString MapName = GetWorld()->GetMapName();
+			if (MapName.Contains("InGameLevel"))
+			{
+				InitInGameUI();
+			}
+			else if (MapName.Contains("LobbyLevel"))
+			{
+				InitLobbyUI();
 			}
 		}
 	}
-	if (IsLocalPlayerController())
-	{
 
-		LobbyWidget = CreateWidget<ULobbyUserWidget>(this, LobbyWidgetClass);
-		if (LobbyWidget)
-		{
-			LobbyWidget->AddToViewport();
-			UE_LOG(LogTemp, Warning, TEXT("AddToViewport"));
-			SetShowMouseCursor(true);
-
-			FInputModeUIOnly InputMode;
-			SetInputMode(InputMode);
-		}
-	}
 
 }
 

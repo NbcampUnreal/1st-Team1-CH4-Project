@@ -7,7 +7,6 @@
 #include "Engine/World.h"
 #include "NiagaraFunctionLibrary.h"
 #include "DrawDebugHelpers.h"
-#include "Character/BricPlayerController.h"
 #include "Network_Structure/BrickGamePlayerController.h"
 
 
@@ -29,8 +28,6 @@ ABricCharacter::ABricCharacter()
 
 	PreviewBlock = nullptr;
 	PreviewPivotToBottom = 0.0f;
-
-
 
 }
 
@@ -56,8 +53,6 @@ void ABricCharacter::Tick(float DeltaTime)
 	{
 		UpdatePreviewBlock();
 	}
-
-
 }
 
 // Called to bind functionality to input
@@ -77,7 +72,9 @@ void ABricCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 			EnhancedInput->BindAction(PlayerController->GetBlock3Action(), ETriggerEvent::Triggered, this, &ABricCharacter::SelectBlock3);
 			EnhancedInput->BindAction(PlayerController->GetRotatePreviewBlockAction(), ETriggerEvent::Triggered, this, &ABricCharacter::RotatePreviewBlock);
 			EnhancedInput->BindAction(PlayerController->GetDeleteBlockAction(), ETriggerEvent::Started, this, &ABricCharacter::DeleteBlock);
-			EnhancedInput->BindAction(PlayerController->GetFKeyAction(), ETriggerEvent::Started, this, &ABricCharacter::OnLeftClick);
+			EnhancedInput->BindAction(PlayerController->GetLeftClickAction(), ETriggerEvent::Started, this, &ABricCharacter::OnLeftClick);
+			EnhancedInput->BindAction(PlayerController->GetHoldFAction(), ETriggerEvent::Started, this, &ABricCharacter::PlayFKeyAnimationStart);
+			EnhancedInput->BindAction(PlayerController->GetHoldFAction(), ETriggerEvent::Completed, this, &ABricCharacter::PlayFKeyAnimationStop);
 		}
 	}
 
