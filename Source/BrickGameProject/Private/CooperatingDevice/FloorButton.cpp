@@ -73,21 +73,9 @@ void AFloorButton::UpdateButtonState()
 	{
 		PlayReleaseAnimation();
 	}
-
-	if (ButtonSet)
-	{
-		ButtonSet->CheckButtonStatus();
-	}
 }
 
-void AFloorButton::LockButton()
-{
-	bLocked = true;
-
-	StaticMeshButtonComp->SetRelativeLocation(PressedButtonLocation);
-	SetButtonMaterial(CompletedMaterial);
-}
-
+// 버튼 눌리는 애니메이션 재생 및 색상 전환
 void AFloorButton::PlayPressAnimation()
 {
 	FLatentActionInfo LatentInfo;
@@ -107,6 +95,7 @@ void AFloorButton::PlayPressAnimation()
 	SetButtonMaterial(PressedMaterial);
 }
 
+// 버튼 올라오는 애니메이션 재생 및 색상 전환
 void AFloorButton::PlayReleaseAnimation()
 {
 	FLatentActionInfo LatentInfo;

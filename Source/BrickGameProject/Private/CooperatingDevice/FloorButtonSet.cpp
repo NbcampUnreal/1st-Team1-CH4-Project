@@ -2,7 +2,7 @@
 
 
 #include "CooperatingDevice/FloorButtonSet.h"
-#include "CooperatingDevice/FloorButton.h"
+#include "CooperatingDevice/TwoPlayersFloorButton.h"
 #include "GameFramework/Character.h"
 
 // Sets default values

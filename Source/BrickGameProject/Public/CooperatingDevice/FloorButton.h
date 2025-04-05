@@ -28,16 +28,10 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* StaticMeshButtonComp;
 
-	// 버튼 세트
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Switch")
-	AFloorButtonSet* ButtonSet;
-
 	UPROPERTY()
 	TArray<ACharacter*> OverlappingPlayers;
 
 	// 버튼 애니메이션
-	UPROPERTY(EditDefaultsOnly)
-	float PressDepth = 50.0f;
 	UPROPERTY(EditDefaultsOnly)
 	float MoveDuration = 0.2f;
 
@@ -46,10 +40,10 @@ public:
 	UMaterialInterface* DefaultMaterial;
 	UPROPERTY(EditDefaultsOnly)
 	UMaterialInterface* PressedMaterial;
-	UPROPERTY(EditDefaultsOnly)
-	UMaterialInterface* CompletedMaterial;
+	
 
 protected:
+	float PressDepth = 20.0f;
 	FVector InitialButtonLocation;
 	FVector PressedButtonLocation;
 	bool bIsPressed = false;
@@ -74,8 +68,7 @@ public:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex);
 
-	void UpdateButtonState();
-	void LockButton();
+	virtual void UpdateButtonState();
 
 protected:
 	void PlayPressAnimation();

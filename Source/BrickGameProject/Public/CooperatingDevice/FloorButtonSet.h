@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "FloorButtonSet.generated.h"
 
-class AFloorButton;
+class ATwoPlayersFloorButton;
 
 UCLASS()
 class BRICKGAMEPROJECT_API AFloorButtonSet : public AActor
@@ -18,10 +18,10 @@ public:
 	AFloorButtonSet();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Switch Set")
-	AFloorButton* Button1;
+	ATwoPlayersFloorButton* Button1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Switch Set")
-	AFloorButton* Button2;
+	ATwoPlayersFloorButton* Button2;
 
 	bool bIsActive;
 
