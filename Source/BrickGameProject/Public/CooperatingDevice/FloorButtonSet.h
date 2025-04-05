@@ -23,5 +23,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Switch Set")
 	AFloorButton* Button2;
 
+	bool bIsActive;
+
 	void CheckButtonStatus();
 };

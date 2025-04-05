@@ -10,6 +10,7 @@ AFloorButtonSet::AFloorButtonSet()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+	bIsActive = false;
 }
 
 void AFloorButtonSet::CheckButtonStatus()
@@ -23,6 +24,10 @@ void AFloorButtonSet::CheckButtonStatus()
 	{
 		ACharacter* Player1 = PlayerOnButton1[0];
 		ACharacter* Player2 = PlayerOnButton2[0];
+		bIsActive = true;
+
+		Button1->LockButton();
+		Button2->LockButton();
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("ButtonActive!!!!"));
 	}
