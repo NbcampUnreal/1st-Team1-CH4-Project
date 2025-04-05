@@ -16,6 +16,7 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
+
 protected:
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "PlayerState")
 	int32 BrickPlayerID;
@@ -40,5 +41,5 @@ public:
 	void SetTeam(EGameTeam InTeam) { Team = InTeam; }
 
 	bool IsReady() const { return bIsReady; }
-	void SetReady(bool bReady) { bIsReady = bReady; }
+	void SetReady(bool bReady);
 };

@@ -8,6 +8,8 @@
 class ABrickGamePlayerState;
 class UInputMappingContext;
 class UInputAction;
+class ULobbyUserWidget;
+class UInGameUserWidget;
 
 UCLASS()
 class BRICKGAMEPROJECT_API ABrickGamePlayerController : public APlayerController
@@ -18,13 +20,39 @@ public:
 	ABrickGamePlayerController();
 
 	virtual void BeginPlay() override;
+	virtual void PostNetInit() override;
 
+
+	//RPC
+	//Server
 	UFUNCTION(Server, Reliable)
 	void Server_SetTeam(EGameTeam Team);
 	UFUNCTION(Server, Reliable)
 	void Server_SetReady(bool bReady);
+	UFUNCTION(Server, Reliable)
+	void Server_StartGame();
+	//Client
+	UFUNCTION(Client, Reliable)
+	void Client_EnableStartButton(bool bEnable);
 
 	ABrickGamePlayerState* GetBrickGamePlayerState() const;
+
+	//Lobby UI
+	UPROPERTY(EditDefaultsOnly, Category = "UI|Lobby")
+	TSubclassOf<ULobbyUserWidget> LobbyWidgetClass;
+
+	UPROPERTY()
+	ULobbyUserWidget* LobbyWidget;
+
+	//InGame UI
+	/*uproperty(editdefaultsonly, category = "ui|ingame")
+	subclassof<uingameuserwidget> ingamewidgetclass;
+
+	uproperty()
+	uingameuserwidget* ingamewidget;*/
+
+	void InitLobbyUI();
+	void InitInGameUI();
 
 protected:
 	//IMC

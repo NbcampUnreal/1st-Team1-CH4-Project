@@ -8,8 +8,6 @@ ABrickLobbyGameMode::ABrickLobbyGameMode()
 	, MaxPlayersPerTeam(2)
 	, TeamCounts()
 	, NextPlayerID(0)
-	, GameDuration(300.0f)
-	, bGameInProgress(false)
 	, TeamOrder({ 
 		EGameTeam::Red,
 		EGameTeam::Blue,
@@ -21,27 +19,53 @@ ABrickLobbyGameMode::ABrickLobbyGameMode()
 	DefaultPawnClass = ABricCharacter::StaticClass(); 
 	PlayerControllerClass = ABrickGamePlayerController::StaticClass();
 
+	bUseSeamlessTravel = true;
 }
 
 void ABrickLobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
+	UE_LOG(LogTemp, Warning, TEXT("PostLogin È£ÃâµÊ: %s"), *NewPlayer->GetName());
+
 	ABrickGamePlayerState* PS = Cast<ABrickGamePlayerState>(NewPlayer->PlayerState);
 	if (!PS)
 		return;
 
-	PS->SetPlayerId(PlayerList.Num());
-	if (PlayerList.Num() == 0)
+	PS->SetPlayerId(NextPlayerID++);
+	if (PS->GetPlayerId() == 0)
 	{
 		PS->SetHost(true);
 	}
-	else
-	{
-		PS->SetHost(false);
-	}
+
 	AssignTeam(NewPlayer);
 	PlayerList.Add(NewPlayer);
+}
+
+void ABrickLobbyGameMode::TryNotifyStartAvailable()
+{
+	if (!CheckAllPlayersReady())
+		return;
+
+	for (APlayerController* Player : PlayerList)
+	{
+		if (ABrickGamePlayerController* PC = Cast<ABrickGamePlayerController>(Player))
+		{
+			if (ABrickGamePlayerState* PS = PC->GetBrickGamePlayerState())
+			{
+				if (PS->IsHost())
+					PC->Client_EnableStartButton(true);
+			}
+		}
+	}
+
+}
+
+void ABrickLobbyGameMode::StartGame()
+{
+
+	FString TargetMap = TEXT("/Game/Maps/InGameLevel?listen");
+	GetWorld()->ServerTravel(TargetMap);
 }
 
 
@@ -83,15 +107,4 @@ bool ABrickLobbyGameMode::CheckAllPlayersReady()
 
 
 
-void ABrickLobbyGameMode::StartGame()
-{
-}
-
-void ABrickLobbyGameMode::EndGame()
-{
-}
-
-void ABrickLobbyGameMode::CheckWinCondition()
-{
-}
 

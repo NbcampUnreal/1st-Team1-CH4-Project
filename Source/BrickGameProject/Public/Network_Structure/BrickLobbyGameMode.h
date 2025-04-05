@@ -16,12 +16,15 @@ public:
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
+	UFUNCTION()
+	void TryNotifyStartAvailable();
+	UFUNCTION()
+	void StartGame();
+
 protected:
 	void AssignTeam(APlayerController* NewPlayer);
 	bool CheckAllPlayersReady();
-	void StartGame();
-	void EndGame();
-	void CheckWinCondition();
+
 
 	//Game Setup
 	UPROPERTY(EditDefaultsOnly, Category = "Game Setup")
@@ -35,10 +38,6 @@ protected:
 
 	int32 NextPlayerID;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Game Setup")
-	float GameDuration;
-
-	bool bGameInProgress;
 
 	TArray<APlayerController*> PlayerList;
 

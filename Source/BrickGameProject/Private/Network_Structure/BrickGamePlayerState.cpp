@@ -1,4 +1,5 @@
 #include "Network_Structure/BrickGamePlayerState.h"
+#include "Network_Structure/BrickLobbyGameMode.h"
 #include "Net/UnrealNetwork.h"
 
 ABrickGamePlayerState::ABrickGamePlayerState()
@@ -18,4 +19,18 @@ void ABrickGamePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(ABrickGamePlayerState, bIsHost);
 	DOREPLIFETIME(ABrickGamePlayerState, Team);
 	DOREPLIFETIME(ABrickGamePlayerState, bIsReady);
+}
+
+void ABrickGamePlayerState::SetReady(bool bReady)
+{
+	bIsReady = bReady;
+
+	if (HasAuthority())
+	{
+		ABrickLobbyGameMode* GM = GetWorld()->GetAuthGameMode<ABrickLobbyGameMode>();
+		if (GM)
+		{
+			GM->TryNotifyStartAvailable();
+		}
+	}
 }

@@ -45,7 +45,6 @@ void ABricCharacter::BeginPlay()
 		PC->SetInputMode(FInputModeGameOnly());
 	}
 
-	
 }
 
 // Called every frame

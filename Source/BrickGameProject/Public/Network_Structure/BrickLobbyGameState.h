@@ -2,16 +2,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameState.h"
-#include "BrickGameState.generated.h"
+#include "BrickLobbyGameState.generated.h"
 
 
 UCLASS()
-class BRICKGAMEPROJECT_API ABrickGameState : public AGameState
+class BRICKGAMEPROJECT_API ABrickLobbyGameState : public AGameState
 {
 	GENERATED_BODY()
 	
 public:
-	ABrickGameState();
+	ABrickLobbyGameState();
 
 protected:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
