@@ -43,10 +43,11 @@ public:
 	UInputAction* DeleteBlockAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	class UInputAction* FKeyAction;
+	UInputAction* HoldFAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	class UInputAction* LeftClickAction;
+
 protected:
 	virtual void BeginPlay() override;
 

@@ -14,7 +14,7 @@
 // Sets default values
 ABricCharacter::ABricCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bUseControllerRotationYaw = true;
 
@@ -31,6 +31,7 @@ ABricCharacter::ABricCharacter()
 	PreviewPivotToBottom = 0.0f;
 
 
+
 }
 
 // Called when the game starts or when spawned
@@ -44,7 +45,6 @@ void ABricCharacter::BeginPlay()
 		PC->bShowMouseCursor = false;
 		PC->SetInputMode(FInputModeGameOnly());
 	}
-
 }
 
 // Called every frame
@@ -249,15 +249,6 @@ void ABricCharacter::OnLeftClick(const FInputActionValue& Value)
 
 }
 
-void ABricCharacter::PlayFKeyAnimation(const FInputActionValue& Value)
-{
-	if (FKeyMontage && GetMesh() && GetMesh()->GetAnimInstance())
-	{
-		GetMesh()->GetAnimInstance()->Montage_Play(FKeyMontage);
-		UE_LOG(LogTemp, Warning, TEXT("F key pressed - Montage Played"));
-	}
-
-}
 
 
 void ABricCharacter::UpdatePreviewBlock()
@@ -281,3 +272,24 @@ void ABricCharacter::UpdatePreviewBlock()
 }
 
 
+void ABricCharacter::PlayFKeyAnimationStart(const FInputActionValue& Value)
+{
+	if (FKeyMontage && GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		UAnimInstance* AnimInst = GetMesh()->GetAnimInstance();
+		if (!AnimInst->Montage_IsPlaying(FKeyMontage))
+		{
+			AnimInst->Montage_Play(FKeyMontage, 1.0f);
+			UE_LOG(LogTemp, Warning, TEXT("F key held - Montage Playing"));
+		}
+	}
+}
+
+void ABricCharacter::PlayFKeyAnimationStop(const FInputActionValue& Value)
+{
+	if (GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Stop(0.2f);
+		UE_LOG(LogTemp, Warning, TEXT("F key released - Montage Stopped"));
+	}
+}
