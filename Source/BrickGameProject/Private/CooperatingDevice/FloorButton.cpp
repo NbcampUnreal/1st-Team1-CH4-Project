@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "CooperatingDevice/FloorButtonSet.h"
 #include "GameFramework/Character.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 AFloorButton::AFloorButton()
@@ -23,8 +24,21 @@ AFloorButton::AFloorButton()
 	CapsuleComp->OnComponentEndOverlap.AddDynamic(this, &AFloorButton::OnOverlapEnd);
 
 	// Static Mesh Component
-	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	StaticMeshComp->SetupAttachment(SceneComp);
+	StaticMeshBaseComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh"));
+	StaticMeshBaseComp->SetupAttachment(SceneComp);
+
+	StaticMeshButtonComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ButtonMesh"));
+	StaticMeshButtonComp->SetupAttachment(StaticMeshBaseComp);
+}
+
+void AFloorButton::BeginPlay()
+{
+	Super::BeginPlay();
+
+	InitialButtonLocation = StaticMeshButtonComp->GetRelativeLocation();
+	PressedButtonLocation = InitialButtonLocation + FVector(0.f, 0.f, PressDepth);
+
+	SetButtonMaterial(DefaultMaterial);
 }
 
 void AFloorButton::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -47,9 +61,68 @@ void AFloorButton::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Oth
 
 void AFloorButton::UpdateButtonState()
 {
-	if (ButtonSet)
+	if (bLocked) return;
+
+	bIsPressed = OverlappingPlayers.Num() > 0;
+
+	if (bIsPressed)
 	{
-		ButtonSet->CheckButtonStatus();
+		PlayPressAnimation();
+	}
+	else
+	{
+		PlayReleaseAnimation();
+	}
+}
+
+// 버튼 눌리는 애니메이션 재생 및 색상 전환
+void AFloorButton::PlayPressAnimation()
+{
+	FLatentActionInfo LatentInfo;
+	LatentInfo.CallbackTarget = this;
+
+	UKismetSystemLibrary::MoveComponentTo(
+		StaticMeshButtonComp,
+		PressedButtonLocation,
+		StaticMeshButtonComp->GetRelativeRotation(),
+		false, false,
+		MoveDuration,
+		false,
+		EMoveComponentAction::Move,
+		LatentInfo
+	);
+
+	SetButtonMaterial(PressedMaterial);
+}
+
+// 버튼 올라오는 애니메이션 재생 및 색상 전환
+void AFloorButton::PlayReleaseAnimation()
+{
+	FLatentActionInfo LatentInfo;
+	LatentInfo.CallbackTarget = this;
+
+	UKismetSystemLibrary::MoveComponentTo(
+		StaticMeshButtonComp,
+		InitialButtonLocation,
+		StaticMeshButtonComp->GetRelativeRotation(),
+		false, false,
+		MoveDuration,
+		false,
+		EMoveComponentAction::Move,
+		LatentInfo
+	);
+
+	SetButtonMaterial(DefaultMaterial);
+}
+
+void AFloorButton::SetButtonMaterial(UMaterialInterface* NewMaterial)
+{
+	if (StaticMeshButtonComp)
+	{
+		if (NewMaterial)
+		{
+			StaticMeshButtonComp->SetMaterial(0, NewMaterial);
+		}
 	}
 }
 
