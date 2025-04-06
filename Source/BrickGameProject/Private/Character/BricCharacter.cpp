@@ -290,3 +290,16 @@ void ABricCharacter::PlayFKeyAnimationStop(const FInputActionValue& Value)
 		UE_LOG(LogTemp, Warning, TEXT("F key released - Montage Stopped"));
 	}
 }
+
+
+void ABricCharacter::AttachCrown()
+{
+	if (!CrownStaticMesh) return;
+
+	UStaticMeshComponent* Crown = NewObject<UStaticMeshComponent>(this);
+	Crown->RegisterComponent();
+	Crown->SetStaticMesh(CrownStaticMesh);
+	Crown->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Head_bone"));
+	Crown->SetRelativeLocation(FVector(0.f, 0.f, 20.f)); 
+	Crown->SetRelativeScale3D(FVector(0.6f)); 
+}
