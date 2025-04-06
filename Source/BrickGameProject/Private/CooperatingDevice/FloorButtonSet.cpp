@@ -30,6 +30,11 @@ void AFloorButtonSet::CheckButtonStatus()
 		Button2->LockButton();
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("ButtonActive!!!!"));
+		if (TargetBridge)
+		{
+
+			TargetBridge->CallFunctionByNameWithArguments(TEXT("StartBridgeAssembly"), *GLog, nullptr, true);
+		}
 	}
 }
 

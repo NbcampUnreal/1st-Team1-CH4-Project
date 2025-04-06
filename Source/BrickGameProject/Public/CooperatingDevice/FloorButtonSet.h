@@ -23,6 +23,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Switch Set")
 	ATwoPlayersFloorButton* Button2;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Switch Set")
+	AActor* TargetBridge; 
+
+
 	bool bIsActive;
 
 	void CheckButtonStatus();

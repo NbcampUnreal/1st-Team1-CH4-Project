@@ -15,7 +15,7 @@ class BRICKGAMEPROJECT_API ATwoPlayersFloorButton : public AFloorButton
 	GENERATED_BODY()
 
 public:
-	// ¹öÆ° ¼¼Æ®
+	// ï¿½ï¿½Æ° ï¿½ï¿½Æ®
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Switch")
 	AFloorButtonSet* ButtonSet;
 
