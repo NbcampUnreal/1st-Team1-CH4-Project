@@ -210,6 +210,7 @@ void ABricCharacter::DeleteBlock(const FInputActionValue& Value)
 
 void ABricCharacter::OnLeftClick(const FInputActionValue& Value)
 {
+	UE_LOG(LogTemp, Warning, TEXT("🚨 OnLeftClick called"));
 	if (!PreviewBlock || !BlockClasses.IsValidIndex(SelectedBlockIndex)) return;
 
 	FVector Origin, Extent;
@@ -289,4 +290,17 @@ void ABricCharacter::PlayFKeyAnimationStop(const FInputActionValue& Value)
 		GetMesh()->GetAnimInstance()->Montage_Stop(0.2f);
 		UE_LOG(LogTemp, Warning, TEXT("F key released - Montage Stopped"));
 	}
+}
+
+
+void ABricCharacter::AttachCrown()
+{
+	if (!CrownStaticMesh) return;
+
+	UStaticMeshComponent* Crown = NewObject<UStaticMeshComponent>(this);
+	Crown->RegisterComponent();
+	Crown->SetStaticMesh(CrownStaticMesh);
+	Crown->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Head_bone"));
+	Crown->SetRelativeLocation(FVector(0.f, 0.f, 20.f)); 
+	Crown->SetRelativeScale3D(FVector(0.6f)); 
 }

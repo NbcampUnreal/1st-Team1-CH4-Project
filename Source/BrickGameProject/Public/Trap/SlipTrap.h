@@ -23,6 +23,13 @@ protected:
 	float OriginGroundFriction;
 	float OriginBreakingDecelerationWalking;
 
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimMontage* FallDownMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimMontage* StandUpMontage;
+
+
 public:
 	virtual void BeginPlay() override;
 	virtual void ActiveTrap(ACharacter* Target) override;
