@@ -210,6 +210,7 @@ void ABricCharacter::DeleteBlock(const FInputActionValue& Value)
 
 void ABricCharacter::OnLeftClick(const FInputActionValue& Value)
 {
+	UE_LOG(LogTemp, Warning, TEXT("🚨 OnLeftClick called"));
 	if (!PreviewBlock || !BlockClasses.IsValidIndex(SelectedBlockIndex)) return;
 
 	FVector Origin, Extent;
