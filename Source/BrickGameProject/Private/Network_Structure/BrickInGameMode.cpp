@@ -10,7 +10,6 @@
 ABrickInGameMode::ABrickInGameMode()
 {
     bUseSeamlessTravel = true;
-
 }
 
 
@@ -23,15 +22,9 @@ void ABrickInGameMode::BeginPlay()
         ABrickPlayerStart* Start = *It;
         if (!Start) continue;
 
-
         EGameTeam TeamID = Start->TeamID;
-        UE_LOG(LogTemp, Warning, TEXT("Found ABrickPlayerStart: %s | TeamID: %d | Location: %s"),
-            *Start->GetName(), (uint8)TeamID, *Start->GetActorLocation().ToString());
-
-        // 이미 등록된 팀이면 건너뜀
         if (!StartPointsMap.Contains(TeamID))
         {
-            UE_LOG(LogTemp, Warning, TEXT("-> Registered Team %d StartPoint: %s"), (uint8)TeamID, *Start->GetName());
             StartPointsMap.Add(TeamID, Start);
         }
     }
@@ -40,39 +33,31 @@ void ABrickInGameMode::BeginPlay()
         InitPlayerSpawnHandle,
         this,
         &ABrickInGameMode::AssignCheckPointForPlayers,
-        0.1f,
+        1.0f,
         false
     );
-}
-
-void ABrickInGameMode::PostLogin(APlayerController* NewPlayer)
-{
 }
 
 
 void ABrickInGameMode::AssignCheckPointForPlayers()
 {
-    UE_LOG(LogTemp, Warning, TEXT(">> AssignCheckpointForPlayers called"));
 
-    for (APlayerState* PS : GameState->PlayerArray)
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
-        if (ABrickGamePlayerState* BrickPS = Cast<ABrickGamePlayerState>(PS))
+        if (APlayerController* PC = It->Get())
         {
-            int32 PlayerId = BrickPS->GetBrickPlayerID();
-            EGameTeam Team = BrickPS->GetTeam();
-            if (ABrickPlayerStart** FoundStart = StartPointsMap.Find(Team))
+            if (ABrickGamePlayerState* PS = PC->GetPlayerState<ABrickGamePlayerState>())
             {
-                FVector StartLocation = (*FoundStart)->GetActorLocation();
-                BrickPS->SetCurrentCheckPoint(StartLocation);
-            }
+                EGameTeam Team = PS->GetTeam();
 
-            if (AController* PC = Cast<AController>(BrickPS->GetOwner()))
-            {
-                RestartPlayer(PC);
+                if (AActor* StartPoint = StartPointsMap.FindRef(Team))
+                {
+                    if (APawn* Pawn = PC->GetPawn())
+                    {
+                        Pawn->SetActorLocation(StartPoint->GetActorLocation());
+                    }
+                }
             }
         }
-
     }
-
-   
 }

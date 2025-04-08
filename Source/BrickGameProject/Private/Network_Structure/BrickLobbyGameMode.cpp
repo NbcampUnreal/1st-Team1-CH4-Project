@@ -5,9 +5,8 @@
 #include "Network_Structure/BrickGameInstance.h"
 
 ABrickLobbyGameMode::ABrickLobbyGameMode()
- : MaxPlayerCount(4)
-	, MaxPlayersPerTeam(2)
-	, TeamCounts()
+	: MaxPlayerCount(4)
+	, MaxCountPerTeam(2)
 	, NextPlayerID(0)
 	, TeamOrder({ 
 		EGameTeam::Red,
@@ -24,23 +23,17 @@ void ABrickLobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
-	ABrickGamePlayerState* PS = Cast<ABrickGamePlayerState>(NewPlayer->PlayerState);
-	if (!PS)
+	if (ABrickGamePlayerState* PS = Cast<ABrickGamePlayerState>(NewPlayer->PlayerState))
 	{
-		return;
-	}
-	
-	PS->SetBrickPlayerID(NextPlayerID++);
-	if (PS->GetBrickPlayerID() == 0)
-	{
-		PS->SetHost(true);
-	}
+		PS->SetBrickPlayerID(NextPlayerID++);
+		if (PS->GetBrickPlayerID() == 0)
+		{
+			PS->SetHost(true);
+		}
 
-	AssignTeam(NewPlayer);
-	PlayerList.Add(NewPlayer);
-	int32 PlayerID = PS->GetBrickPlayerID();
-	EGameTeam Team = PS->GetTeam();
-
+		AssignTeam(NewPlayer);
+		PlayerList.Add(NewPlayer);
+	}
 }
 
 void ABrickLobbyGameMode::TryNotifyStartAvailable()
@@ -64,7 +57,6 @@ void ABrickLobbyGameMode::TryNotifyStartAvailable()
 
 void ABrickLobbyGameMode::StartGame()
 {
-
 	FString TargetMap = TEXT("/Game/Maps/InGameLevel?listen");
 	GetWorld()->ServerTravel(TargetMap);
 }
@@ -77,11 +69,12 @@ void ABrickLobbyGameMode::AssignTeam(APlayerController* NewPlayer)
 
 	for (EGameTeam Team: TeamOrder)
 	{
-		int32 CurrentCount = TeamCounts.FindRef(Team);
-		if (CurrentCount < MaxPlayersPerTeam)
+		int32 CurrentCount = PlayersPerTeam.FindRef(Team);
+		if (CurrentCount < MaxCountPerTeam)
 		{
 			PlayerState->SetTeam(Team);
-			TeamCounts.FindOrAdd(Team)++; 
+			int32& Count = PlayersPerTeam.FindOrAdd(Team);
+			Count++;
 			return;
 		}
 	}
@@ -105,7 +98,3 @@ bool ABrickLobbyGameMode::CheckAllPlayersReady()
 
 	return true;
 }
-
-
-
-

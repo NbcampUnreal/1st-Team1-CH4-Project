@@ -16,12 +16,10 @@ public:
 	ABrickInGameMode();
 
 	virtual void BeginPlay() override;
-	virtual void PostLogin(APlayerController* NewPlayer) override;
 
 	void AssignCheckPointForPlayers();
 
 	FTimerHandle InitPlayerSpawnHandle;
-
 
 protected:
 	TMap<EGameTeam, ABrickPlayerStart*> StartPointsMap;

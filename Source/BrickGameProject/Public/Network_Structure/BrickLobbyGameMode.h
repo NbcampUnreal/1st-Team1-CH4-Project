@@ -26,15 +26,14 @@ protected:
 	bool CheckAllPlayersReady();
 
 
-	//Game Setup
 	UPROPERTY(EditDefaultsOnly, Category = "Game Setup")
 	int32 MaxPlayerCount;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Game Setup")
-	int32 MaxPlayersPerTeam;
+	int32 MaxCountPerTeam;
 
 	UPROPERTY(VisibleAnywhere, Category = "Game Setup")
-	TMap<EGameTeam, int32> TeamCounts;
+	TMap<EGameTeam, int32> PlayersPerTeam;
 
 	int32 NextPlayerID;
 

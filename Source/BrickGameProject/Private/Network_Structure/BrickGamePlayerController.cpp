@@ -49,35 +49,10 @@ void ABrickGamePlayerController::BeginPlay()
 			FString MapName = GetWorld()->GetMapName();
 			if (MapName.Contains("InGameLevel"))
 			{
-				if (ABrickGamePlayerState* PS = GetPlayerState<ABrickGamePlayerState>())
-				{
-					if (UBrickGameInstance* GI = GetGameInstance<UBrickGameInstance>())
-					{
-						if (HasAuthority()) 
-						{
-							PS->SetTeam(GI->MyTeam);  
-							PS->SetBrickPlayerID(GI->MyPlayerId);
-						}
-						else 
-						{
-							Server_SetTeam(GI->MyTeam);  
-							Server_SetPlayerID(GI->MyPlayerId);
-						}
-
-					}
-				}
 				InitInGameUI();
 			}
 			else if (MapName.Contains("LobbyLevel"))
 			{
-				if (ABrickGamePlayerState* PS = GetPlayerState<ABrickGamePlayerState>())
-				{
-					if (UBrickGameInstance* GI = GetGameInstance<UBrickGameInstance>())
-					{
-						GI->MyPlayerId = PS->GetPlayerId();
-						GI->MyTeam = PS->GetTeam();
-					}
-				}
 				InitLobbyUI();
 			}
 		}
@@ -110,14 +85,6 @@ void ABrickGamePlayerController::PostNetInit()
 		}
 		else if (MapName.Contains("LobbyLevel"))
 		{
-			if (ABrickGamePlayerState* PS = GetPlayerState<ABrickGamePlayerState>())
-			{
-				if (UBrickGameInstance* GI = GetGameInstance<UBrickGameInstance>())
-				{
-					GI->MyPlayerId = PS->GetPlayerId();
-					GI->MyTeam = PS->GetTeam();
-				}
-			}
 			InitLobbyUI();
 		}
 	}
@@ -140,8 +107,6 @@ void ABrickGamePlayerController::Server_SetTeam_Implementation(EGameTeam Selecte
 	{
 		PS->SetTeam(SelectedTeam);
 	}
-	
-	
 }
 
 void ABrickGamePlayerController::Server_SetReady_Implementation(bool bReady)

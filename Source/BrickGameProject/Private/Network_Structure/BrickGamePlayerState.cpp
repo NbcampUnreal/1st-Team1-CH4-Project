@@ -30,6 +30,22 @@ void ABrickGamePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(ABrickGamePlayerState, FinishOrder);
 }
 
+void ABrickGamePlayerState::CopyProperties(APlayerState* PlayerState)
+{
+	Super::CopyProperties(PlayerState);
+
+	if (ABrickGamePlayerState* BrickPS = Cast<ABrickGamePlayerState>(PlayerState))
+	{
+		BrickPS->BrickPlayerID = BrickPlayerID;
+		BrickPS->bIsHost = bIsHost;
+		BrickPS->Team = Team;
+		BrickPS->bIsReady = bIsReady;
+		BrickPS->CurrentCheckPoint = CurrentCheckPoint;
+		BrickPS->bHasFinished = bHasFinished;
+		BrickPS->FinishOrder = FinishOrder;
+	}
+}
+
 void ABrickGamePlayerState::SetReady(bool bReady)
 {
 	bIsReady = bReady;

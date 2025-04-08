@@ -15,6 +15,8 @@ public:
 	ABrickGamePlayerState();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void CopyProperties(APlayerState* PlayerState) override;
+
 
 protected:
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "PlayerState")
