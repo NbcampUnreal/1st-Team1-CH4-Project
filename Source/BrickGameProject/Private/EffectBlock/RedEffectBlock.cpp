@@ -12,7 +12,7 @@ ARedEffectBlock::ARedEffectBlock()
 {
 	EffectDuration = 5.0f;
 	BlockLifeTime = 5.0f;
-	SpeedBoostValue = 1.2f;
+	SpeedBoostValue = 2.0f;
 	LaunchPower = 1500.0f;
 }
 
