@@ -4,6 +4,8 @@
 #include "Trap/SlipTrap.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Animation/AnimMontage.h"
+#include "TimerManager.h"
 #include "GameFramework/Character.h"
 
 ASlipTrap::ASlipTrap()
@@ -20,23 +22,52 @@ void ASlipTrap::BeginPlay()
 void ASlipTrap::ActiveTrap(ACharacter* Target)
 {
     Super::ActiveTrap(Target);
+
     ACharacter* PlayerCharacter = Cast<ACharacter>(Target);
     if (PlayerCharacter)
     {
         UCharacterMovementComponent* MovementComp = PlayerCharacter->GetCharacterMovement();
         if (MovementComp)
         {
-            // ±âº» Á¦µ¿ º¯¼ö ÀúÀå
+            // ì›ëž˜ ê°’ ì €ìž¥
             OriginGroundFriction = MovementComp->GroundFriction;
             OriginBreakingDecelerationWalking = MovementComp->BrakingDecelerationWalking;
+            OriginMaxAcceleration = MovementComp->MaxAcceleration;
+            OriginMaxWalkSpeed = MovementComp->MaxWalkSpeed;
 
-            // ¹Ì²ô·¯Áöµµ·Ï Á¦µ¿ º¯°æ
-            MovementComp->bUseSeparateBrakingFriction = false; // Á¦µ¿ ¸¶Âû Á¦°Å
-            MovementComp->BrakingDecelerationWalking = 0.0f;  // °È±â °¨¼Ó Á¦°Å
-            MovementComp->GroundFriction = SlipTrapGroundFriction; // Áö¸é ¸¶Âû·Â Á¦°Å
+            // ë¯¸ë„ëŸ¬ì§€ëŠ” ê°’ ì ìš©
+            MovementComp->bUseSeparateBrakingFriction = false;
+            MovementComp->BrakingDecelerationWalking = 0.0f;
+            MovementComp->GroundFriction = SlipTrapGroundFriction;
+            MovementComp->MaxAcceleration = 200.0f;
+            MovementComp->MaxWalkSpeed = OriginMaxWalkSpeed * 1.5f;
+        }
+
+        // ë„˜ì–´ì§€ëŠ” ëª½íƒ€ì£¼ ìž¬ìƒ
+        if (FallDownMontage)
+        {
+            PlayerCharacter->PlayAnimMontage(FallDownMontage);
+        }
+
+        // 3ì´ˆ í›„ ì¼ì–´ë‚˜ëŠ” ëª½íƒ€ì£¼ ìž¬ìƒ
+        if (GetWorld())
+        {
+            FTimerHandle TimerHandle;
+            FTimerDelegate TimerDelegate;
+
+            TimerDelegate.BindLambda([PlayerCharacter, this]()
+                {
+                    if (PlayerCharacter && StandUpMontage)
+                    {
+                        PlayerCharacter->PlayAnimMontage(StandUpMontage);
+                    }
+                });
+
+            GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 3.0f, false);
         }
     }
 }
+
 
 void ASlipTrap::DeactiveTrap(ACharacter* Target)
 {
@@ -48,10 +79,12 @@ void ASlipTrap::DeactiveTrap(ACharacter* Target)
         UCharacterMovementComponent* MovementComp = PlayerCharacter->GetCharacterMovement();
         if (MovementComp)
         {
-            // ¹Ì²ô·¯Áöµµ·Ï Á¦µ¿ º¯°æ
-            MovementComp->bUseSeparateBrakingFriction = true; // Á¦µ¿ ¸¶Âû Á¦°Å
-            MovementComp->BrakingDecelerationWalking = OriginBreakingDecelerationWalking;  // °È±â °¨¼Ó Á¦°Å
-            MovementComp->GroundFriction = OriginGroundFriction; // Áö¸é ¸¶Âû·Â Á¦°Å
+            // ï¿½Ì²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            MovementComp->bUseSeparateBrakingFriction = true; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            MovementComp->BrakingDecelerationWalking = OriginBreakingDecelerationWalking;  // ï¿½È±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            MovementComp->GroundFriction = OriginGroundFriction; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            MovementComp->MaxAcceleration = OriginMaxAcceleration;
+            MovementComp->MaxWalkSpeed = OriginMaxWalkSpeed;
         }
     }
 }

@@ -17,8 +17,11 @@ class BRICKGAMEPROJECT_API ARedEffectBlock : public AEffectBlockBase
 public:
 	ARedEffectBlock();
 
+	UPROPERTY(EditDefaultsOnly, Category = "GameDesignSettings")
 	float SpeedBoostValue;
+	UPROPERTY(EditDefaultsOnly, Category = "GameDesignSettings")
 	float LaunchPower;
+	UPROPERTY(EditDefaultsOnly, Category = "GameDesignSettings")
 	float EffectDuration;
 
 	virtual void ApplyEffect(ACharacter* Target) override;

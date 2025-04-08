@@ -43,7 +43,7 @@ public:
 	
 
 protected:
-	float PressDepth = 20.0f;
+	float PressDepth = 15.0f;
 	FVector InitialButtonLocation;
 	FVector PressedButtonLocation;
 	bool bIsPressed = false;

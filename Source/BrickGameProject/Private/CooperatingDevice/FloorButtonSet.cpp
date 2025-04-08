@@ -16,6 +16,7 @@ AFloorButtonSet::AFloorButtonSet()
 void AFloorButtonSet::CheckButtonStatus()
 {
 	if (!Button1 || !Button2) return;
+	if (bIsActive) return;
 
 	TArray<ACharacter*> PlayerOnButton1 = Button1->OverlappingPlayers;
 	TArray<ACharacter*> PlayerOnButton2 = Button2->OverlappingPlayers;

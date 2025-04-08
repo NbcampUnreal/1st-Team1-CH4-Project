@@ -89,6 +89,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	UAnimMontage* FKeyMontage;
+	// 헤더에
+	UPROPERTY(EditDefaultsOnly)
+	UStaticMesh* CrownStaticMesh;
+
+	UFUNCTION(BlueprintCallable)
+	void AttachCrown();
 
 
 	// 모드 구분용 변수

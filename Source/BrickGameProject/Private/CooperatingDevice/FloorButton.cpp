@@ -18,10 +18,10 @@ AFloorButton::AFloorButton()
 	SetRootComponent(SceneComp);
 
 	// Collision Component
-	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Collision"));
+	/*CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Collision"));
 	CapsuleComp->SetupAttachment(SceneComp);
 	CapsuleComp->OnComponentBeginOverlap.AddDynamic(this, &AFloorButton::OnOverlapBegin);
-	CapsuleComp->OnComponentEndOverlap.AddDynamic(this, &AFloorButton::OnOverlapEnd);
+	CapsuleComp->OnComponentEndOverlap.AddDynamic(this, &AFloorButton::OnOverlapEnd);*/
 
 	// Static Mesh Component
 	StaticMeshBaseComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh"));
@@ -29,6 +29,13 @@ AFloorButton::AFloorButton()
 
 	StaticMeshButtonComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ButtonMesh"));
 	StaticMeshButtonComp->SetupAttachment(StaticMeshBaseComp);
+	StaticMeshButtonComp->SetGenerateOverlapEvents(true);
+	StaticMeshButtonComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly); // È¤Àº QueryAndPhysics
+	StaticMeshButtonComp->SetCollisionObjectType(ECC_WorldDynamic);
+	StaticMeshButtonComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	StaticMeshButtonComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	StaticMeshButtonComp->OnComponentBeginOverlap.AddDynamic(this, &AFloorButton::OnOverlapBegin);
+	StaticMeshButtonComp->OnComponentEndOverlap.AddDynamic(this, &AFloorButton::OnOverlapEnd);
 }
 
 void AFloorButton::BeginPlay()
