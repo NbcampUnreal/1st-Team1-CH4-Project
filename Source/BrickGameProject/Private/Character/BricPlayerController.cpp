@@ -1,5 +1,5 @@
 #include "Character/BricPlayerController.h"
-#include "Character/BricCharacter.h"
+#include "Character/BrickCharacter.h"
 #include "EnhancedInputSubsystems.h"
 
 ABricPlayerController::ABricPlayerController()

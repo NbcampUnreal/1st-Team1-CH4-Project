@@ -1,10 +1,11 @@
 #include "Network_Structure/BrickLobbyGameMode.h"
-#include "Character/BricCharacter.h"
+#include "Character/BrickCharacter.h"
 #include "Network_Structure/BrickGamePlayerController.h"
 #include "Network_Structure/BrickGamePlayerState.h"
+#include "Network_Structure/BrickGameInstance.h"
 
 ABrickLobbyGameMode::ABrickLobbyGameMode()
-	: MaxPlayerCount(4)
+ : MaxPlayerCount(4)
 	, MaxPlayersPerTeam(2)
 	, TeamCounts()
 	, NextPlayerID(0)
@@ -16,9 +17,6 @@ ABrickLobbyGameMode::ABrickLobbyGameMode()
 		})
 
 {
-	DefaultPawnClass = ABricCharacter::StaticClass(); 
-	PlayerControllerClass = ABrickGamePlayerController::StaticClass();
-
 	bUseSeamlessTravel = true;
 }
 
@@ -26,20 +24,23 @@ void ABrickLobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
-	UE_LOG(LogTemp, Warning, TEXT("PostLogin È£ÃâµÊ: %s"), *NewPlayer->GetName());
-
 	ABrickGamePlayerState* PS = Cast<ABrickGamePlayerState>(NewPlayer->PlayerState);
 	if (!PS)
+	{
 		return;
-
-	PS->SetPlayerId(NextPlayerID++);
-	if (PS->GetPlayerId() == 0)
+	}
+	
+	PS->SetBrickPlayerID(NextPlayerID++);
+	if (PS->GetBrickPlayerID() == 0)
 	{
 		PS->SetHost(true);
 	}
 
 	AssignTeam(NewPlayer);
 	PlayerList.Add(NewPlayer);
+	int32 PlayerID = PS->GetBrickPlayerID();
+	EGameTeam Team = PS->GetTeam();
+
 }
 
 void ABrickLobbyGameMode::TryNotifyStartAvailable()

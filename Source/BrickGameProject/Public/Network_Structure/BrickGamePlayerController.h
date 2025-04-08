@@ -26,11 +26,14 @@ public:
 	//RPC
 	//Server
 	UFUNCTION(Server, Reliable)
+	void Server_SetPlayerID(int32 PlayerID);
+	UFUNCTION(Server, Reliable)
 	void Server_SetTeam(EGameTeam Team);
 	UFUNCTION(Server, Reliable)
 	void Server_SetReady(bool bReady);
 	UFUNCTION(Server, Reliable)
 	void Server_StartGame();
+
 	//Client
 	UFUNCTION(Client, Reliable)
 	void Client_EnableStartButton(bool bEnable);

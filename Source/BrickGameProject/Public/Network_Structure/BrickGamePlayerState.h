@@ -15,12 +15,12 @@ public:
 	ABrickGamePlayerState();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
 
 protected:
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "PlayerState")
 	int32 BrickPlayerID;
 
+	//Lobby
 	UPROPERTY(Replicated, BlueprintReadOnly)
 	bool bIsHost;
 
@@ -30,9 +30,19 @@ protected:
 	UPROPERTY(Replicated)
 	bool bIsReady;
 	
+	//InGame
+	UPROPERTY(Replicated)
+	FVector CurrentCheckPoint;
+
+	UPROPERTY(Replicated)
+	bool bHasFinished;
+
+	UPROPERTY(Replicated)
+	int32 FinishOrder;
+
 public:
-	int32 GetPlayerId() const { return BrickPlayerID; }
-	void SetPlayerId(int32 InPlayerId) { BrickPlayerID = InPlayerId; }
+	int32 GetBrickPlayerID() const { return BrickPlayerID; }
+	void SetBrickPlayerID(int32 InPlayerId) { BrickPlayerID = InPlayerId; }
 
 	bool IsHost() const { return bIsHost; }
 	void SetHost(bool InIsHost) { bIsHost = InIsHost; }
@@ -42,4 +52,8 @@ public:
 
 	bool IsReady() const { return bIsReady; }
 	void SetReady(bool bReady);
+
+	FVector GetCurrentCheckPoint() const { return CurrentCheckPoint; }
+	void SetCurrentCheckPoint(const FVector& Location);
+
 };

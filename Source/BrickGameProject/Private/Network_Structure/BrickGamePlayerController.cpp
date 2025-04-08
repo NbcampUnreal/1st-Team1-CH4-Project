@@ -1,7 +1,9 @@
 #include "Network_Structure/BrickGamePlayerController.h"
 #include "Network_Structure/BrickGamePlayerState.h"
 #include "Network_Structure/BrickLobbyGameMode.h"
+#include "Network_Structure/BrickInGameMode.h"
 #include "Network_Structure/LobbyUserWidget.h"
+#include "Network_Structure/BrickGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "EnhancedInputSubsystems.h"
 
@@ -29,6 +31,7 @@ void ABrickGamePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+
 	if (HasAuthority())
 	{
 		if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
@@ -46,10 +49,35 @@ void ABrickGamePlayerController::BeginPlay()
 			FString MapName = GetWorld()->GetMapName();
 			if (MapName.Contains("InGameLevel"))
 			{
+				if (ABrickGamePlayerState* PS = GetPlayerState<ABrickGamePlayerState>())
+				{
+					if (UBrickGameInstance* GI = GetGameInstance<UBrickGameInstance>())
+					{
+						if (HasAuthority()) 
+						{
+							PS->SetTeam(GI->MyTeam);  
+							PS->SetBrickPlayerID(GI->MyPlayerId);
+						}
+						else 
+						{
+							Server_SetTeam(GI->MyTeam);  
+							Server_SetPlayerID(GI->MyPlayerId);
+						}
+
+					}
+				}
 				InitInGameUI();
 			}
 			else if (MapName.Contains("LobbyLevel"))
 			{
+				if (ABrickGamePlayerState* PS = GetPlayerState<ABrickGamePlayerState>())
+				{
+					if (UBrickGameInstance* GI = GetGameInstance<UBrickGameInstance>())
+					{
+						GI->MyPlayerId = PS->GetPlayerId();
+						GI->MyTeam = PS->GetTeam();
+					}
+				}
 				InitLobbyUI();
 			}
 		}
@@ -61,6 +89,7 @@ void ABrickGamePlayerController::BeginPlay()
 void ABrickGamePlayerController::PostNetInit()
 {
 	Super::PostNetInit();
+
 
 	if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
 	{
@@ -81,8 +110,25 @@ void ABrickGamePlayerController::PostNetInit()
 		}
 		else if (MapName.Contains("LobbyLevel"))
 		{
+			if (ABrickGamePlayerState* PS = GetPlayerState<ABrickGamePlayerState>())
+			{
+				if (UBrickGameInstance* GI = GetGameInstance<UBrickGameInstance>())
+				{
+					GI->MyPlayerId = PS->GetPlayerId();
+					GI->MyTeam = PS->GetTeam();
+				}
+			}
 			InitLobbyUI();
 		}
+	}
+}
+
+void ABrickGamePlayerController::Server_SetPlayerID_Implementation(int32 PlayerID)
+{
+	ABrickGamePlayerState* PS = GetBrickGamePlayerState();
+	if (PS)
+	{
+		PS->SetBrickPlayerID(PlayerID);
 	}
 }
 
@@ -117,6 +163,7 @@ void ABrickGamePlayerController::Server_StartGame_Implementation()
 	}
 }
 
+
 void ABrickGamePlayerController::Client_EnableStartButton_Implementation(bool bEnable)
 {
 
@@ -125,6 +172,7 @@ void ABrickGamePlayerController::Client_EnableStartButton_Implementation(bool bE
 		LobbyWidget->ActivateStartButton();
 	}
 }
+
 
 ABrickGamePlayerState* ABrickGamePlayerController::GetBrickGamePlayerState() const
 {
