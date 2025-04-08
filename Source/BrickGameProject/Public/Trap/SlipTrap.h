@@ -22,6 +22,8 @@ protected:
 
 	float OriginGroundFriction;
 	float OriginBreakingDecelerationWalking;
+	float OriginMaxAcceleration;
+	float OriginMaxWalkSpeed;
 
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	UAnimMontage* FallDownMontage;

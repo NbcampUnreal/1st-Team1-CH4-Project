@@ -32,11 +32,15 @@ void ASlipTrap::ActiveTrap(ACharacter* Target)
             // 원래 값 저장
             OriginGroundFriction = MovementComp->GroundFriction;
             OriginBreakingDecelerationWalking = MovementComp->BrakingDecelerationWalking;
+            OriginMaxAcceleration = MovementComp->MaxAcceleration;
+            OriginMaxWalkSpeed = MovementComp->MaxWalkSpeed;
 
             // 미끄러지는 값 적용
             MovementComp->bUseSeparateBrakingFriction = false;
             MovementComp->BrakingDecelerationWalking = 0.0f;
             MovementComp->GroundFriction = SlipTrapGroundFriction;
+            MovementComp->MaxAcceleration = 200.0f;
+            MovementComp->MaxWalkSpeed = OriginMaxWalkSpeed * 1.5f;
         }
 
         // 넘어지는 몽타주 재생
@@ -79,6 +83,8 @@ void ASlipTrap::DeactiveTrap(ACharacter* Target)
             MovementComp->bUseSeparateBrakingFriction = true; // ���� ���� ����
             MovementComp->BrakingDecelerationWalking = OriginBreakingDecelerationWalking;  // �ȱ� ���� ����
             MovementComp->GroundFriction = OriginGroundFriction; // ���� ������ ����
+            MovementComp->MaxAcceleration = OriginMaxAcceleration;
+            MovementComp->MaxWalkSpeed = OriginMaxWalkSpeed;
         }
     }
 }
