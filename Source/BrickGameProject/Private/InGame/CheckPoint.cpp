@@ -34,13 +34,13 @@ void ACheckPoint::OnOverlapBegin(
     const FHitResult& SweepResult)
 {
     if (!HasAuthority()) return;
-
     ACharacter* Character = Cast<ACharacter>(OtherActor);
     if (Character)
     {
         ABrickGamePlayerState* PS = Character->GetPlayerState<ABrickGamePlayerState>();
         if (PS)
         {
+            UE_LOG(LogTemp, Warning, TEXT("PS Exist"));
             PS->SetCurrentCheckPoint(GetActorLocation());
         }
     }
