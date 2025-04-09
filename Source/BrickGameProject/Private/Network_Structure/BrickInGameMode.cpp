@@ -55,6 +55,7 @@ void ABrickInGameMode::AssignCheckPointForPlayers()
                     if (APawn* Pawn = PC->GetPawn())
                     {
                         Pawn->SetActorLocation(StartPoint->GetActorLocation());
+						PS->SetCurrentCheckPoint(StartPoint->GetActorLocation());
                     }
                 }
             }
