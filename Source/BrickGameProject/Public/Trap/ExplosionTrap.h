@@ -30,6 +30,17 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "GameDesignSettings")
 	float ExplosionRadius = 500.0f;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ExplosionTrap|Animation")
+	UAnimMontage* FallDownMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ExplosionTrap|Animation")
+	UAnimMontage* StandUpMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ExplosionTrap|Effect")
+	UNiagaraSystem* StarEffectNiagaraSystem;
+
+
 	virtual void ActiveTrap(ACharacter* Target) override;
 	UFUNCTION()
 	void OnExplosionFinished(UNiagaraComponent* FinishedComponent);

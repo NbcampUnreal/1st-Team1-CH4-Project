@@ -75,22 +75,32 @@ public:
 	UFUNCTION()
 	void OnLeftClick(const FInputActionValue& Value);
 
+	UFUNCTION()
+	void PlayFKeyAnimationStart(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void PlayFKeyAnimationStop(const FInputActionValue& Value);
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Block")
 	int32 SelectedBlockIndex = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block")
 	TArray<TSubclassOf<AActor>> BlockClasses;
 
-	UFUNCTION()
-	void PlayFKeyAnimation(const FInputActionValue& Value);
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	UAnimMontage* FKeyMontage;
+	// 헤더에
+	UPROPERTY(EditDefaultsOnly)
+	UStaticMesh* CrownStaticMesh;
+
+	UFUNCTION(BlueprintCallable)
+	void AttachCrown();
 
 
 	// 모드 구분용 변수
 	bool bIsPlacingMode;
 
+	// 모드 전환 함수
 
 
 

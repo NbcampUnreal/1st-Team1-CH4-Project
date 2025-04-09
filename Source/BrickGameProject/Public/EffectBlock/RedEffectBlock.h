@@ -7,18 +7,21 @@
 #include "RedEffectBlock.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class BRICKGAMEPROJECT_API ARedEffectBlock : public AEffectBlockBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	ARedEffectBlock();
 
+	UPROPERTY(EditDefaultsOnly, Category = "GameDesignSettings")
 	float SpeedBoostValue;
-	float ImpulseValue;
+	UPROPERTY(EditDefaultsOnly, Category = "GameDesignSettings")
+	float LaunchPower;
+	UPROPERTY(EditDefaultsOnly, Category = "GameDesignSettings")
 	float EffectDuration;
 
 	virtual void ApplyEffect(ACharacter* Target) override;

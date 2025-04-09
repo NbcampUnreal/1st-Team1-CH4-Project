@@ -7,13 +7,13 @@
 #include "Engine/World.h"
 #include "NiagaraFunctionLibrary.h"
 #include "DrawDebugHelpers.h"
-#include "Character/BricPlayerController.h"
+#include "Network_Structure/BrickGamePlayerController.h"
 
 
 // Sets default values
 ABricCharacter::ABricCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bUseControllerRotationYaw = true;
 
@@ -29,7 +29,6 @@ ABricCharacter::ABricCharacter()
 	PreviewBlock = nullptr;
 	PreviewPivotToBottom = 0.0f;
 
-
 }
 
 // Called when the game starts or when spawned
@@ -43,8 +42,6 @@ void ABricCharacter::BeginPlay()
 		PC->bShowMouseCursor = false;
 		PC->SetInputMode(FInputModeGameOnly());
 	}
-
-	
 }
 
 // Called every frame
@@ -56,8 +53,6 @@ void ABricCharacter::Tick(float DeltaTime)
 	{
 		UpdatePreviewBlock();
 	}
-
-
 }
 
 // Called to bind functionality to input
@@ -66,18 +61,20 @@ void ABricCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		if (ABricPlayerController* PlayerController = Cast<ABricPlayerController>(GetController()))
+		if (ABrickGamePlayerController* PlayerController = Cast<ABrickGamePlayerController>(GetController()))
 		{
-			EnhancedInput->BindAction(PlayerController->MoveAction, ETriggerEvent::Triggered, this, &ABricCharacter::Move);
-			EnhancedInput->BindAction(PlayerController->JumpAction, ETriggerEvent::Triggered, this, &ABricCharacter::StartJump);
-			EnhancedInput->BindAction(PlayerController->JumpAction, ETriggerEvent::Completed, this, &ABricCharacter::StopJump);
-			EnhancedInput->BindAction(PlayerController->LookAction, ETriggerEvent::Triggered, this, &ABricCharacter::Look);
-			EnhancedInput->BindAction(PlayerController->Block1Action, ETriggerEvent::Triggered, this, &ABricCharacter::SelectBlock1);
-			EnhancedInput->BindAction(PlayerController->Block2Action, ETriggerEvent::Triggered, this, &ABricCharacter::SelectBlock2);
-			EnhancedInput->BindAction(PlayerController->Block3Action, ETriggerEvent::Triggered, this, &ABricCharacter::SelectBlock3);
-			EnhancedInput->BindAction(PlayerController->RotatePreviewBlockAction, ETriggerEvent::Triggered, this, &ABricCharacter::RotatePreviewBlock);
-			EnhancedInput->BindAction(PlayerController->DeleteBlockAction, ETriggerEvent::Started, this, &ABricCharacter::DeleteBlock);
-			EnhancedInput->BindAction(PlayerController->LeftClickAction, ETriggerEvent::Started, this, &ABricCharacter::OnLeftClick);
+			EnhancedInput->BindAction(PlayerController->GetMoveAction(), ETriggerEvent::Triggered, this, &ABricCharacter::Move);
+			EnhancedInput->BindAction(PlayerController->GetJumpAction(), ETriggerEvent::Triggered, this, &ABricCharacter::StartJump);
+			EnhancedInput->BindAction(PlayerController->GetJumpAction(), ETriggerEvent::Completed, this, &ABricCharacter::StopJump);
+			EnhancedInput->BindAction(PlayerController->GetLookAction(), ETriggerEvent::Triggered, this, &ABricCharacter::Look);
+			EnhancedInput->BindAction(PlayerController->GetBlock1Action(), ETriggerEvent::Triggered, this, &ABricCharacter::SelectBlock1);
+			EnhancedInput->BindAction(PlayerController->GetBlock2Action(), ETriggerEvent::Triggered, this, &ABricCharacter::SelectBlock2);
+			EnhancedInput->BindAction(PlayerController->GetBlock3Action(), ETriggerEvent::Triggered, this, &ABricCharacter::SelectBlock3);
+			EnhancedInput->BindAction(PlayerController->GetRotatePreviewBlockAction(), ETriggerEvent::Triggered, this, &ABricCharacter::RotatePreviewBlock);
+			EnhancedInput->BindAction(PlayerController->GetDeleteBlockAction(), ETriggerEvent::Started, this, &ABricCharacter::DeleteBlock);
+			EnhancedInput->BindAction(PlayerController->GetLeftClickAction(), ETriggerEvent::Started, this, &ABricCharacter::OnLeftClick);
+			EnhancedInput->BindAction(PlayerController->GetHoldFAction(), ETriggerEvent::Started, this, &ABricCharacter::PlayFKeyAnimationStart);
+			EnhancedInput->BindAction(PlayerController->GetHoldFAction(), ETriggerEvent::Completed, this, &ABricCharacter::PlayFKeyAnimationStop);
 		}
 	}
 
@@ -213,6 +210,7 @@ void ABricCharacter::DeleteBlock(const FInputActionValue& Value)
 
 void ABricCharacter::OnLeftClick(const FInputActionValue& Value)
 {
+	UE_LOG(LogTemp, Warning, TEXT("🚨 OnLeftClick called"));
 	if (!PreviewBlock || !BlockClasses.IsValidIndex(SelectedBlockIndex)) return;
 
 	FVector Origin, Extent;
@@ -249,15 +247,6 @@ void ABricCharacter::OnLeftClick(const FInputActionValue& Value)
 
 }
 
-void ABricCharacter::PlayFKeyAnimation(const FInputActionValue& Value)
-{
-	if (FKeyMontage && GetMesh() && GetMesh()->GetAnimInstance())
-	{
-		GetMesh()->GetAnimInstance()->Montage_Play(FKeyMontage);
-		UE_LOG(LogTemp, Warning, TEXT("F key pressed - Montage Played"));
-	}
-
-}
 
 
 void ABricCharacter::UpdatePreviewBlock()
@@ -281,3 +270,37 @@ void ABricCharacter::UpdatePreviewBlock()
 }
 
 
+void ABricCharacter::PlayFKeyAnimationStart(const FInputActionValue& Value)
+{
+	if (FKeyMontage && GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		UAnimInstance* AnimInst = GetMesh()->GetAnimInstance();
+		if (!AnimInst->Montage_IsPlaying(FKeyMontage))
+		{
+			AnimInst->Montage_Play(FKeyMontage, 1.0f);
+			UE_LOG(LogTemp, Warning, TEXT("F key held - Montage Playing"));
+		}
+	}
+}
+
+void ABricCharacter::PlayFKeyAnimationStop(const FInputActionValue& Value)
+{
+	if (GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Stop(0.2f);
+		UE_LOG(LogTemp, Warning, TEXT("F key released - Montage Stopped"));
+	}
+}
+
+
+void ABricCharacter::AttachCrown()
+{
+	if (!CrownStaticMesh) return;
+
+	UStaticMeshComponent* Crown = NewObject<UStaticMeshComponent>(this);
+	Crown->RegisterComponent();
+	Crown->SetStaticMesh(CrownStaticMesh);
+	Crown->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Head_bone"));
+	Crown->SetRelativeLocation(FVector(0.f, 0.f, 20.f)); 
+	Crown->SetRelativeScale3D(FVector(0.6f)); 
+}

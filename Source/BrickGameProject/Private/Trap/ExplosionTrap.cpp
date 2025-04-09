@@ -1,41 +1,40 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Trap/ExplosionTrap.h"
 #include "PhysicsEngine/RadialForceComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "TimerManager.h"
 
 AExplosionTrap::AExplosionTrap()
 {
-    // Collision ÃÊ±âÈ­
+    // Collision ì´ˆê¸°í™”
     InitCollision(true, false);
 
-    // Æø¹ß ¹İ°æ°ú ¹°¸® Èû Àû¿ëÀ» À§ÇÑ RadialForceComponent ¼³Á¤
+    // í­ë°œ ë¬¼ë¦¬ í˜ì„ ì£¼ê¸° ìœ„í•œ RadialForceComponent ìƒì„±
     RadialForceComp = CreateDefaultSubobject<URadialForceComponent>(TEXT("RadialForceComp"));
     RadialForceComp->SetupAttachment(RootComponent);
     RadialForceComp->Radius = ExplosionRadius;
-    RadialForceComp->bImpulseVelChange = true; // ¼ø°£ÀûÀÎ Èû °¡ÇÔ
-    RadialForceComp->bIgnoreOwningActor = true; // ÀÚ±â ÀÚ½ÅÀº ¿µÇâ ¹ŞÁö ¾ÊÀ½
+    RadialForceComp->bImpulseVelChange = true;
+    RadialForceComp->bIgnoreOwningActor = true;
     RadialForceComp->ImpulseStrength = ExplosionForce;
 }
 
 void AExplosionTrap::ActiveTrap(ACharacter* Target)
 {
-    // ÆøÅºÀÇ ¸Ş½¬¸¦ ºñÈ°¼ºÈ­ÇÏ¿© º¸ÀÌÁö ¾Ê°Ô ÇÏ±â
+    // ë©”ì‹œ ìˆ¨ê¸°ê³  ì¶©ëŒ ì œê±°
     if (StaticMeshComp)
     {
-        StaticMeshComp->SetVisibility(false);  // ¸Ş½¬ ¼û±â±â
-        StaticMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);  // Ãæµ¹ ºñÈ°¼ºÈ­
+        StaticMeshComp->SetVisibility(false);
+        StaticMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     }
-    InitCollision(false, false); // Ãæµ¹ ºñÈ°¼ºÈ­
+    InitCollision(false, false);
 
-    // Æø¹ß È¿°ú ¹ß»ı (Niagara System Ãß°¡)
+    // í­ë°œ ë¹„ì£¼ì–¼ ì´í™íŠ¸ ì¬ìƒ
     if (ExplosionNiagaraSystem)
     {
-        // Æø¹ß À§Ä¡¿¡ Niagara System ½ºÆù
         UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
             GetWorld(),
             ExplosionNiagaraSystem,
@@ -43,19 +42,45 @@ void AExplosionTrap::ActiveTrap(ACharacter* Target)
             GetActorRotation()
         );
 
-        // Niagara ÀÌÆåÆ® Á¾·á ÈÄ Æ®·¦ °´Ã¼¸¦ Á¦°ÅÇÏµµ·Ï ¼³Á¤
         if (NiagaraComponent)
         {
             NiagaraComponent->OnSystemFinished.AddDynamic(this, &AExplosionTrap::OnExplosionFinished);
         }
     }
 
-    // Æø¹ß È¿°ú ¹ß»ı
+
     RadialForceComp->FireImpulse();
+
+
+    if (Target && StarEffectNiagaraSystem)
+    {
+        UNiagaraComponent* StarEffect = UNiagaraFunctionLibrary::SpawnSystemAttached(
+            StarEffectNiagaraSystem,
+            Target->GetMesh(),
+            FName("Head_bone"),
+            FVector(0.f, 0.f, 20.f),
+            FRotator::ZeroRotator,
+            EAttachLocation::KeepRelativeOffset,
+            false 
+        );
+
+        if (StarEffect && GetWorld())
+        {
+            FTimerHandle StarDestroyHandle;
+            GetWorld()->GetTimerManager().SetTimer(
+                StarDestroyHandle,
+                FTimerDelegate::CreateLambda([StarEffect]()
+                    {
+                        StarEffect->DestroyComponent();
+                    }),
+                8.0f, false
+            );
+        }
+    }
 }
 
 void AExplosionTrap::OnExplosionFinished(UNiagaraComponent* FinishedComponent)
 {
-    // Æ®·¦ °´Ã¼¸¦ »èÁ¦
+    // íŠ¸ë© ì œê±°
     Destroy();
 }

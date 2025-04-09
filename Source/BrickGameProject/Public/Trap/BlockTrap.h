@@ -7,13 +7,13 @@
 #include "BlockTrap.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class BRICKGAMEPROJECT_API ABlockTrap : public ATrapBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	void DisappearBlockTrap();
 };

@@ -12,8 +12,8 @@ UCLASS()
 class BRICKGAMEPROJECT_API AEffectBlockBase : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AEffectBlockBase();
 	UPROPERTY(VisibleAnywhere, Category = "Root")

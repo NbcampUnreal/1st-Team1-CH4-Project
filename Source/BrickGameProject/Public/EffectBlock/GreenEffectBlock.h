@@ -8,13 +8,13 @@
 
 class UArrowComponent;
 /**
- * 
+ *
  */
 UCLASS()
 class BRICKGAMEPROJECT_API AGreenEffectBlock : public AEffectBlockBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	AGreenEffectBlock();
 

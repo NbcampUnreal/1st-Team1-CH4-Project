@@ -7,7 +7,7 @@
 #include "SlipTrap.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class BRICKGAMEPROJECT_API ASlipTrap : public ATrapBase
@@ -22,6 +22,15 @@ protected:
 
 	float OriginGroundFriction;
 	float OriginBreakingDecelerationWalking;
+	float OriginMaxAcceleration;
+	float OriginMaxWalkSpeed;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimMontage* FallDownMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimMontage* StandUpMontage;
+
 
 public:
 	virtual void BeginPlay() override;

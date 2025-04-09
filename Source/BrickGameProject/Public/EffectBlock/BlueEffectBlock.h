@@ -7,13 +7,13 @@
 #include "BlueEffectBlock.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class BRICKGAMEPROJECT_API ABlueEffectBlock : public AEffectBlockBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	ABlueEffectBlock();
 

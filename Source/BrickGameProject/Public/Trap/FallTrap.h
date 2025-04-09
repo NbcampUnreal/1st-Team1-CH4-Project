@@ -7,7 +7,7 @@
 #include "FallTrap.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class BRICKGAMEPROJECT_API AFallTrap : public ATrapBase
