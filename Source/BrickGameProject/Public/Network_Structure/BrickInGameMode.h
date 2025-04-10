@@ -18,10 +18,31 @@ public:
 	virtual void BeginPlay() override;
 
 	void AssignCheckPointForPlayers();
+	void HandleTeamWin(EGameTeam WinningTeam);
 
+	//Timer
 	FTimerHandle InitPlayerSpawnHandle;
+	FTimerHandle TimerHandle_GameTimer;
+	FTimerHandle ResultTravelHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayTime")
+	float MaxGameTime; 
 
 protected:
+	void StartGameTimer();     
+	void TickGameTimer();       
+
+	void HandleWinByDistance();
+
+	void TravelToResultLevel();
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bGameOver;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	EGameTeam WinningTeam;
+
 	TMap<EGameTeam, ABrickPlayerStart*> StartPointsMap;
 
 };
