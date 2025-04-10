@@ -41,6 +41,9 @@ public:
 	UNiagaraSystem* StarEffectNiagaraSystem;
 
 
+
+
+
 	virtual void ActiveTrap(ACharacter* Target) override;
 	UFUNCTION()
 	void OnExplosionFinished(UNiagaraComponent* FinishedComponent);

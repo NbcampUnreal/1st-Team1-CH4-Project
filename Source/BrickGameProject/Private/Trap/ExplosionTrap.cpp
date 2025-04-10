@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Character/BricCharacter.h"
+#include "Components/WidgetComponent.h"
 #include "TimerManager.h"
 
 AExplosionTrap::AExplosionTrap()
@@ -75,6 +77,32 @@ void AExplosionTrap::ActiveTrap(ACharacter* Target)
                     }),
                 8.0f, false
             );
+        }
+
+    }
+    if (Target && Target->IsPlayerControlled())
+    {
+        UUserWidget* Widget = nullptr;
+
+        Widget = Cast<UUserWidget>(Target->FindComponentByClass<UWidgetComponent>());
+
+        if (!Widget)
+        {
+            
+            ABricCharacter* MyChar = Cast<ABricCharacter>(Target);
+            if (MyChar && MyChar->DamageInstance)
+            {
+                Widget = MyChar->DamageInstance;
+            }
+        }
+
+        if (Widget)
+        {
+            UFunction* FlashFunc = Widget->FindFunction(TEXT("PlayFlash"));
+            if (FlashFunc)
+            {
+                Widget->ProcessEvent(FlashFunc, nullptr);
+            }
         }
     }
 }

@@ -5,6 +5,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "Camera/CameraComponent.h"  
+#include "Blueprint/UserWidget.h" 
 #include "BricCharacter.generated.h"
 
 struct FInputActionValue;
@@ -95,6 +96,21 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AttachCrown();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
+	TSubclassOf<UUserWidget> DamageClass;
+
+	UPROPERTY()
+	UUserWidget* DamageInstance;
+
+	void PlayVictoryMontage();
+	void PlayDefeatMontage();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animations")
+	UAnimMontage* VictoryMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animations")
+	UAnimMontage* DefeatMontage;
 
 
 	// 모드 구분용 변수

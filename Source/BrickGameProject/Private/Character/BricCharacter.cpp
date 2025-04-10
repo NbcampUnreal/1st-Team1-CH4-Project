@@ -42,6 +42,14 @@ void ABricCharacter::BeginPlay()
 		PC->bShowMouseCursor = false;
 		PC->SetInputMode(FInputModeGameOnly());
 	}
+	if (DamageClass)
+	{
+		DamageInstance = CreateWidget<UUserWidget>(GetWorld(), DamageClass);
+		if (DamageInstance)
+		{
+			DamageInstance->AddToViewport();
+		}
+	}
 }
 
 // Called every frame
@@ -303,4 +311,21 @@ void ABricCharacter::AttachCrown()
 	Crown->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Head_bone"));
 	Crown->SetRelativeLocation(FVector(0.f, 0.f, 20.f)); 
 	Crown->SetRelativeScale3D(FVector(0.6f)); 
+}
+
+
+void ABricCharacter::PlayVictoryMontage()
+{
+	if (VictoryMontage && GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(VictoryMontage);
+	}
+}
+
+void ABricCharacter::PlayDefeatMontage()
+{
+	if (DefeatMontage && GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(DefeatMontage);
+	}
 }
