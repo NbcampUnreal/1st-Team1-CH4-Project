@@ -171,5 +171,5 @@ void ABrickInGameMode::HandleWinByDistance()
 
 void ABrickInGameMode::TravelToResultLevel()
 {
-    GetWorld()->ServerTravel("/Game/Maps/ResultMap?listen");
+    GetWorld()->ServerTravel("/Game/Maps/ResultLevel?listen");
 }
