@@ -46,7 +46,7 @@ void ABrickCharacter::BeginPlay()
 	if (PC)
 	{
 		PC->bShowMouseCursor = false;
-		//PC->SetInputMode(FInputModeGameOnly());
+		PC->SetInputMode(FInputModeGameOnly());
 	}
 }
 
@@ -314,7 +314,7 @@ void ABrickCharacter::AttachCrown()
 	Crown->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Head_bone"));
 	Crown->SetRelativeLocation(FVector(0.f, 0.f, 40.f));
 	Crown->SetRelativeScale3D(FVector(0.6f));
-}
+};
 
 
 void ABrickCharacter::PlayVictoryMontage()

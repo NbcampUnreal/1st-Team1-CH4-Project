@@ -57,7 +57,7 @@ void AGoResultTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
     bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (!bReadyToCount) return; // ✅ 플레이어 수 설정 전이면 무시
+    if (!bReadyToCount) return;
 
     if (OtherActor && OtherActor->IsA(APawn::StaticClass()))
     {
@@ -72,8 +72,12 @@ void AGoResultTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 
             if (HasAuthority() && TriggerCount >= RequiredPlayerCount)
             {
-                UGameplayStatics::OpenLevel(GetWorld(), FName("ResultLevel"), true);
+                UE_LOG(LogTemp, Warning, TEXT("모든 플레이어가 도착했습니다. 결과 씬으로 이동!"));
+                GetWorld()->ServerTravel(TEXT("/Game/Maps/ResultLevel?listen"));
+                return; 
             }
+
         }
     }
 }
+
