@@ -3,6 +3,8 @@
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Animation/AnimInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "NiagaraFunctionLibrary.h"
@@ -39,6 +41,7 @@ void ABrickCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+
 	APlayerController* PC = Cast<APlayerController>(GetController());
 	if (PC)
 	{
@@ -66,6 +69,7 @@ void ABrickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	{
 		if (ABrickGamePlayerController* PlayerController = Cast<ABrickGamePlayerController>(GetController()))
 		{
+
 			EnhancedInput->BindAction(PlayerController->GetMoveAction(), ETriggerEvent::Triggered, this, &ABrickCharacter::Move);
 			EnhancedInput->BindAction(PlayerController->GetJumpAction(), ETriggerEvent::Triggered, this, &ABrickCharacter::StartJump);
 			EnhancedInput->BindAction(PlayerController->GetJumpAction(), ETriggerEvent::Completed, this, &ABrickCharacter::StopJump);
@@ -87,6 +91,8 @@ void ABrickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 void ABrickCharacter::Move(const FInputActionValue& value)
 {
 	if (!Controller) return;
+	UE_LOG(LogTemp, Warning, TEXT("Move 함수 실행됨"));
+
 
 	const FVector2D MoveInput = value.Get<FVector2D>();
 	FRotator ControlRot = Controller->GetControlRotation(); // Get current control rotation(usually from the camera)
@@ -297,5 +303,34 @@ void ABrickCharacter::PlayFKeyAnimationStop(const FInputActionValue& Value)
 	{
 		GetMesh()->GetAnimInstance()->Montage_Stop(0.2f);
 		UE_LOG(LogTemp, Warning, TEXT("F key released - Montage Stopped"));
+	}
+}
+
+void ABrickCharacter::AttachCrown()
+{
+	if (!CrownStaticMesh) return;
+
+	UStaticMeshComponent* Crown = NewObject<UStaticMeshComponent>(this);
+	Crown->RegisterComponent();
+	Crown->SetStaticMesh(CrownStaticMesh);
+	Crown->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Head_bone"));
+	Crown->SetRelativeLocation(FVector(0.f, 0.f, 20.f));
+	Crown->SetRelativeScale3D(FVector(0.6f));
+}
+
+
+void ABrickCharacter::PlayVictoryMontage()
+{
+	if (VictoryMontage && GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(VictoryMontage);
+	}
+}
+
+void ABrickCharacter::PlayDefeatMontage()
+{
+	if (DefeatMontage && GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(DefeatMontage);
 	}
 }

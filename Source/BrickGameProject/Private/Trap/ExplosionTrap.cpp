@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "Character/BricCharacter.h"
+#include "Character/BrickCharacter.h"
 #include "Components/WidgetComponent.h"
 #include "TimerManager.h"
 
@@ -89,7 +89,7 @@ void AExplosionTrap::ActiveTrap(ACharacter* Target)
         if (!Widget)
         {
             
-            ABricCharacter* MyChar = Cast<ABricCharacter>(Target);
+            ABrickCharacter* MyChar = Cast<ABrickCharacter>(Target);
             if (MyChar && MyChar->DamageInstance)
             {
                 Widget = MyChar->DamageInstance;
