@@ -22,6 +22,7 @@ void ABrickInGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+
     for (TActorIterator<ABrickPlayerStart> It(GetWorld()); It; ++It)
     {
         ABrickPlayerStart* Start = *It;
@@ -172,7 +173,7 @@ void ABrickInGameMode::HandleWinByDistance()
 
 void ABrickInGameMode::TravelToResultLevel()
 {
-    GetWorld()->ServerTravel("/Game/Maps/ResultMap?listen");
+    GetWorld()->ServerTravel("/Game/Maps/ResultLevel?listen");
 }
 
 

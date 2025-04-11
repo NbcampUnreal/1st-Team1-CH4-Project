@@ -312,7 +312,7 @@ void ABrickCharacter::AttachCrown()
 	Crown->RegisterComponent();
 	Crown->SetStaticMesh(CrownStaticMesh);
 	Crown->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Head_bone"));
-	Crown->SetRelativeLocation(FVector(0.f, 0.f, 20.f));
+	Crown->SetRelativeLocation(FVector(0.f, 0.f, 40.f));
 	Crown->SetRelativeScale3D(FVector(0.6f));
 }
 
