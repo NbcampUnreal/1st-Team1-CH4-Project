@@ -46,7 +46,7 @@ void ABrickCharacter::BeginPlay()
 	if (PC)
 	{
 		PC->bShowMouseCursor = false;
-		PC->SetInputMode(FInputModeGameOnly());
+		//PC->SetInputMode(FInputModeGameOnly());
 	}
 }
 
@@ -91,15 +91,13 @@ void ABrickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 void ABrickCharacter::Move(const FInputActionValue& value)
 {
 	if (!Controller) return;
-	UE_LOG(LogTemp, Warning, TEXT("Move 함수 실행됨"));
-
 
 	const FVector2D MoveInput = value.Get<FVector2D>();
-	FRotator ControlRot = Controller->GetControlRotation(); // Get current control rotation(usually from the camera)
-	FRotator YawRotation(0, ControlRot.Yaw, 0); // Remove pitch, roll(keep only yaw for horizontal movement)
+	FRotator ControlRot = Controller->GetControlRotation();
+	FRotator YawRotation(0, ControlRot.Yaw, 0); 
 
-	FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X); // Forward direction relative to the camera's yaw
-	FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y); // Right direction relative to the camera's yaw
+	FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X); 
+	FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y); 
 
 	if (!FMath::IsNearlyZero(MoveInput.X)) AddMovementInput(Forward, MoveInput.X);
 	if (!FMath::IsNearlyZero(MoveInput.Y)) AddMovementInput(Right, MoveInput.Y);
