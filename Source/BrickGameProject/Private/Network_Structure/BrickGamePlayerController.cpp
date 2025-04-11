@@ -3,6 +3,7 @@
 #include "Network_Structure/BrickLobbyGameMode.h"
 #include "Network_Structure/BrickInGameMode.h"
 #include "Network_Structure/LobbyUserWidget.h"
+#include "Network_Structure/HubUserWidget.h"
 #include "Network_Structure/BrickGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "EnhancedInputSubsystems.h"
@@ -10,6 +11,7 @@
 
 ABrickGamePlayerController::ABrickGamePlayerController()
 	: LobbyWidget(nullptr)
+	, HubWidget(nullptr)
 	, InputMappingContext(nullptr)
 	, MoveAction(nullptr)
 	, JumpAction(nullptr)
@@ -55,6 +57,10 @@ void ABrickGamePlayerController::BeginPlay()
 			{
 				InitLobbyUI();
 			}
+			else if (MapName.Contains("HubLevel"))
+			{
+				InitHubUI();
+			}
 		}
 	}
 
@@ -78,7 +84,7 @@ void ABrickGamePlayerController::PostNetInit()
 	}
 	if (IsLocalPlayerController())
 	{
-		FString MapName = GetWorld()->GetMapName(); 
+		FString MapName = GetWorld()->GetMapName();
 		if (MapName.Contains("InGameLevel"))
 		{
 			InitInGameUI();
@@ -86,6 +92,10 @@ void ABrickGamePlayerController::PostNetInit()
 		else if (MapName.Contains("LobbyLevel"))
 		{
 			InitLobbyUI();
+		}
+		else if (MapName.Contains("HubLevel"))
+		{
+			InitHubUI();
 		}
 	}
 }
@@ -179,5 +189,24 @@ void ABrickGamePlayerController::InitInGameUI()
 		FInputModeGameOnly InputMode;
 		SetInputMode(InputMode);
 	}*/
+}
+
+void ABrickGamePlayerController::InitHubUI()
+{
+	if (LobbyWidget)
+	{
+		LobbyWidget->RemoveFromParent();
+		LobbyWidget = nullptr;
+	}
+
+	HubWidget = CreateWidget<UHubUserWidget>(this, HubWidgetClass);
+	if (HubWidget)
+	{
+		HubWidget->AddToViewport();
+		SetShowMouseCursor(true);
+
+		FInputModeUIOnly InputMode;
+		SetInputMode(InputMode);
+	}
 }
 

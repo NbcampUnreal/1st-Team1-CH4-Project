@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "EGameTeam.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "BrickGameInstance.generated.h"
 
 
@@ -18,5 +19,19 @@ public:
 	UPROPERTY()
 	EGameTeam MyTeam;
 
+	UFUNCTION(BlueprintCallable)
+	void CreateGameSession();
+
+	UFUNCTION(BlueprintCallable)
+	void JoinGameSession(const FString& IPAddress);
+
+private:
+	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
+	void CreateSessionInternal();
+	virtual void Init() override;
+
+	TSharedPtr<class FOnlineSessionSettings> SessionSettings;
+	IOnlineSessionPtr SessionInterface;
 	
 };

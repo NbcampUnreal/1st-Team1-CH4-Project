@@ -8,6 +8,12 @@
 
 AGreenEffectBlock::AGreenEffectBlock()
 {
+	InitCollsion(false);
+
+	// Static Mesh Component
+	StaticMeshComp2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh2"));
+	StaticMeshComp2->SetupAttachment(StaticMeshComp);
+
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
 	ArrowComponent->SetupAttachment(RootComponent); // 루트에 부착
 
