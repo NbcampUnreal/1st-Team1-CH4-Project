@@ -10,6 +10,7 @@ class UInputMappingContext;
 class UInputAction;
 class ULobbyUserWidget;
 class UInGameUserWidget;
+class UHubUserWidget;
 
 UCLASS()
 class BRICKGAMEPROJECT_API ABrickGamePlayerController : public APlayerController
@@ -47,6 +48,13 @@ public:
 	UPROPERTY()
 	ULobbyUserWidget* LobbyWidget;
 
+	// Hub UI
+	UPROPERTY(EditDefaultsOnly, Category = "UI|Hub")
+	TSubclassOf<UHubUserWidget> HubWidgetClass;
+
+	UPROPERTY()
+	UHubUserWidget* HubWidget;
+
 	//InGame UI
 	/*uproperty(editdefaultsonly, category = "ui|ingame")
 	subclassof<uingameuserwidget> ingamewidgetclass;
@@ -56,6 +64,7 @@ public:
 
 	void InitLobbyUI();
 	void InitInGameUI();
+	void InitHubUI();
 
 protected:
 	//IMC
