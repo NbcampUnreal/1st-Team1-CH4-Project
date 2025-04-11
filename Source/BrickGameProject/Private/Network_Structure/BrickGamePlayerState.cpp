@@ -10,6 +10,7 @@ ABrickGamePlayerState::ABrickGamePlayerState()
 	, Team(EGameTeam::None)
 	, bIsReady(false)
 	, CurrentCheckPoint(FVector::ZeroVector)
+	, ProgressRatio(0.f)
 	, bHasFinished(false)
 	, FinishOrder(-1)
 {
@@ -44,6 +45,11 @@ void ABrickGamePlayerState::CopyProperties(APlayerState* PlayerState)
 		BrickPS->bHasFinished = bHasFinished;
 		BrickPS->FinishOrder = FinishOrder;
 	}
+}
+
+void ABrickGamePlayerState::OnRep_ProgressRatio()
+{
+	//클라이언트 UI 업데이트 처리
 }
 
 void ABrickGamePlayerState::SetReady(bool bReady)

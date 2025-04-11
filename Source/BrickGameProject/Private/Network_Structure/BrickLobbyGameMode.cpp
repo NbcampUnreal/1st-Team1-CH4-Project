@@ -52,7 +52,6 @@ void ABrickLobbyGameMode::TryNotifyStartAvailable()
 			}
 		}
 	}
-
 }
 
 void ABrickLobbyGameMode::StartGame()
