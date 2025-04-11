@@ -36,20 +36,20 @@ void ABricCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APlayerController* PC = Cast<APlayerController>(GetController());
+	/*APlayerController* PC = Cast<APlayerController>(GetController());
 	if (PC)
 	{
 		PC->bShowMouseCursor = false;
 		PC->SetInputMode(FInputModeGameOnly());
-	}
-	if (DamageClass)
+	}*/
+	/*if (DamageClass)
 	{
 		DamageInstance = CreateWidget<UUserWidget>(GetWorld(), DamageClass);
 		if (DamageInstance)
 		{
 			DamageInstance->AddToViewport();
 		}
-	}
+	}*/
 }
 
 // Called every frame
