@@ -10,6 +10,7 @@
 
 ARedEffectBlock::ARedEffectBlock()
 {
+	InitCollsion(true);
 	EffectDuration = 5.0f;
 	BlockLifeTime = 5.0f;
 	SpeedBoostValue = 2.0f;

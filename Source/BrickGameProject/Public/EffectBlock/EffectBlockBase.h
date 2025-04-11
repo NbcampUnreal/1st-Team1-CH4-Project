@@ -19,8 +19,8 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Root")
 	USceneComponent* SceneComp;
 
-	UPROPERTY(VisibleAnywhere, Category = "Collision")
-	UBoxComponent* BoxColliderComp;
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UShapeComponent* CollisionComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	UStaticMeshComponent* StaticMeshComp;
@@ -51,4 +51,5 @@ public:
 
 	virtual void ApplyEffect(ACharacter* Target);
 	void DestoryBlock();
+	void InitCollsion(bool bIsBox);
 };
