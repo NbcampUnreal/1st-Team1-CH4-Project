@@ -31,10 +31,10 @@ void AKillVolume::OnOverlapBegin(
 	const FHitResult& SweepResult)
 {
 	ABrickCharacter* Character = Cast<ABrickCharacter>(OtherActor);
-	ABrickGamePlayerState* PS = Cast<ABrickGamePlayerState>(Character->GetPlayerState());
-	if ( PS)
+	if (Character && Character->HasAuthority())
 	{
-		if (Character && Character->HasAuthority())
+		ABrickGamePlayerState* PS = Cast<ABrickGamePlayerState>(Character->GetPlayerState());
+		if (PS)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Saved checkpoint: %s"), *PS->GetCurrentCheckPoint().ToString());
 			Character->TeleportTo(PS->GetCurrentCheckPoint(), Character->GetActorRotation());
