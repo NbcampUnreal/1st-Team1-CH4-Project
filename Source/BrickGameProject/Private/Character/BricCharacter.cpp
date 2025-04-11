@@ -42,14 +42,14 @@ void ABricCharacter::BeginPlay()
 		PC->bShowMouseCursor = false;
 		PC->SetInputMode(FInputModeGameOnly());
 	}
-	if (DamageClass)
+	/*if (DamageClass)
 	{
 		DamageInstance = CreateWidget<UUserWidget>(GetWorld(), DamageClass);
 		if (DamageInstance)
 		{
 			DamageInstance->AddToViewport();
 		}
-	}
+	}*/
 }
 
 // Called every frame
