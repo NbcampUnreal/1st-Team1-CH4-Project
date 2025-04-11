@@ -22,5 +22,8 @@ public:
 	UArrowComponent* ArrowComponent;
 	float JumpBoostValue;
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UStaticMeshComponent* StaticMeshComp2;
+
 	virtual void ApplyEffect(ACharacter* Target) override;
 };
