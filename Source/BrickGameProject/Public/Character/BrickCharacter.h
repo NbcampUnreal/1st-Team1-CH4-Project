@@ -94,6 +94,32 @@ public:
 	// 모드 전환 함수
 
 
+	void AttachCrown();
+
+
+	void PlayVictoryMontage();
+
+
+	void PlayDefeatMontage();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Crown")
+	UStaticMesh* CrownStaticMesh;
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animations")
+	UAnimMontage* VictoryMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animations")
+	UAnimMontage* DefeatMontage;
+
+	// UI 위젯 클래스 (할당용)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> DamageClass;
+
+	// UI 위젯 인스턴스 (화면에 띄울 용도)
+	UPROPERTY()
+	UUserWidget* DamageInstance;
+
 
 private:
 	AActor* PreviewBlock;

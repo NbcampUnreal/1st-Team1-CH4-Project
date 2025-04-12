@@ -3,6 +3,8 @@
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Animation/AnimInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "NiagaraFunctionLibrary.h"
@@ -39,6 +41,7 @@ void ABrickCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+
 	APlayerController* PC = Cast<APlayerController>(GetController());
 	if (PC)
 	{
@@ -66,6 +69,7 @@ void ABrickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	{
 		if (ABrickGamePlayerController* PlayerController = Cast<ABrickGamePlayerController>(GetController()))
 		{
+
 			EnhancedInput->BindAction(PlayerController->GetMoveAction(), ETriggerEvent::Triggered, this, &ABrickCharacter::Move);
 			EnhancedInput->BindAction(PlayerController->GetJumpAction(), ETriggerEvent::Triggered, this, &ABrickCharacter::StartJump);
 			EnhancedInput->BindAction(PlayerController->GetJumpAction(), ETriggerEvent::Completed, this, &ABrickCharacter::StopJump);
@@ -89,11 +93,11 @@ void ABrickCharacter::Move(const FInputActionValue& value)
 	if (!Controller) return;
 
 	const FVector2D MoveInput = value.Get<FVector2D>();
-	FRotator ControlRot = Controller->GetControlRotation(); // Get current control rotation(usually from the camera)
-	FRotator YawRotation(0, ControlRot.Yaw, 0); // Remove pitch, roll(keep only yaw for horizontal movement)
+	FRotator ControlRot = Controller->GetControlRotation();
+	FRotator YawRotation(0, ControlRot.Yaw, 0); 
 
-	FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X); // Forward direction relative to the camera's yaw
-	FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y); // Right direction relative to the camera's yaw
+	FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X); 
+	FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y); 
 
 	if (!FMath::IsNearlyZero(MoveInput.X)) AddMovementInput(Forward, MoveInput.X);
 	if (!FMath::IsNearlyZero(MoveInput.Y)) AddMovementInput(Right, MoveInput.Y);
@@ -297,5 +301,34 @@ void ABrickCharacter::PlayFKeyAnimationStop(const FInputActionValue& Value)
 	{
 		GetMesh()->GetAnimInstance()->Montage_Stop(0.2f);
 		UE_LOG(LogTemp, Warning, TEXT("F key released - Montage Stopped"));
+	}
+}
+
+void ABrickCharacter::AttachCrown()
+{
+	if (!CrownStaticMesh) return;
+
+	UStaticMeshComponent* Crown = NewObject<UStaticMeshComponent>(this);
+	Crown->RegisterComponent();
+	Crown->SetStaticMesh(CrownStaticMesh);
+	Crown->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Head_bone"));
+	Crown->SetRelativeLocation(FVector(0.f, 0.f, 40.f));
+	Crown->SetRelativeScale3D(FVector(0.6f));
+};
+
+
+void ABrickCharacter::PlayVictoryMontage()
+{
+	if (VictoryMontage && GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(VictoryMontage);
+	}
+}
+
+void ABrickCharacter::PlayDefeatMontage()
+{
+	if (DefeatMontage && GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(DefeatMontage);
 	}
 }

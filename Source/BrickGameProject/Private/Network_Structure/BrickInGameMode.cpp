@@ -14,12 +14,14 @@ ABrickInGameMode::ABrickInGameMode()
 {
     bUseSeamlessTravel = true;
 	MaxGameTime = 30.f; 
+
 }
 
 
 void ABrickInGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
 
     for (TActorIterator<ABrickPlayerStart> It(GetWorld()); It; ++It)
     {
@@ -60,7 +62,7 @@ void ABrickInGameMode::AssignCheckPointForPlayers()
                     {
                         Pawn->SetActorLocation(StartPoint->GetActorLocation());
 						PS->SetCurrentCheckPoint(StartPoint->GetActorLocation());
-                        // ÀÓ½Ã
+                        // ï¿½Ó½ï¿½
                         StartGameTimer();
                     }
                 }
@@ -146,7 +148,7 @@ void ABrickInGameMode::HandleWinByDistance()
                 if (ABrickCharacter* Character = Cast<ABrickCharacter>(Pawn))
                 {
                     FVector Location = Character->GetActorLocation();
-                    if (Location.Y > MaxDistance) // YÃà ±âÁØ
+                    if (Location.Y > MaxDistance) // Yï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                     {
                         MaxDistance = Location.Y;
                         FurthestCharacter = Character;
@@ -173,3 +175,5 @@ void ABrickInGameMode::TravelToResultLevel()
 {
     GetWorld()->ServerTravel("/Game/Maps/ResultLevel?listen");
 }
+
+
