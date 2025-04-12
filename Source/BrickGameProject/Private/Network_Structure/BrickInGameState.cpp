@@ -10,6 +10,7 @@ ABrickInGameState::ABrickInGameState()
 	: WinningTeam(EGameTeam::None)
 {
 	bReplicates = true;
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void ABrickInGameState::BeginPlay()
