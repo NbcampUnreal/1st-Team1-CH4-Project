@@ -135,5 +135,7 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void ClientFixRotation(FRotator ActorRot, FRotator MeshRot);
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastApplyFinalPose(FRotator ActorRot, FRotator MeshRot);
 
 };

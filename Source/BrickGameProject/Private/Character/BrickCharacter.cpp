@@ -367,4 +367,14 @@ void ABrickCharacter::ClientFixRotation_Implementation(FRotator ActorRot, FRotat
 		GetMesh()->SetRelativeRotation(MeshRot);
 	}
 }
+void ABrickCharacter::MulticastApplyFinalPose_Implementation(FRotator ActorRot, FRotator MeshRot)
+{
+	SetActorRotation(ActorRot);
+
+	if (GetMesh())
+	{
+		GetMesh()->SetRelativeRotation(MeshRot);
+	}
+}
+
 
