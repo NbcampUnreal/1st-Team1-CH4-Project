@@ -42,6 +42,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	bool bCanMove = true; 
+
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -120,10 +122,20 @@ public:
 	UPROPERTY()
 	UUserWidget* DamageInstance;
 
+	void SetMovementEnabled(bool bEnabled);
 
-private:
+	bool CanBeMoved() const;
+
 	AActor* PreviewBlock;
+
 	void UpdatePreviewBlock();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastFixMeshRotation(FRotator NewRotation);
+
+	UFUNCTION(Client, Reliable)
+	void ClientFixRotation(FRotator ActorRot, FRotator MeshRot);
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastApplyFinalPose(FRotator ActorRot, FRotator MeshRot);
 
 };

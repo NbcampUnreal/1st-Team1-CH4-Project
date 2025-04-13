@@ -34,6 +34,8 @@ ABrickCharacter::ABrickCharacter()
 	PreviewBlock = nullptr;
 	PreviewPivotToBottom = 0.0f;
 
+	bReplicates = true;
+	SetReplicateMovement(true);
 }
 
 // Called when the game starts or when spawned
@@ -282,6 +284,7 @@ void ABrickCharacter::UpdatePreviewBlock()
 }
 
 
+
 void ABrickCharacter::PlayFKeyAnimationStart(const FInputActionValue& Value)
 {
 	if (FKeyMontage && GetMesh() && GetMesh()->GetAnimInstance())
@@ -332,3 +335,46 @@ void ABrickCharacter::PlayDefeatMontage()
 		GetMesh()->GetAnimInstance()->Montage_Play(DefeatMontage);
 	}
 }
+void ABrickCharacter::SetMovementEnabled(bool bEnabled)
+{
+	bCanMove = bEnabled;
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+	{
+		MoveComp->DisableMovement();
+		if (bEnabled)
+		{
+			MoveComp->SetMovementMode(MOVE_Walking);
+		}
+	}
+}
+bool ABrickCharacter::CanBeMoved() const
+{
+	return bCanMove;
+}
+
+void ABrickCharacter::MulticastFixMeshRotation_Implementation(FRotator NewRotation)
+{
+	if (GetMesh())
+	{
+		GetMesh()->SetRelativeRotation(NewRotation);
+	}
+}
+void ABrickCharacter::ClientFixRotation_Implementation(FRotator ActorRot, FRotator MeshRot)
+{
+	SetActorRotation(ActorRot);
+	if (GetMesh())
+	{
+		GetMesh()->SetRelativeRotation(MeshRot);
+	}
+}
+void ABrickCharacter::MulticastApplyFinalPose_Implementation(FRotator ActorRot, FRotator MeshRot)
+{
+	SetActorRotation(ActorRot);
+
+	if (GetMesh())
+	{
+		GetMesh()->SetRelativeRotation(MeshRot);
+	}
+}
+
+
