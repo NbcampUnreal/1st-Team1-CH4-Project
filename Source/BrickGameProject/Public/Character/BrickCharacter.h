@@ -133,8 +133,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastFixMeshRotation(FRotator NewRotation);
 
-	UFUNCTION(Client, Reliable)
-	void ClientFixRotation(FRotator ActorRot, FRotator MeshRot);
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastApplyFinalPose(FRotator ActorRot, FRotator MeshRot);
 

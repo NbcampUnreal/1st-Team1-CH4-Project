@@ -71,9 +71,10 @@ void AResultGameMode::BeginPlay()
             {
                 Char->SetActorLocation(WinSpots[i]->GetActorLocation());
                 Char->SetActorRotation(WinSpots[i]->GetActorRotation());
+                Char->MulticastFixMeshRotation(FRotator(0.f, 0.f, 0.f));
             }
 
-            Char->MulticastApplyFinalPose(WinSpots[i]->GetActorRotation(), FRotator(0.f, 0.f, 0.f));
+            Char->GetMesh()->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
             Char->AttachCrown();
             Char->PlayVictoryMontage();
             Char->SetMovementEnabled(false);
@@ -92,19 +93,37 @@ void AResultGameMode::BeginPlay()
             if (!LoseSpots.IsValidIndex(i)) break;
 
             ABrickCharacter* Char = AllLosers[i];
-            if (!Char) continue;
+            if (!Char || !Char->HasAuthority()) continue;
 
-            if (Char->HasAuthority())
-            {
-                Char->SetActorLocation(LoseSpots[i]->GetActorLocation());
-                Char->SetActorRotation(LoseSpots[i]->GetActorRotation());
-            }
-
-            Char->MulticastApplyFinalPose(LoseSpots[i]->GetActorRotation(), FRotator(0.f, 0.f, 0.f));
+            Char->SetActorLocation(LoseSpots[i]->GetActorLocation());
+            Char->SetActorRotation(LoseSpots[i]->GetActorRotation());
+            Char->GetMesh()->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
             Char->PlayDefeatMontage();
             Char->SetMovementEnabled(false);
 
             LosingChars.Add(Char);
+        }
+
+        // 로컬 컨트롤러 캐릭터만 회전 보정
+        for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+        {
+            if (APlayerController* PC = Cast<APlayerController>(It->Get()))
+            {
+                ABrickCharacter* MyChar = Cast<ABrickCharacter>(PC->GetPawn());
+                if (!MyChar) continue;
+
+                ABrickGamePlayerState* PS = Cast<ABrickGamePlayerState>(MyChar->GetPlayerState());
+                if (!PS) continue;
+
+                bool bIsWinner = (PS->GetTeam() == WinningTeam);
+                int32 SpotIndex = bIsWinner ? AllWinners.Find(MyChar) : AllLosers.Find(MyChar);
+                const TArray<AActor*>& SpotArray = bIsWinner ? WinSpots : LoseSpots;
+
+                if (SpotArray.IsValidIndex(SpotIndex))
+                {
+                    MyChar->MulticastApplyFinalPose(SpotArray[SpotIndex]->GetActorRotation(), FRotator(0.f, 0.f, 0.f));
+                }
+            }
         }
 
         // 밀기 로직

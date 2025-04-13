@@ -34,8 +34,8 @@ ABrickCharacter::ABrickCharacter()
 	PreviewBlock = nullptr;
 	PreviewPivotToBottom = 0.0f;
 
-	bReplicates = true;
-	SetReplicateMovement(true);
+	bUseControllerRotationYaw = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 }
 
 // Called when the game starts or when spawned
@@ -359,22 +359,13 @@ void ABrickCharacter::MulticastFixMeshRotation_Implementation(FRotator NewRotati
 		GetMesh()->SetRelativeRotation(NewRotation);
 	}
 }
-void ABrickCharacter::ClientFixRotation_Implementation(FRotator ActorRot, FRotator MeshRot)
-{
-	SetActorRotation(ActorRot);
-	if (GetMesh())
-	{
-		GetMesh()->SetRelativeRotation(MeshRot);
-	}
-}
+
 void ABrickCharacter::MulticastApplyFinalPose_Implementation(FRotator ActorRot, FRotator MeshRot)
 {
 	SetActorRotation(ActorRot);
-
 	if (GetMesh())
 	{
 		GetMesh()->SetRelativeRotation(MeshRot);
 	}
 }
-
 
