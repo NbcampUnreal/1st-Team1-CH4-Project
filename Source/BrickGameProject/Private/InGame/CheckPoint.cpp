@@ -1,6 +1,7 @@
 #include "InGame/CheckPoint.h"
 #include "Network_Structure/BrickGamePlayerState.h"
 #include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
 //Components
 #include "Components/BoxComponent.h"
 
@@ -58,6 +59,12 @@ void ACheckPoint::OnOverlapBegin(
                 if (Effect)
                 {
                     Effect->SetLifeSpan(2.0f);
+                }
+
+                // 🔊 사운드 재생 추가
+                if (CheckPointSound)
+                {
+                    UGameplayStatics::PlaySoundAtLocation(this, CheckPointSound, SpawnLoc);
                 }
             }
 

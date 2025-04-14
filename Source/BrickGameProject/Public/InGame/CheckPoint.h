@@ -33,4 +33,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Checkpoint")
 	TSubclassOf<AActor> CheckPointEffectClass;
 
+	UPROPERTY(EditAnywhere, Category = "Checkpoint")
+	USoundBase* CheckPointSound;
+
 };
