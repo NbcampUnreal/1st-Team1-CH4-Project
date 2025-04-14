@@ -117,6 +117,9 @@ void ABrickCharacter::StopJump(const FInputActionValue& value)
 
 void ABrickCharacter::Look(const FInputActionValue& value)
 {
+
+	if (!bCanTurn) return; // 🔒 마우스 회전 차단
+
 	FVector2D LookInput = value.Get<FVector2D>();
 	AddControllerYawInput(LookInput.X);
 	AddControllerPitchInput(LookInput.Y);
@@ -336,21 +339,38 @@ void ABrickCharacter::PlayDefeatMontage()
 {
 	if (DefeatMontage && GetMesh() && GetMesh()->GetAnimInstance())
 	{
-		GetMesh()->GetAnimInstance()->Montage_Play(DefeatMontage);
+		UAnimInstance* AnimInst = GetMesh()->GetAnimInstance();
+
+		SetMovementEnabled(false);
+		bCanTurn = false;
+
+		if (!AnimInst->Montage_IsPlaying(DefeatMontage))
+		{
+			AnimInst->Montage_Play(DefeatMontage, 1.0f);
+			UE_LOG(LogTemp, Warning, TEXT("▶▶ DefeatMontage 재생 시작"));
+		}
 	}
 }
+
+
+
 void ABrickCharacter::SetMovementEnabled(bool bEnabled)
 {
 	bCanMove = bEnabled;
+
 	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
 	{
-		MoveComp->DisableMovement();
 		if (bEnabled)
 		{
 			MoveComp->SetMovementMode(MOVE_Walking);
 		}
+		else
+		{
+			MoveComp->DisableMovement(); 
+		}
 	}
 }
+
 bool ABrickCharacter::CanBeMoved() const
 {
 	return bCanMove;
