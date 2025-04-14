@@ -223,6 +223,8 @@ void ABrickCharacter::DeleteBlock(const FInputActionValue& Value)
 
 }
 
+// BrickCharacter.cpp
+
 void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 {
 	if (!PreviewBlock || !BlockClasses.IsValidIndex(SelectedBlockIndex)) return;
@@ -256,10 +258,15 @@ void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 
 	GetWorld()->SpawnActor<AActor>(BlockClasses[SelectedBlockIndex], SpawnLocation, SpawnRotation);
 
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ClickSound, GetActorLocation());
+	}
+
 	PreviewBlock->Destroy();
 	PreviewBlock = nullptr;
-
 }
+
 
 
 
