@@ -147,4 +147,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "State")
 	bool bIsDefeated = false;
 
+	UFUNCTION(Server, Reliable)
+	void ServerPlaceBlock(FVector SpawnLocation, FRotator SpawnRotation);
+	void ServerPlaceBlock_Implementation(FVector SpawnLocation, FRotator SpawnRotation);
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlayVictoryMontage();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlayDefeatMontage();
 };

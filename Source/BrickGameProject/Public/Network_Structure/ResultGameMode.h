@@ -13,5 +13,5 @@ public:
 	AResultGameMode();
 
 	virtual void BeginPlay() override;
-	
+
 };
