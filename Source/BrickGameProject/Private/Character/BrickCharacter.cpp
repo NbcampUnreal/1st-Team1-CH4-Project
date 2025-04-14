@@ -222,11 +222,6 @@ void ABrickCharacter::DeleteBlock(const FInputActionValue& Value)
 
 }
 
-<<<<<<< Updated upstream
-// BrickCharacter.cpp
-=======
->>>>>>> Stashed changes
-
 void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 {
 	if (!PreviewBlock || !BlockClasses.IsValidIndex(SelectedBlockIndex)) return;
@@ -260,10 +255,6 @@ void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 
 	GetWorld()->SpawnActor<AActor>(BlockClasses[SelectedBlockIndex], SpawnLocation, SpawnRotation);
 
-<<<<<<< Updated upstream
-=======
-	// 🔊 클릭 사운드 재생
->>>>>>> Stashed changes
 	if (ClickSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, ClickSound, GetActorLocation());
@@ -383,7 +374,3 @@ void ABrickCharacter::MulticastApplyFinalPose_Implementation(FRotator ActorRot, 
 		GetMesh()->SetRelativeRotation(MeshRot);
 	}
 }
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes

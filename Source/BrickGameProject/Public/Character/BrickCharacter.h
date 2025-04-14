@@ -136,11 +136,7 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastApplyFinalPose(FRotator ActorRot, FRotator MeshRot);
 
-<<<<<<< Updated upstream
-=======
 
-
->>>>>>> Stashed changes
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
 	USoundBase* ClickSound;
 
