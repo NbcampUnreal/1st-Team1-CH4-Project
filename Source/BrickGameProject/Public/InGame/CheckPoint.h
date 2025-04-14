@@ -30,6 +30,7 @@ protected:
 		bool bFromSweep,
 		const FHitResult& SweepResult);
 
-
+	UPROPERTY(EditAnywhere, Category = "Checkpoint")
+	TSubclassOf<AActor> CheckPointEffectClass;
 
 };

@@ -34,6 +34,7 @@ void ACheckPoint::OnOverlapBegin(
     const FHitResult& SweepResult)
 {
     if (!HasAuthority()) return;
+
     ACharacter* Character = Cast<ACharacter>(OtherActor);
     if (Character)
     {
@@ -42,7 +43,24 @@ void ACheckPoint::OnOverlapBegin(
         {
             UE_LOG(LogTemp, Warning, TEXT("PS Exist"));
             PS->SetCurrentCheckPoint(GetActorLocation());
+
+
+            if (CheckPointEffectClass)
+            {
+                FActorSpawnParameters Params;
+                Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+                FVector SpawnLoc = Character->GetActorLocation();
+                FRotator SpawnRot = FRotator::ZeroRotator;
+
+                AActor* Effect = GetWorld()->SpawnActor<AActor>(CheckPointEffectClass, SpawnLoc, SpawnRot, Params);
+
+                if (Effect)
+                {
+                    Effect->SetLifeSpan(2.0f);
+                }
+            }
+
         }
     }
 }
-
