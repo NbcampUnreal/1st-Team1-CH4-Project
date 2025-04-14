@@ -24,6 +24,7 @@ public:
 	FTimerHandle InitPlayerSpawnHandle;
 	FTimerHandle TimerHandle_GameTimer;
 	FTimerHandle ResultTravelHandle;
+	FTimerHandle PhaseTimerHandle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayTime")
 	float MaxGameTime; 
@@ -35,6 +36,9 @@ protected:
 	void HandleWinByDistance();
 
 	void TravelToResultLevel();
+
+	void EnterPlacementPhase();
+	void EnterGameplayPhase();
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
