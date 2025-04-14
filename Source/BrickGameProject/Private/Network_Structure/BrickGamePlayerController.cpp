@@ -5,6 +5,7 @@
 #include "Network_Structure/LobbyUserWidget.h"
 #include "Network_Structure/HubUserWidget.h"
 #include "Network_Structure/BrickGameInstance.h"
+#include "InGame/InGameHUD.h"
 #include "Kismet/GameplayStatics.h"
 #include "EnhancedInputSubsystems.h"
 
@@ -156,11 +157,11 @@ ABrickGamePlayerState* ABrickGamePlayerController::GetBrickGamePlayerState() con
 
 void ABrickGamePlayerController::InitLobbyUI()
 {
-	/*if (InGameWidget)
+	if (InGameHUDWidget)
 	{
-		InGameWidget->RemoveFromParent();
-		InGameWidget = nullptr;
-	}*/
+		InGameHUDWidget->RemoveFromParent();
+		InGameHUDWidget = nullptr;
+	}
 
 	LobbyWidget = CreateWidget<ULobbyUserWidget>(this, LobbyWidgetClass);
 	if (LobbyWidget)
@@ -181,14 +182,14 @@ void ABrickGamePlayerController::InitInGameUI()
 		LobbyWidget = nullptr;
 	}
 
-	/*InGameWidget = CreateWidget<UInGameUserWidget>(this, InGameWidgetClass);
-	if (InGameWidget)
+	InGameHUDWidget = CreateWidget<UInGameHUD>(this, InGameHUDClass);
+	if (InGameHUDWidget)
 	{
-		InGameWidget->AddToViewport();
+		InGameHUDWidget->AddToViewport();
 		SetShowMouseCursor(false);
 		FInputModeGameOnly InputMode;
 		SetInputMode(InputMode);
-	}*/
+	}
 }
 
 void ABrickGamePlayerController::InitHubUI()

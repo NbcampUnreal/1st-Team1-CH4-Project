@@ -9,7 +9,7 @@ class ABrickGamePlayerState;
 class UInputMappingContext;
 class UInputAction;
 class ULobbyUserWidget;
-class UInGameUserWidget;
+class UInGameHUD;
 class UHubUserWidget;
 
 UCLASS()
@@ -56,11 +56,14 @@ public:
 	UHubUserWidget* HubWidget;
 
 	//InGame UI
-	/*uproperty(editdefaultsonly, category = "ui|ingame")
-	subclassof<uingameuserwidget> ingamewidgetclass;
+	UPROPERTY(EditDefaultsOnly, Category = "UI|InGame")
+	TSubclassOf<UInGameHUD> InGameHUDClass;
 
-	uproperty()
-	uingameuserwidget* ingamewidget;*/
+	UPROPERTY()
+	UInGameHUD* InGameHUDWidget;
+
+
+
 
 	void InitLobbyUI();
 	void InitInGameUI();

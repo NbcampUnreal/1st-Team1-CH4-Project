@@ -62,7 +62,6 @@ public:
 	EGameTeam GetTeam() const { return Team; }
 	UFUNCTION(BlueprintCallable)
 	void SetTeam(EGameTeam InTeam) { Team = InTeam; }
-
 	UFUNCTION(BlueprintCallable)
 	bool IsReady() const { return bIsReady; }
 	UFUNCTION(BlueprintCallable)
