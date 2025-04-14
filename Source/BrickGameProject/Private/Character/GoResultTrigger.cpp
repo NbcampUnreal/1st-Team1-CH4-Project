@@ -15,7 +15,7 @@ AGoResultTrigger::AGoResultTrigger()
     TriggerBox->SetCollisionProfileName(TEXT("Trigger"));
 
     TriggerCount = 0;
-    RequiredPlayerCount = 4; // 초기값, 나중에 자동 설정됨
+    RequiredPlayerCount = 4; 
     bReadyToCount = false;
 }
 
@@ -25,7 +25,6 @@ void AGoResultTrigger::BeginPlay()
 
     TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AGoResultTrigger::OnOverlapBegin);
 
-    // ✅ 초기에는 트리거 꺼두기
     TriggerBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
     FTimerHandle DelayHandle;
