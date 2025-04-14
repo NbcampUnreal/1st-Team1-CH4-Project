@@ -39,7 +39,6 @@ void ACheckPoint::OnOverlapBegin(
     ACharacter* Character = Cast<ACharacter>(OtherActor);
     if (Character && !TriggeredCharacters.Contains(Character))
     {
-
         TriggeredCharacters.Add(Character);
 
         ABrickGamePlayerState* PS = Character->GetPlayerState<ABrickGamePlayerState>();
@@ -49,26 +48,30 @@ void ACheckPoint::OnOverlapBegin(
             PS->SetCurrentCheckPoint(GetActorLocation());
         }
 
+        MulticastSpawnCheckpointEffect(Character->GetActorLocation());
+        MulticastPlayCheckpointSound(Character->GetActorLocation());
+    }
+}
 
-        if (CheckPointEffectClass)
+void ACheckPoint::MulticastSpawnCheckpointEffect_Implementation(FVector Location)
+{
+    if (CheckPointEffectClass)
+    {
+        FActorSpawnParameters Params;
+        Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+        AActor* Effect = GetWorld()->SpawnActor<AActor>(CheckPointEffectClass, Location, FRotator::ZeroRotator, Params);
+        if (Effect)
         {
-            FActorSpawnParameters Params;
-            Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-            FVector SpawnLoc = Character->GetActorLocation();
-            FRotator SpawnRot = FRotator::ZeroRotator;
-
-            AActor* Effect = GetWorld()->SpawnActor<AActor>(CheckPointEffectClass, SpawnLoc, SpawnRot, Params);
-
-            if (Effect)
-            {
-                Effect->SetLifeSpan(2.0f);
-            }
+            Effect->SetLifeSpan(2.0f);
         }
+    }
+}
 
-        if (CheckPointSound)
-        {
-            UGameplayStatics::PlaySoundAtLocation(this, CheckPointSound, Character->GetActorLocation());
-        }
+void ACheckPoint::MulticastPlayCheckpointSound_Implementation(FVector Location)
+{
+    if (CheckPointSound)
+    {
+        UGameplayStatics::PlaySoundAtLocation(this, CheckPointSound, Location);
     }
 }

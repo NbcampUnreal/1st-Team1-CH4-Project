@@ -37,4 +37,12 @@ protected:
 	TSubclassOf<AActor> CheckPointEffectClass;
 	UPROPERTY()
 	TSet<ACharacter*> TriggeredCharacters;
+
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlayCheckpointSound(FVector Location);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSpawnCheckpointEffect(FVector Location);
+
 };
