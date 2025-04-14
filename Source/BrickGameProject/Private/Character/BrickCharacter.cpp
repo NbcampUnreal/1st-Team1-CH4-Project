@@ -34,15 +34,14 @@ ABrickCharacter::ABrickCharacter()
 	PreviewBlock = nullptr;
 	PreviewPivotToBottom = 0.0f;
 
-	bReplicates = true;
-	SetReplicateMovement(true);
+	bUseControllerRotationYaw = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 }
 
 // Called when the game starts or when spawned
 void ABrickCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
 
 	APlayerController* PC = Cast<APlayerController>(GetController());
 	if (PC)
@@ -118,6 +117,9 @@ void ABrickCharacter::StopJump(const FInputActionValue& value)
 
 void ABrickCharacter::Look(const FInputActionValue& value)
 {
+
+	if (!bCanTurn) return; // 🔒 마우스 회전 차단
+
 	FVector2D LookInput = value.Get<FVector2D>();
 	AddControllerYawInput(LookInput.X);
 	AddControllerPitchInput(LookInput.Y);
@@ -256,10 +258,15 @@ void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 
 	GetWorld()->SpawnActor<AActor>(BlockClasses[SelectedBlockIndex], SpawnLocation, SpawnRotation);
 
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ClickSound, GetActorLocation());
+	}
+
 	PreviewBlock->Destroy();
 	PreviewBlock = nullptr;
-
 }
+
 
 
 
@@ -332,21 +339,38 @@ void ABrickCharacter::PlayDefeatMontage()
 {
 	if (DefeatMontage && GetMesh() && GetMesh()->GetAnimInstance())
 	{
-		GetMesh()->GetAnimInstance()->Montage_Play(DefeatMontage);
+		UAnimInstance* AnimInst = GetMesh()->GetAnimInstance();
+
+		SetMovementEnabled(false);
+		bCanTurn = false;
+
+		if (!AnimInst->Montage_IsPlaying(DefeatMontage))
+		{
+			AnimInst->Montage_Play(DefeatMontage, 1.0f);
+			UE_LOG(LogTemp, Warning, TEXT("▶▶ DefeatMontage 재생 시작"));
+		}
 	}
 }
+
+
+
 void ABrickCharacter::SetMovementEnabled(bool bEnabled)
 {
 	bCanMove = bEnabled;
+
 	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
 	{
-		MoveComp->DisableMovement();
 		if (bEnabled)
 		{
 			MoveComp->SetMovementMode(MOVE_Walking);
 		}
+		else
+		{
+			MoveComp->DisableMovement(); 
+		}
 	}
 }
+
 bool ABrickCharacter::CanBeMoved() const
 {
 	return bCanMove;
@@ -359,22 +383,14 @@ void ABrickCharacter::MulticastFixMeshRotation_Implementation(FRotator NewRotati
 		GetMesh()->SetRelativeRotation(NewRotation);
 	}
 }
-void ABrickCharacter::ClientFixRotation_Implementation(FRotator ActorRot, FRotator MeshRot)
-{
-	SetActorRotation(ActorRot);
-	if (GetMesh())
-	{
-		GetMesh()->SetRelativeRotation(MeshRot);
-	}
-}
+
 void ABrickCharacter::MulticastApplyFinalPose_Implementation(FRotator ActorRot, FRotator MeshRot)
 {
-	SetActorRotation(ActorRot);
+	UE_LOG(LogTemp, Warning, TEXT("MulticastApplyFinalPose CALLED on %s. Rot: %s"), *GetName(), *ActorRot.ToString());
 
+	SetActorRotation(ActorRot);
 	if (GetMesh())
 	{
 		GetMesh()->SetRelativeRotation(MeshRot);
 	}
 }
-
-

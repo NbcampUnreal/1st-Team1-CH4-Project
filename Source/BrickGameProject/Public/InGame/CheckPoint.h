@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Kismet/GameplayStatics.h"
 #include "CheckPoint.generated.h"
 
 class UBoxComponent;
@@ -30,6 +31,10 @@ protected:
 		bool bFromSweep,
 		const FHitResult& SweepResult);
 
-
-
+	UPROPERTY(EditAnywhere, Category = "Checkpoint")
+	USoundBase* CheckPointSound;
+	UPROPERTY(EditAnywhere, Category = "Checkpoint")
+	TSubclassOf<AActor> CheckPointEffectClass;
+	UPROPERTY()
+	TSet<ACharacter*> TriggeredCharacters;
 };

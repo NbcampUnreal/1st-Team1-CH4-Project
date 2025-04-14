@@ -5,6 +5,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "Camera/CameraComponent.h"  
+#include "Animation/AnimInstance.h"
 #include "BrickCharacter.generated.h"
 
 struct FInputActionValue;
@@ -133,9 +134,17 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastFixMeshRotation(FRotator NewRotation);
 
-	UFUNCTION(Client, Reliable)
-	void ClientFixRotation(FRotator ActorRot, FRotator MeshRot);
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastApplyFinalPose(FRotator ActorRot, FRotator MeshRot);
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
+	USoundBase* ClickSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
+	bool bCanTurn = true;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "State")
+	bool bIsDefeated = false;
 
 };
