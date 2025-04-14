@@ -43,7 +43,6 @@ void ABrickCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-
 	APlayerController* PC = Cast<APlayerController>(GetController());
 	if (PC)
 	{
@@ -223,7 +222,10 @@ void ABrickCharacter::DeleteBlock(const FInputActionValue& Value)
 
 }
 
+<<<<<<< Updated upstream
 // BrickCharacter.cpp
+=======
+>>>>>>> Stashed changes
 
 void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 {
@@ -258,6 +260,10 @@ void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 
 	GetWorld()->SpawnActor<AActor>(BlockClasses[SelectedBlockIndex], SpawnLocation, SpawnRotation);
 
+<<<<<<< Updated upstream
+=======
+	// 🔊 클릭 사운드 재생
+>>>>>>> Stashed changes
 	if (ClickSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, ClickSound, GetActorLocation());
@@ -369,10 +375,15 @@ void ABrickCharacter::MulticastFixMeshRotation_Implementation(FRotator NewRotati
 
 void ABrickCharacter::MulticastApplyFinalPose_Implementation(FRotator ActorRot, FRotator MeshRot)
 {
+	UE_LOG(LogTemp, Warning, TEXT("MulticastApplyFinalPose CALLED on %s. Rot: %s"), *GetName(), *ActorRot.ToString());
+
 	SetActorRotation(ActorRot);
 	if (GetMesh())
 	{
 		GetMesh()->SetRelativeRotation(MeshRot);
 	}
 }
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
