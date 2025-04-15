@@ -19,7 +19,15 @@ public:
 
 	UFUNCTION()
 	void OnRep_ProgressRatio();
+	UFUNCTION()
+	void OnRep_Team();
+
+	UPROPERTY()
+	bool bIsTeamReplicated = false;
+
 protected:
+
+
 
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "PlayerState")
 	int32 BrickPlayerID;
@@ -61,7 +69,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	EGameTeam GetTeam() const { return Team; }
 	UFUNCTION(BlueprintCallable)
-	void SetTeam(EGameTeam InTeam) { Team = InTeam; }
+	void SetTeam(EGameTeam NewTeam);
 	UFUNCTION(BlueprintCallable)
 	bool IsReady() const { return bIsReady; }
 	UFUNCTION(BlueprintCallable)

@@ -117,13 +117,13 @@ void ABrickGamePlayerController::Server_SetPlayerID_Implementation(int32 PlayerI
 	}
 }
 
-
 void ABrickGamePlayerController::Server_SetTeam_Implementation(EGameTeam SelectedTeam)
 {
 	ABrickGamePlayerState* PS = GetBrickGamePlayerState();
 	if (PS)
 	{
 		PS->SetTeam(SelectedTeam);
+
 	}
 }
 
@@ -152,9 +152,10 @@ void ABrickGamePlayerController::Client_EnableStartButton_Implementation(bool bE
 
 	if (LobbyWidget)
 	{
-		LobbyWidget->ActivateStartButton();
+		LobbyWidget->ActivateStartButton(bEnable);
 	}
 }
+
 
 
 ABrickGamePlayerState* ABrickGamePlayerController::GetBrickGamePlayerState() const
