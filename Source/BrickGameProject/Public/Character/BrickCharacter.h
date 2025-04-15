@@ -43,8 +43,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	bool bCanMove = true; 
-
+	bool bCanMove = true;
+	bool bCanUseSkill = true;
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -90,12 +90,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	UAnimMontage* FKeyMontage;
 
+	void SetCanUseSkill(bool NewCanUseSkill);
 
 	// 모드 구분용 변수
 	bool bIsPlacingMode;
 
 	// 모드 전환 함수
-
 
 	void AttachCrown();
 

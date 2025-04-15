@@ -38,8 +38,10 @@ protected:
 	void TravelToResultLevel();
 
 	void EnterPlacementPhase();
+	void EnterCountdownPhase();
+public:
 	void EnterGameplayPhase();
-
+protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bGameOver;

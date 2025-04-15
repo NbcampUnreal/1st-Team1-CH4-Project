@@ -9,8 +9,10 @@ UENUM(BlueprintType)
 enum class EGamePhase : uint8
 {
 	None,
+	Loading,
 	Intro,
 	Placement,
+	Countdown,
 	Gameplay
 };
 
@@ -53,13 +55,24 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_GamePhase, BlueprintReadOnly)
 	EGamePhase CurrentPhase = EGamePhase::None;
 
+	UPROPERTY(ReplicatedUsing = OnRep_Countdown)
+	int32 Countdown;
+
+	FTimerHandle CountdownTimerHandle;
 
 	UFUNCTION()
 	void OnRep_WinningTeam();
+
+	UFUNCTION()
+	void OnRep_Countdown();
+
+	void CountdownTick();
 
 public:
 	UFUNCTION()
 	void OnRep_GamePhase();
 
 	void SetGamePhase(EGamePhase NewPhase);
+	EGamePhase GetCurrentPhase();
+	void StartCountdown();
 };

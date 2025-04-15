@@ -12,6 +12,7 @@ class ULobbyUserWidget;
 class UInGameHUD;
 class UHubUserWidget;
 class UTrapSettingUserWidget;
+class UCountdownUserWidget;
 class ATrapBase;
 
 UCLASS()
@@ -58,7 +59,7 @@ public:
 	UHubUserWidget* HubWidget;
 
 	// TrapSetting UI
-	UPROPERTY(EditDefaultsOnly, Category = "UI|Hub")
+	UPROPERTY(EditDefaultsOnly, Category = "UI|TrapSetting")
 	TSubclassOf<UTrapSettingUserWidget> TrapSettingWidgetClass;
 
 	UPROPERTY()
@@ -67,6 +68,13 @@ public:
 	TArray<ACameraActor*> Cameras;
 	int32 CurrentCameraIndex = 0;
 	FTimerHandle CameraSwitchTimerHandle;
+
+	// Countdown UI
+	UPROPERTY(EditDefaultsOnly, Category="UI|Countdown")
+	TSubclassOf<UCountdownUserWidget> CountdownWidgetClass;
+
+	UPROPERTY()
+	UCountdownUserWidget* CountdownWidget;
 
 	//InGame UI
 	UPROPERTY(EditDefaultsOnly, Category = "UI|InGame")
@@ -82,6 +90,7 @@ public:
 	void InitInGameUI();
 	void InitHubUI();
 	void InitTrapSettingUI();
+	void InitCountdownUI();
 
 	// Phase
 	void PlayIntroCameraSequence();
@@ -89,6 +98,7 @@ public:
 	void ReturnToPawnCamera();
 	void FindCamerasByTag(FName TagName);
 	void ResetCameras();
+	void UpdateCountdownUI(int32 InCountdown);
 
 	UFUNCTION(BlueprintCallable)
 	void HandleTrapDrop(FVector2D ScreenPosition, TSubclassOf<ATrapBase> TrapClass);
