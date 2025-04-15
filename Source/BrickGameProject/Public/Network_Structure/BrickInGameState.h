@@ -5,6 +5,14 @@
 #include "Network_Structure/EGameTeam.h"
 #include "BrickInGameState.generated.h"
 
+UENUM(BlueprintType)
+enum class EGamePhase : uint8
+{
+	None,
+	Intro,
+	Placement,
+	Gameplay
+};
 
 UCLASS()
 class BRICKGAMEPROJECT_API ABrickInGameState : public AGameState
@@ -42,7 +50,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Progress")
 	float GoalY = 1000.f; // ¿¹½Ã°ª
 
+	UPROPERTY(ReplicatedUsing = OnRep_GamePhase, BlueprintReadOnly)
+	EGamePhase CurrentPhase = EGamePhase::None;
+
 
 	UFUNCTION()
 	void OnRep_WinningTeam();
+
+public:
+	UFUNCTION()
+	void OnRep_GamePhase();
+
+	void SetGamePhase(EGamePhase NewPhase);
 };

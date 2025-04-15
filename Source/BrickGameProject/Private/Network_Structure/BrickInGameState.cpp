@@ -1,7 +1,9 @@
 #include "Network_Structure/BrickInGameState.h"
 #include "Network_Structure/BrickGamePlayerState.h"
 #include "Network_Structure/BrickInGameMode.h"
+#include "Network_Structure/BrickGamePlayerController.h"
 #include "Character/BrickCharacter.h"
+#include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
@@ -60,6 +62,7 @@ void ABrickInGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ABrickInGameState, WinningTeam);
 	DOREPLIFETIME(ABrickInGameState, RemainingTime);
+	DOREPLIFETIME(ABrickInGameState, CurrentPhase);
 }
 
 
@@ -90,4 +93,53 @@ void ABrickInGameState::SetRemainingTime(float Time)
 void ABrickInGameState::OnRep_WinningTeam()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Winning team replicated: %d"), (int32)WinningTeam);
+}
+
+void ABrickInGameState::OnRep_GamePhase()
+{
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
+	{
+		if (ABrickGamePlayerController* BPC = Cast<ABrickGamePlayerController>(PC))
+		{
+			if (CurrentPhase == EGamePhase::Intro)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("EGamePhase : Intro"));
+				if (BPC->IsLocalPlayerController())
+				{
+					BPC->PlayIntroCameraSequence(); // 로컬 플레이어만 카메라 전환
+				}
+			}
+			else if (CurrentPhase == EGamePhase::Placement)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("EGamePhase : Placement"));
+				if (BPC->IsLocalPlayerController())
+				{
+					BPC->ResetCameras();
+					BPC->PlayPlacementCameraSequence(true); // 로컬 플레이어만 카메라 전환
+					BPC->InitTrapSettingUI();
+				}
+			}
+			else if (CurrentPhase == EGamePhase::Gameplay)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("EGamePhase : Gameplay"));
+				if (BPC->IsLocalPlayerController())
+				{
+					BPC->ReturnToPawnCamera();
+					BPC->InitInGameUI();
+				}
+			}
+		}
+	}
+}
+
+void ABrickInGameState::SetGamePhase(EGamePhase NewPhase)
+{
+	CurrentPhase = NewPhase;
+
+	// 플레이어 컨트롤러가 로컬 플레이어 컨트롤러인지 확인
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0); // 인덱스 0번은 로컬 플레이어의 컨트롤러
+	if (PlayerController && PlayerController->IsLocalPlayerController() && HasAuthority())
+	{
+		OnRep_GamePhase();  // 로컬 플레이어에게만 실행
+	}
 }
