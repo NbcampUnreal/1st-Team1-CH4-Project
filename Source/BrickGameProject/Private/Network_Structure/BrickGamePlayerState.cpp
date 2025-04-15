@@ -1,7 +1,9 @@
 #include "Network_Structure/BrickGamePlayerState.h"
 #include "Network_Structure/BrickLobbyGameMode.h"
+#include "Network_Structure/BrickLobbyGameState.h"
 #include "Network_Structure/BrickInGameMode.h"
 #include "Network_Structure/BrickGamePlayerController.h"
+#include "Network_Structure/LobbyUserWidget.h"
 #include "Net/UnrealNetwork.h"
 
 ABrickGamePlayerState::ABrickGamePlayerState()
@@ -52,12 +54,42 @@ void ABrickGamePlayerState::OnRep_ProgressRatio()
 	//클라이언트 UI 업데이트 처리
 }
 
+void ABrickGamePlayerState::OnRep_Team()
+{
+	bIsTeamReplicated = true;
+}
+
+void ABrickGamePlayerState::SetTeam(EGameTeam NewTeam)
+{
+	bIsTeamReplicated = false;
+	Team = NewTeam;
+
+	if (HasAuthority())
+	{
+		if (ABrickLobbyGameState* GS = GetWorld()->GetGameState<ABrickLobbyGameState>())
+		{
+			GS->NetMulticast_UpdateLobbyUI();  
+			
+		}
+		ABrickLobbyGameMode* GM = GetWorld()->GetAuthGameMode<ABrickLobbyGameMode>();
+		if (GM)
+		{
+			GM->TryNotifyStartAvailable();
+		}
+	}
+}
+
 void ABrickGamePlayerState::SetReady(bool bReady)
 {
 	bIsReady = bReady;
 
 	if (HasAuthority())
 	{
+		if (ABrickLobbyGameState* GS = GetWorld()->GetGameState<ABrickLobbyGameState>())
+		{
+			GS->NetMulticast_UpdateLobbyUI();
+
+		}
 		ABrickLobbyGameMode* GM = GetWorld()->GetAuthGameMode<ABrickLobbyGameMode>();
 		if (GM)
 		{
@@ -70,3 +102,4 @@ void ABrickGamePlayerState::SetCurrentCheckPoint(const FVector& Location)
 {
 	CurrentCheckPoint = Location;
 }
+

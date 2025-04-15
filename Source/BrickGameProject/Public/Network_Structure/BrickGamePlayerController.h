@@ -25,6 +25,7 @@ public:
 
 
 	//RPC
+
 	//Server
 	UFUNCTION(Server, Reliable)
 	void Server_SetPlayerID(int32 PlayerID);

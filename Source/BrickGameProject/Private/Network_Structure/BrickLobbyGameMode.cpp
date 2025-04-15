@@ -1,6 +1,7 @@
 #include "Network_Structure/BrickLobbyGameMode.h"
 #include "Character/BrickCharacter.h"
 #include "Network_Structure/BrickGamePlayerController.h"
+#include "Network_Structure/BrickLobbyGameState.h"
 #include "Network_Structure/BrickGamePlayerState.h"
 #include "Network_Structure/BrickGameInstance.h"
 
@@ -33,13 +34,40 @@ void ABrickLobbyGameMode::PostLogin(APlayerController* NewPlayer)
 
 		AssignTeam(NewPlayer);
 		PlayerList.Add(NewPlayer);
+
+		FTimerHandle DelayHandle;
+		GetWorld()->GetTimerManager().SetTimer(DelayHandle, [this]()
+			{
+				if (ABrickLobbyGameState* GS = GetGameState<ABrickLobbyGameState>())
+				{
+					GS->NetMulticast_UpdateLobbyUI();
+				}
+			}, 1.0f, false); 
+
 	}
+
 }
 
 void ABrickLobbyGameMode::TryNotifyStartAvailable()
 {
-	if (!CheckAllPlayersReady())
+	if (!CheckAllPlayersReady() || !CheckTeamsFull())
+	{
+		for (APlayerController* Player : PlayerList)
+		{
+			if (ABrickGamePlayerController* PC = Cast<ABrickGamePlayerController>(Player))
+			{
+				if (ABrickGamePlayerState* PS = PC->GetBrickGamePlayerState())
+				{
+					if (PS->IsHost())
+						PC->Client_EnableStartButton(false);
+				}
+			}
+		}
+
 		return;
+	}
+
+
 
 	for (APlayerController* Player : PlayerList)
 	{
@@ -96,4 +124,30 @@ bool ABrickLobbyGameMode::CheckAllPlayersReady()
 	}
 
 	return true;
+}
+
+bool ABrickLobbyGameMode::CheckTeamsFull()
+{
+	int32 RedCount = 0;
+	int32 BlueCount = 0;
+
+	for (APlayerController* PC : PlayerList)
+	{
+		if (ABrickGamePlayerController* BrickPC = Cast<ABrickGamePlayerController>(PC))
+		{
+			if (ABrickGamePlayerState* PS = BrickPC->GetBrickGamePlayerState())
+			{
+				if (PS->GetTeam() == EGameTeam::Red)
+				{
+					RedCount++;
+				}
+				else if (PS->GetTeam() == EGameTeam::Blue)
+				{
+					BlueCount++;
+				}
+			}
+		}
+	}
+
+	return (RedCount == 2 && BlueCount == 2);  
 }
