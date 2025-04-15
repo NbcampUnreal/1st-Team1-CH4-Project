@@ -26,6 +26,13 @@ ABrickCharacter::ABrickCharacter()
 	SpringArmComp->SetupAttachment(RootComponent);
 	SpringArmComp->TargetArmLength = 300.0f;
 	SpringArmComp->bUsePawnControlRotation = true;
+	SpringArmComp->bDoCollisionTest = true;
+	SpringArmComp->ProbeSize = 16.0f;
+	SpringArmComp->ProbeChannel = ECC_Camera;
+	SpringArmComp->bEnableCameraLag = true;
+	SpringArmComp->CameraLagSpeed = 10.0f;
+
+
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
@@ -42,7 +49,7 @@ ABrickCharacter::ABrickCharacter()
 void ABrickCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	OnActorHit.AddDynamic(this, &ABrickCharacter::OnHitByObstacle);
 	APlayerController* PC = Cast<APlayerController>(GetController());
 	if (PC)
 	{
@@ -431,3 +438,31 @@ void ABrickCharacter::ServerPlaceBlock_Implementation(FVector SpawnLocation, FRo
 		}
 	}
 }
+void ABrickCharacter::ApplyKnockback(const FVector& Direction, float Strength)
+{
+	if (!Controller || !GetCharacterMovement()) return;
+
+	FVector LaunchVelocity = Direction.GetSafeNormal() * Strength;
+	LaunchCharacter(LaunchVelocity, true, true);
+	SetMovementEnabled(false);
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABrickCharacter::EnableMovementAfterKnockback, 1.0f, false);
+}
+
+void ABrickCharacter::EnableMovementAfterKnockback()
+{
+	SetMovementEnabled(true);
+}
+
+
+void ABrickCharacter::OnHitByObstacle(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor && OtherActor->ActorHasTag(FName("Obstacle")))
+	{
+		FVector KnockbackDir = Hit.ImpactNormal * -1.0f;
+		KnockbackDir.Z += 0.4f; 
+		ApplyKnockback(KnockbackDir, 1500.f);
+	}
+}
+
