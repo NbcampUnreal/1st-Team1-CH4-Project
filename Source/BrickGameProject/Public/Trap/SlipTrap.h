@@ -13,7 +13,7 @@ UCLASS()
 class BRICKGAMEPROJECT_API ASlipTrap : public ATrapBase
 {
 	GENERATED_BODY()
-
+	
 public:
 	ASlipTrap();
 protected:

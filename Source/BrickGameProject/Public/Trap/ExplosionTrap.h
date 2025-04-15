@@ -14,7 +14,7 @@ UCLASS()
 class BRICKGAMEPROJECT_API AExplosionTrap : public ATrapBase
 {
 	GENERATED_BODY()
-
+	
 public:
 	AExplosionTrap();
 

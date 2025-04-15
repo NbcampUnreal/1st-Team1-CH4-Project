@@ -22,7 +22,6 @@ void ABrickInGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-
     for (TActorIterator<ABrickPlayerStart> It(GetWorld()); It; ++It)
     {
         ABrickPlayerStart* Start = *It;
@@ -39,7 +38,7 @@ void ABrickInGameMode::BeginPlay()
         InitPlayerSpawnHandle,
         this,
         &ABrickInGameMode::AssignCheckPointForPlayers,
-        1.0f,
+        2.0f,
         false
     );
 }
@@ -62,13 +61,20 @@ void ABrickInGameMode::AssignCheckPointForPlayers()
                     {
                         Pawn->SetActorLocation(StartPoint->GetActorLocation());
 						PS->SetCurrentCheckPoint(StartPoint->GetActorLocation());
-                        // �ӽ�
-                        StartGameTimer();
+                        
                     }
                 }
             }
         }
     }
+
+    // Update GamePhase(Intro)
+    if (ABrickInGameState* GS = GetGameState<ABrickInGameState>())
+    {
+        GS->SetGamePhase(EGamePhase::Intro);
+    }
+
+    GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ABrickInGameMode::EnterPlacementPhase, 6.0f, false);
 }
 
 void ABrickInGameMode::HandleTeamWin(EGameTeam WinnerTeam)
@@ -166,14 +172,32 @@ void ABrickInGameMode::HandleWinByDistance()
             WinningTeam = PS->GetTeam();
 			HandleTeamWin(WinningTeam);
         }
-
     }
-    
 }
 
 void ABrickInGameMode::TravelToResultLevel()
 {
     GetWorld()->ServerTravel("/Game/Maps/ResultLevel?listen");
+}
+
+void ABrickInGameMode::EnterPlacementPhase()
+{
+    if (ABrickInGameState* GS = GetGameState<ABrickInGameState>())
+    {
+        GS->SetGamePhase(EGamePhase::Placement);
+    }
+
+    GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ABrickInGameMode::EnterGameplayPhase, 20.0f, false);
+}
+
+void ABrickInGameMode::EnterGameplayPhase()
+{
+    if (ABrickInGameState* GS = GetGameState<ABrickInGameState>())
+    {
+        GS->SetGamePhase(EGamePhase::Gameplay);
+    }
+
+    StartGameTimer();
 }
 
 
