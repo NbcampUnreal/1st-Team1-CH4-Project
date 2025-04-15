@@ -50,7 +50,8 @@ void ABrickLobbyGameMode::PostLogin(APlayerController* NewPlayer)
 
 void ABrickLobbyGameMode::TryNotifyStartAvailable()
 {
-	if (!CheckAllPlayersReady() || !CheckTeamsFull())
+	//실제 게임으로 만들 때  조건문에  !CheckAllPlayersReady() 추가하기
+	if ( !CheckTeamsFull())
 	{
 		for (APlayerController* Player : PlayerList)
 		{
