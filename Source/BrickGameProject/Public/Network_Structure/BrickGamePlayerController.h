@@ -86,7 +86,6 @@ public:
 	void ReturnToPawnCamera();
 	void FindCamerasByTag(FName TagName);
 	void ResetCameras();
-	FVector CalcRayStartPositionFromScreenOffset();
 
 	UFUNCTION(BlueprintCallable)
 	void HandleTrapDrop(FVector2D ScreenPosition, TSubclassOf<ATrapBase> TrapClass);

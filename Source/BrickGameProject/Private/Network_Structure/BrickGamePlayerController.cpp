@@ -198,6 +198,7 @@ void ABrickGamePlayerController::InitInGameUI()
 	FInputModeGameOnly InputMode;
 	SetInputMode(InputMode);
 	SetShowMouseCursor(false);
+	FSlateApplication::Get().CancelDragDrop();
 	/*InGameWidget = CreateWidget<UInGameUserWidget>(this, InGameWidgetClass);
 	if (InGameWidget)
 	{
@@ -355,48 +356,6 @@ void ABrickGamePlayerController::ResetCameras()
 {
 	Cameras.Empty();
 	CurrentCameraIndex = 0;
-}
-
-FVector ABrickGamePlayerController::CalcRayStartPositionFromScreenOffset()
-{
-	FVector2D ViewportSize;
-	GEngine->GameViewport->GetViewportSize(ViewportSize);
-	float X, Y;
-	GetMousePosition(X, Y);
-	float Scale = UWidgetLayoutLibrary::GetViewportScale(this);
-	// DPI 보정된 마우스 위치
-	FVector2D DPIAdjusted;
-	DPIAdjusted.X = X;
-	DPIAdjusted.Y = Y;
-	DPIAdjusted /= Scale;
-	/*if (!UWidgetLayoutLibrary::GetMousePositionScaledByDPI(this, DPIAdjusted.X, DPIAdjusted.Y))
-	{
-		UE_LOG(LogTemp, Error, TEXT("GetMousePositionScaledByDPI Failed"));
-		UE_LOG(LogTemp, Error, TEXT("IsLocalController: %d"), IsLocalController());
-		UE_LOG(LogTemp, Error, TEXT("IsValid(PlayerController): %d"), IsValid(this));
-		return FVector::ZeroVector;
-	}*/
-
-	FVector2D ViewportCenter = ViewportSize / 2.0f;
-	FVector2D Offset = DPIAdjusted - ViewportCenter;
-
-	// 픽셀 → 월드 단위 변환 비율 (실험적으로 조정)
-	const float PixelToWorld = 5.0f;
-
-	// 오프셋을 월드 거리로 변환
-	FVector2D WorldOffset = Offset * PixelToWorld;
-
-	// 카메라 기준 방향 가져오기
-	FVector CamLoc;
-	FRotator CamRot;
-	GetPlayerViewPoint(CamLoc, CamRot);
-
-	FVector Forward = FRotationMatrix(CamRot).GetUnitAxis(EAxis::X); // 전방
-	FVector Right = FRotationMatrix(CamRot).GetUnitAxis(EAxis::Y);   // 우측
-
-	// 카메라에서 Offset 적용 위치 계산
-	FVector RayStart = CamLoc + (Right * WorldOffset.X) + (Forward * WorldOffset.Y);
-	return RayStart;
 }
 
 void ABrickGamePlayerController::HandleTrapDrop(FVector2D ScreenPosition, TSubclassOf<ATrapBase> TrapClass)

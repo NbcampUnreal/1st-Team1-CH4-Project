@@ -2,6 +2,7 @@
 
 
 #include "InGame/TrapButtonWidget.h"
+#include "InGame/TrapSetPointUserWidget.h"
 #include "Trap/TrapBase.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
@@ -15,7 +16,7 @@ void UTrapButtonWidget::NativeOnDragDetected(const FGeometry& InGeometry, const 
 {
 	UDragDropOperation* DragOp = NewObject<UDragDropOperation>(this);
 	DragOp->Payload = TrapClassToSpawn;
-	DragOp->DefaultDragVisual = this;
-	DragOp->Pivot = EDragPivot::MouseDown; // 중요한 포인트
+	DragOp->DefaultDragVisual = CreateWidget<UTrapSetPointUserWidget>(GetWorld(), TrapSetIcon);
+	DragOp->Pivot = EDragPivot::CenterCenter;
 	OutOperation = DragOp;
 }
