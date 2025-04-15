@@ -63,6 +63,7 @@ void ABrickInGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ABrickInGameState, WinningTeam);
 	DOREPLIFETIME(ABrickInGameState, RemainingTime);
 	DOREPLIFETIME(ABrickInGameState, CurrentPhase);
+	DOREPLIFETIME(ABrickInGameState, Countdown);
 }
 
 
@@ -95,13 +96,67 @@ void ABrickInGameState::OnRep_WinningTeam()
 	UE_LOG(LogTemp, Warning, TEXT("Winning team replicated: %d"), (int32)WinningTeam);
 }
 
+void ABrickInGameState::OnRep_Countdown()
+{
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
+	{
+		if (ABrickGamePlayerController* BPC = Cast<ABrickGamePlayerController>(PC))
+		{
+			BPC->UpdateCountdownUI(Countdown);
+		}
+	}
+}
+
+void ABrickInGameState::StartCountdown()
+{
+	if (!HasAuthority()) return;
+
+	Countdown = 3;
+	OnRep_Countdown(); // For Server
+	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ABrickInGameState::CountdownTick, 1.0f, true);
+}
+
+void ABrickInGameState::CountdownTick()
+{
+	Countdown--;
+	if (Countdown <= 0)
+	{
+		GetWorldTimerManager().ClearTimer(CountdownTimerHandle);
+
+		if (HasAuthority()) // 서버에서만 실행
+		{
+			if (ABrickInGameMode* GM = Cast<ABrickInGameMode>(GetWorld()->GetAuthGameMode()))
+			{
+				GM->EnterGameplayPhase();
+			}
+		}
+	}
+
+	OnRep_Countdown(); // For Client
+}
+
 void ABrickInGameState::OnRep_GamePhase()
 {
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
 	{
 		if (ABrickGamePlayerController* BPC = Cast<ABrickGamePlayerController>(PC))
 		{
-			if (CurrentPhase == EGamePhase::Intro)
+			if (CurrentPhase == EGamePhase::Loading)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("EGamePhase : Loading"));
+				if (BPC->IsLocalPlayerController())
+				{
+					BPC->SetIgnoreMoveInput(true);
+					if (APawn* Pawn = BPC->GetPawn())
+					{
+						if (ABrickCharacter* MyCharacter = Cast<ABrickCharacter>(Pawn))
+						{
+							MyCharacter->SetCanUseSkill(false);
+						}
+					}
+				}
+			}
+			else if (CurrentPhase == EGamePhase::Intro)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("EGamePhase : Intro"));
 				if (BPC->IsLocalPlayerController())
@@ -119,13 +174,30 @@ void ABrickInGameState::OnRep_GamePhase()
 					BPC->InitTrapSettingUI();
 				}
 			}
+			else if (CurrentPhase == EGamePhase::Countdown)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("EGamePhase : Countdown"));
+				if (BPC->IsLocalPlayerController())
+				{
+					BPC->ReturnToPawnCamera();
+					BPC->SetIgnoreMoveInput(true);
+					BPC->InitCountdownUI();
+				}
+			}
 			else if (CurrentPhase == EGamePhase::Gameplay)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("EGamePhase : Gameplay"));
 				if (BPC->IsLocalPlayerController())
 				{
-					BPC->ReturnToPawnCamera();
 					BPC->InitInGameUI();
+					BPC->SetIgnoreMoveInput(false);
+					if (APawn* Pawn = BPC->GetPawn())
+					{
+						if (ABrickCharacter* MyCharacter = Cast<ABrickCharacter>(Pawn))
+						{
+							MyCharacter->SetCanUseSkill(true);
+						}
+					}
 				}
 			}
 		}
@@ -142,4 +214,9 @@ void ABrickInGameState::SetGamePhase(EGamePhase NewPhase)
 	{
 		OnRep_GamePhase();  // 로컬 플레이어에게만 실행
 	}
+}
+
+EGamePhase ABrickInGameState::GetCurrentPhase()
+{
+	return CurrentPhase;
 }

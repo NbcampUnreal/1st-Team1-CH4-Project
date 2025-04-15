@@ -40,7 +40,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
 	bool bCanMove = true;
+	bool bCanUseSkill = true;
 
 public:
 	virtual void Tick(float DeltaTime) override;
@@ -65,6 +67,7 @@ public:
 
 	// 모드 구분용 변수
 	bool bIsPlacingMode;
+	void SetCanUseSkill(bool NewCanUseSkill);
 
 	void AttachCrown();
 	void PlayVictoryMontage();

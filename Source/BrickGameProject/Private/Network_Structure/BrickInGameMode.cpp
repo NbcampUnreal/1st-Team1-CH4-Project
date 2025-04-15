@@ -22,6 +22,11 @@ void ABrickInGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+    if (ABrickInGameState* GS = GetGameState<ABrickInGameState>())
+    {
+        GS->SetGamePhase(EGamePhase::Loading);
+    }
+
     for (TActorIterator<ABrickPlayerStart> It(GetWorld()); It; ++It)
     {
         ABrickPlayerStart* Start = *It;
@@ -38,7 +43,7 @@ void ABrickInGameMode::BeginPlay()
         InitPlayerSpawnHandle,
         this,
         &ABrickInGameMode::AssignCheckPointForPlayers,
-        2.0f,
+        5.0f,
         false
     );
 }
@@ -187,7 +192,7 @@ void ABrickInGameMode::EnterPlacementPhase()
         GS->SetGamePhase(EGamePhase::Placement);
     }
 
-    GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ABrickInGameMode::EnterGameplayPhase, 20.0f, false);
+    GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ABrickInGameMode::EnterCountdownPhase, 20.0f, false);
 }
 
 void ABrickInGameMode::EnterGameplayPhase()
@@ -198,6 +203,15 @@ void ABrickInGameMode::EnterGameplayPhase()
     }
 
     StartGameTimer();
+}
+
+void ABrickInGameMode::EnterCountdownPhase()
+{
+    if (ABrickInGameState* GS = GetGameState<ABrickInGameState>())
+    {
+        GS->SetGamePhase(EGamePhase::Countdown);
+        GS->StartCountdown();
+    }
 }
 
 

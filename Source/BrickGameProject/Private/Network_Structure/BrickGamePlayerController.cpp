@@ -15,6 +15,8 @@
 #include "InGame/TrapSettingUserWidget.h"
 #include "Trap/TrapBase.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
+#include "InGame/CountdownUserWidget.h"
+#include "Character/BrickCharacter.h"
 
 
 ABrickGamePlayerController::ABrickGamePlayerController()
@@ -40,7 +42,6 @@ ABrickGamePlayerController::ABrickGamePlayerController()
 void ABrickGamePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
 
 	if (HasAuthority())
 	{
@@ -185,15 +186,10 @@ void ABrickGamePlayerController::InitLobbyUI()
 
 void ABrickGamePlayerController::InitInGameUI()
 {
-	if (LobbyWidget)
+	if (CountdownWidget)
 	{
-		LobbyWidget->RemoveFromParent();
-		LobbyWidget = nullptr;
-	}
-	if (TrapSettingWidget)
-	{
-		TrapSettingWidget->RemoveFromParent();
-		TrapSettingWidget = nullptr;
+		CountdownWidget->RemoveFromParent();
+		CountdownWidget = nullptr;
 	}
 
 	InGameHUDWidget = CreateWidget<UInGameHUD>(this, InGameHUDClass);
@@ -202,7 +198,6 @@ void ABrickGamePlayerController::InitInGameUI()
 		FInputModeGameOnly InputMode;
 		SetInputMode(InputMode);
 		SetShowMouseCursor(false);
-		FSlateApplication::Get().CancelDragDrop();
 	}
 }
 
@@ -245,6 +240,26 @@ void ABrickGamePlayerController::InitTrapSettingUI()
 		SetInputMode(InputMode);
 
 		bShowMouseCursor = true;
+	}
+}
+
+void ABrickGamePlayerController::InitCountdownUI()
+{
+	if (TrapSettingWidget)
+	{
+		TrapSettingWidget->RemoveFromParent();
+		TrapSettingWidget = nullptr;
+	}
+
+	CountdownWidget = CreateWidget<UCountdownUserWidget>(this, CountdownWidgetClass);
+	if (CountdownWidget)
+	{
+		CountdownWidget->AddToViewport();
+
+		FInputModeGameOnly InputMode;
+		SetInputMode(InputMode);
+		SetShowMouseCursor(false);
+		FSlateApplication::Get().CancelDragDrop();
 	}
 }
 
@@ -353,6 +368,25 @@ void ABrickGamePlayerController::ResetCameras()
 {
 	Cameras.Empty();
 	CurrentCameraIndex = 0;
+}
+
+void ABrickGamePlayerController::UpdateCountdownUI(int32 InCountdown)
+{
+	if (CountdownWidget)
+	{
+		if (InCountdown > 0)
+		{
+
+			CountdownWidget->SetVisibility(ESlateVisibility::Visible);
+			CountdownWidget->SetCountdownText(FText::FromString(FString::FromInt(InCountdown)));
+			CountdownWidget->PlayCountdownAnimation();
+
+		}
+		else
+		{
+			CountdownWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
 }
 
 void ABrickGamePlayerController::HandleTrapDrop(FVector2D ScreenPosition, TSubclassOf<ATrapBase> TrapClass)

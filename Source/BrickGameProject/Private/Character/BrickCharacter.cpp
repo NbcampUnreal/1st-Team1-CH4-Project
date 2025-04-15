@@ -165,6 +165,7 @@ void ABrickCharacter::StartPlacingBlock(const FInputActionValue& Value)
 
 void ABrickCharacter::SelectBlock1(const FInputActionValue& value)
 {
+	if (!bCanUseSkill) return;
 	if (value.Get<bool>())
 	{
 		SelectedBlockIndex = 0;
@@ -184,6 +185,7 @@ void ABrickCharacter::SelectBlock1(const FInputActionValue& value)
 
 void ABrickCharacter::SelectBlock2(const FInputActionValue& value)
 {
+	if (!bCanUseSkill) return;
 	if (value.Get<bool>())
 	{
 		SelectedBlockIndex = 1;
@@ -199,7 +201,6 @@ void ABrickCharacter::SelectBlock2(const FInputActionValue& value)
 		StartPlacingBlock(FInputActionValue());
 	}
 }
-
 
 void ABrickCharacter::RotatePreviewBlock(const FInputActionValue& Value)
 {
@@ -238,6 +239,8 @@ void ABrickCharacter::DeleteBlock(const FInputActionValue& Value)
 
 void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 {
+	if (!bCanUseSkill) return;
+
 	AActor* CurrentPreview = PreviewBlocks[SelectedBlockIndex];
 	if (!CurrentPreview || !BlockClasses.IsValidIndex(SelectedBlockIndex)) return;
 
@@ -321,6 +324,11 @@ void ABrickCharacter::PlayFKeyAnimationStop(const FInputActionValue& Value)
 		GetMesh()->GetAnimInstance()->Montage_Stop(0.2f);
 		UE_LOG(LogTemp, Warning, TEXT("F key released - Montage Stopped"));
 	}
+}
+
+void ABrickCharacter::SetCanUseSkill(bool NewCanUseSkill)
+{
+	bCanUseSkill = NewCanUseSkill;
 }
 
 void ABrickCharacter::AttachCrown()
