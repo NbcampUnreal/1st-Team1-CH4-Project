@@ -256,17 +256,40 @@ void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 	FVector SpawnLocation = Origin - FVector(0, 0, Extent.Z);
 	FRotator SpawnRotation = PreviewBlock->GetActorRotation();
 
-	GetWorld()->SpawnActor<AActor>(BlockClasses[SelectedBlockIndex], SpawnLocation, SpawnRotation);
 
-	if (ClickSound)
+	if (HasAuthority())
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, ClickSound, GetActorLocation());
+		ServerPlaceBlock(SpawnLocation, SpawnRotation);
+	}
+	else
+	{
+		ServerPlaceBlock(SpawnLocation, SpawnRotation);
 	}
 
 	PreviewBlock->Destroy();
 	PreviewBlock = nullptr;
 }
 
+void ABrickCharacter::MulticastPlayVictoryMontage_Implementation()
+{
+	if (VictoryMontage && GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(VictoryMontage);
+	}
+}
+
+void ABrickCharacter::MulticastPlayDefeatMontage_Implementation()
+{
+	if (DefeatMontage && GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		UAnimInstance* AnimInst = GetMesh()->GetAnimInstance();
+		if (!AnimInst->Montage_IsPlaying(DefeatMontage))
+		{
+			AnimInst->Montage_Play(DefeatMontage, 1.0f);
+			UE_LOG(LogTemp, Warning, TEXT("▶▶ Multicast DefeatMontage 재생"));
+		}
+	}
+}
 
 
 
@@ -392,5 +415,19 @@ void ABrickCharacter::MulticastApplyFinalPose_Implementation(FRotator ActorRot, 
 	if (GetMesh())
 	{
 		GetMesh()->SetRelativeRotation(MeshRot);
+	}
+}
+void ABrickCharacter::ServerPlaceBlock_Implementation(FVector SpawnLocation, FRotator SpawnRotation)
+{
+	if (BlockClasses.IsValidIndex(SelectedBlockIndex))
+	{
+		AActor* SpawnedBlock = GetWorld()->SpawnActor<AActor>(
+			BlockClasses[SelectedBlockIndex], SpawnLocation, SpawnRotation
+		);
+
+		if (ClickSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, ClickSound, GetActorLocation());
+		}
 	}
 }

@@ -76,7 +76,7 @@ void AResultGameMode::BeginPlay()
 
             Char->GetMesh()->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
             Char->AttachCrown();
-            Char->PlayVictoryMontage();
+            Char->MulticastPlayVictoryMontage();
             Char->SetMovementEnabled(false);
 
             WinningChars.Add(Char);
@@ -98,7 +98,7 @@ void AResultGameMode::BeginPlay()
             Char->SetActorLocation(LoseSpots[i]->GetActorLocation());
             Char->SetActorRotation(LoseSpots[i]->GetActorRotation());
             Char->GetMesh()->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
-            Char->PlayDefeatMontage();
+            Char->MulticastPlayDefeatMontage();
             Char->SetMovementEnabled(false);
 
             LosingChars.Add(Char);
