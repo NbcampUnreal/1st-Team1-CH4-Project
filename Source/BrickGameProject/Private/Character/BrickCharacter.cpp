@@ -40,9 +40,6 @@ ABrickCharacter::ABrickCharacter()
 
 	PreviewBlock = nullptr;
 	PreviewPivotToBottom = 0.0f;
-
-	bUseControllerRotationYaw = true;
-	GetCharacterMovement()->bOrientRotationToMovement = false;
 }
 
 // Called when the game starts or when spawned
@@ -101,11 +98,11 @@ void ABrickCharacter::Move(const FInputActionValue& value)
 	if (!Controller) return;
 
 	const FVector2D MoveInput = value.Get<FVector2D>();
-	FRotator ControlRot = Controller->GetControlRotation();
-	FRotator YawRotation(0, ControlRot.Yaw, 0); 
+	FRotator ControlRot = Controller->GetControlRotation(); // Get current control rotation(usually from the camera)
+	FRotator YawRotation(0, ControlRot.Yaw, 0); // Remove pitch, roll(keep only yaw for horizontal movement)
 
-	FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X); 
-	FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y); 
+	FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X); // Forward direction relative to the camera's yaw
+	FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y); // Right direction relative to the camera's yaw
 
 	if (!FMath::IsNearlyZero(MoveInput.X)) AddMovementInput(Forward, MoveInput.X);
 	if (!FMath::IsNearlyZero(MoveInput.Y)) AddMovementInput(Right, MoveInput.Y);
