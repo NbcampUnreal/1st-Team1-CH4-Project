@@ -150,8 +150,16 @@ void ABrickCharacter::StartPlacingBlock(const FInputActionValue& Value)
 			Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			Comp->SetSimulatePhysics(false);
 		}
+		if (SelectedBlockIndex == 1)
+		{
+			FRotator Rot = Spawned->GetActorRotation();
+			Rot.Yaw += 180.f;
+			Spawned->SetActorRotation(Rot);
+		}
+
 		PreviewBlocks[SelectedBlockIndex] = Spawned;
 	}
+
 }
 
 
