@@ -13,6 +13,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InGame/TrapSettingUserWidget.h"
 #include "Trap/TrapBase.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
 
 
 ABrickGamePlayerController::ABrickGamePlayerController()
@@ -238,10 +239,14 @@ void ABrickGamePlayerController::InitTrapSettingUI()
 	if (TrapSettingWidget)
 	{
 		TrapSettingWidget->AddToViewport();
+
 		FInputModeGameAndUI InputMode;
+		InputMode.SetWidgetToFocus(TrapSettingWidget->TakeWidget());
 		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 		InputMode.SetHideCursorDuringCapture(false);
 		SetInputMode(InputMode);
+
+		bShowMouseCursor = true;
 	}
 }
 
@@ -262,7 +267,7 @@ void ABrickGamePlayerController::PlayIntroCameraSequence()
 		UE_LOG(LogTemp, Warning, TEXT("CameraChange"));
 		SetViewTarget(Cast<AActor>(Cameras[CurrentCameraIndex]));
 		CurrentCameraIndex++;
-		SetViewTargetWithBlend(Cast<AActor>(Cameras[CurrentCameraIndex]), 10.0f);
+		SetViewTargetWithBlend(Cast<AActor>(Cameras[CurrentCameraIndex]), 5.0f);
 	}
 
 }
@@ -352,53 +357,92 @@ void ABrickGamePlayerController::ResetCameras()
 	CurrentCameraIndex = 0;
 }
 
-void ABrickGamePlayerController::HandleTrapDrop(FVector2D ScreenPosition, TSubclassOf<ATrapBase> TrapClass)
+FVector ABrickGamePlayerController::CalcRayStartPositionFromScreenOffset()
 {
-	
-	/*FVector WorldLocation;
-	FVector WorldDirection;*/
-
 	FVector2D ViewportSize;
 	GEngine->GameViewport->GetViewportSize(ViewportSize);
-	FVector2D ViewportCenter = ViewportSize / 2;
-
-	FVector WorldLocation;
-	FVector WorldDirection;
-	
-	// 1. 스크린 좌표를 3D 월드로 변환
-	//if (DeprojectScreenPositionToWorld(ScreenPosition.X, ScreenPosition.Y, WorldLocation, WorldDirection))
-	if(DeprojectScreenPositionToWorld(ViewportCenter.X, ViewportCenter.Y, WorldLocation, WorldDirection))
+	float X, Y;
+	GetMousePosition(X, Y);
+	float Scale = UWidgetLayoutLibrary::GetViewportScale(this);
+	// DPI 보정된 마우스 위치
+	FVector2D DPIAdjusted;
+	DPIAdjusted.X = X;
+	DPIAdjusted.Y = Y;
+	DPIAdjusted /= Scale;
+	/*if (!UWidgetLayoutLibrary::GetMousePositionScaledByDPI(this, DPIAdjusted.X, DPIAdjusted.Y))
 	{
-		// 2. 라인 트레이스를 아래 방향으로 쏴서 지형 히트 확인
+		UE_LOG(LogTemp, Error, TEXT("GetMousePositionScaledByDPI Failed"));
+		UE_LOG(LogTemp, Error, TEXT("IsLocalController: %d"), IsLocalController());
+		UE_LOG(LogTemp, Error, TEXT("IsValid(PlayerController): %d"), IsValid(this));
+		return FVector::ZeroVector;
+	}*/
+
+	FVector2D ViewportCenter = ViewportSize / 2.0f;
+	FVector2D Offset = DPIAdjusted - ViewportCenter;
+
+	// 픽셀 → 월드 단위 변환 비율 (실험적으로 조정)
+	const float PixelToWorld = 5.0f;
+
+	// 오프셋을 월드 거리로 변환
+	FVector2D WorldOffset = Offset * PixelToWorld;
+
+	// 카메라 기준 방향 가져오기
+	FVector CamLoc;
+	FRotator CamRot;
+	GetPlayerViewPoint(CamLoc, CamRot);
+
+	FVector Forward = FRotationMatrix(CamRot).GetUnitAxis(EAxis::X); // 전방
+	FVector Right = FRotationMatrix(CamRot).GetUnitAxis(EAxis::Y);   // 우측
+
+	// 카메라에서 Offset 적용 위치 계산
+	FVector RayStart = CamLoc + (Right * WorldOffset.X) + (Forward * WorldOffset.Y);
+	return RayStart;
+}
+
+void ABrickGamePlayerController::HandleTrapDrop(FVector2D ScreenPosition, TSubclassOf<ATrapBase> TrapClass)
+{
+	FVector WorldOrigin;
+	FVector WorldDirection;
+
+	// 1. 마우스 위치 기준으로 월드 방향 계산
+	if (DeprojectScreenPositionToWorld(ScreenPosition.X, ScreenPosition.Y, WorldOrigin, WorldDirection))
+	{
+		// 2. 카메라 위치 기준으로 시작점 설정
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		GetPlayerViewPoint(CameraLocation, CameraRotation);
+
+		FVector Start = CameraLocation;
+		FVector End = Start + WorldDirection * 10000.0f;
+
 		FHitResult Hit;
-		FVector Start = WorldLocation;
-		FVector End = Start + WorldDirection * 10000.0f; // 너무 멀 필요 없음, 10,000도 충분
+		//DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 5.0f, 0, 2.0f);
 
-
-		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 5.0f, 0, 2.0f);
 		if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("HandleTrapDrop_2"));
-			if (HasAuthority()) // 서버에서만 스폰
+			UE_LOG(LogTemp, Warning, TEXT("LineTrace Success: %s"), *Hit.Location.ToString());
+
+			if (HasAuthority())
 			{
-				FVector TrapSpawnLocation = Hit.Location;
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.Owner = this;
 				SpawnParams.Instigator = GetPawn();
-				UE_LOG(LogTemp, Warning, TEXT("Trap_install_by server"));
-				// 예: 드래그 시 Payload에 담긴 클래스를 사용할 수 있다면 거기서 사용
-				GetWorld()->SpawnActor<ATrapBase>(TrapClass, TrapSpawnLocation, FRotator::ZeroRotator, SpawnParams);
+
+				GetWorld()->SpawnActor<ATrapBase>(TrapClass, Hit.Location, FRotator::ZeroRotator, SpawnParams);
 			}
 			else
 			{
-				// 클라이언트인 경우, 서버 RPC 요청
 				Server_SpawnTrap(Hit.Location, TrapClass);
 			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("LineTrace Failed: Start %s End %s"), *Start.ToString(), *End.ToString());
+			UE_LOG(LogTemp, Warning, TEXT("LineTrace Failed: Start=%s End=%s"), *Start.ToString(), *End.ToString());
 		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Deproject Failed: ScreenPos=(%f, %f)"), ScreenPosition.X, ScreenPosition.Y);
 	}
 }
 
@@ -412,4 +456,3 @@ void ABrickGamePlayerController::Server_SpawnTrap_Implementation(FVector Locatio
 
 	GetWorld()->SpawnActor<ATrapBase>(TrapClass, TrapSpawnLocation, FRotator::ZeroRotator, SpawnParams);
 }
-

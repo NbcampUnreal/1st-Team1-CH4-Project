@@ -74,7 +74,7 @@ void ABrickInGameMode::AssignCheckPointForPlayers()
         GS->SetGamePhase(EGamePhase::Intro);
     }
 
-    GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ABrickInGameMode::EnterPlacementPhase, 11.0f, false);
+    GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ABrickInGameMode::EnterPlacementPhase, 6.0f, false);
 }
 
 void ABrickInGameMode::HandleTeamWin(EGameTeam WinnerTeam)

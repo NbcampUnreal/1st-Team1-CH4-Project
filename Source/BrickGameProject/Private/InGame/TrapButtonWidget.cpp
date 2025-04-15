@@ -13,8 +13,9 @@ FReply UTrapButtonWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, c
 
 void UTrapButtonWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
-    UDragDropOperation* DragOp = NewObject<UDragDropOperation>(this);
-    DragOp->Payload = TrapClassToSpawn;
-    DragOp->DefaultDragVisual = this;
-    OutOperation = DragOp;
+	UDragDropOperation* DragOp = NewObject<UDragDropOperation>(this);
+	DragOp->Payload = TrapClassToSpawn;
+	DragOp->DefaultDragVisual = this;
+	DragOp->Pivot = EDragPivot::MouseDown; // 중요한 포인트
+	OutOperation = DragOp;
 }

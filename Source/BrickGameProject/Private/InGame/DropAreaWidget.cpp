@@ -5,6 +5,8 @@
 #include "Blueprint/DragDropOperation.h"
 #include "Trap/TrapBase.h"
 #include "Network_Structure/BrickGamePlayerController.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
+
 
 
 bool UDropAreaWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -16,8 +18,10 @@ bool UDropAreaWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropE
         if (ABrickGamePlayerController* PC = Cast<ABrickGamePlayerController>(GetOwningPlayer()))
         {
             FVector2D ScreenPos = InDragDropEvent.GetScreenSpacePosition();
-            FVector2D ScreenPosition = FSlateApplication::Get().GetCursorPos();
-            PC->HandleTrapDrop(ScreenPosition, TrapClass);
+            float Scale = UWidgetLayoutLibrary::GetViewportScale(GetOwningPlayer());
+            FVector2D ScaledScreenPos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
+            ScaledScreenPos *= Scale;
+            PC->HandleTrapDrop(ScaledScreenPos, TrapClass);
             return true;
         }
     }
