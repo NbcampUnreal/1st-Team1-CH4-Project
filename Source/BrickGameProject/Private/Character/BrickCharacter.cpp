@@ -38,7 +38,6 @@ ABrickCharacter::ABrickCharacter()
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 	CameraComp->bUsePawnControlRotation = false;
 
-	PreviewBlock = nullptr;
 	PreviewPivotToBottom = 0.0f;
 }
 
@@ -60,7 +59,7 @@ void ABrickCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (PreviewBlock)
+	if (PreviewBlocks.IsValidIndex(SelectedBlockIndex) && PreviewBlocks[SelectedBlockIndex])
 	{
 		UpdatePreviewBlock();
 	}
@@ -81,7 +80,6 @@ void ABrickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 			EnhancedInput->BindAction(PlayerController->GetLookAction(), ETriggerEvent::Triggered, this, &ABrickCharacter::Look);
 			EnhancedInput->BindAction(PlayerController->GetBlock1Action(), ETriggerEvent::Triggered, this, &ABrickCharacter::SelectBlock1);
 			EnhancedInput->BindAction(PlayerController->GetBlock2Action(), ETriggerEvent::Triggered, this, &ABrickCharacter::SelectBlock2);
-			EnhancedInput->BindAction(PlayerController->GetBlock3Action(), ETriggerEvent::Triggered, this, &ABrickCharacter::SelectBlock3);
 			EnhancedInput->BindAction(PlayerController->GetRotatePreviewBlockAction(), ETriggerEvent::Triggered, this, &ABrickCharacter::RotatePreviewBlock);
 			EnhancedInput->BindAction(PlayerController->GetDeleteBlockAction(), ETriggerEvent::Started, this, &ABrickCharacter::DeleteBlock);
 			EnhancedInput->BindAction(PlayerController->GetLeftClickAction(), ETriggerEvent::Started, this, &ABrickCharacter::OnLeftClick);
@@ -131,82 +129,83 @@ void ABrickCharacter::Look(const FInputActionValue& value)
 
 void ABrickCharacter::StartPlacingBlock(const FInputActionValue& Value)
 {
-	if (!PreviewBlock && PreviewBlockClass)
+	if (!PreviewBlockClasses.IsValidIndex(SelectedBlockIndex)) return;
+
+	if (PreviewBlocks.IsValidIndex(SelectedBlockIndex) && PreviewBlocks[SelectedBlockIndex])
 	{
-		FActorSpawnParameters Params;
-		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		PreviewBlock = GetWorld()->SpawnActor<AActor>(PreviewBlockClass, FVector::ZeroVector, FRotator::ZeroRotator, Params);
-		if (PreviewBlock)
-		{
-			TArray<UPrimitiveComponent*> PrimComponents;
-			PreviewBlock->GetComponents<UPrimitiveComponent>(PrimComponents);
-			for (UPrimitiveComponent* PrimComp : PrimComponents)
-			{
-				PrimComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-				PrimComp->SetSimulatePhysics(false);
-			}
-		}
+		PreviewBlocks[SelectedBlockIndex]->Destroy();
+		PreviewBlocks[SelectedBlockIndex] = nullptr;
 	}
 
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AActor* Spawned = GetWorld()->SpawnActor<AActor>(PreviewBlockClasses[SelectedBlockIndex], FVector::ZeroVector, FRotator::ZeroRotator, Params);
+
+	if (Spawned)
+	{
+		TArray<UPrimitiveComponent*> PrimComponents;
+		Spawned->GetComponents<UPrimitiveComponent>(PrimComponents);
+		for (auto Comp : PrimComponents)
+		{
+			Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			Comp->SetSimulatePhysics(false);
+		}
+		PreviewBlocks[SelectedBlockIndex] = Spawned;
+	}
 }
+
 
 void ABrickCharacter::SelectBlock1(const FInputActionValue& value)
 {
 	if (value.Get<bool>())
 	{
 		SelectedBlockIndex = 0;
-		if (PreviewBlock)
+		for (int i = 0; i < 2; i++)
 		{
-			PreviewBlock->Destroy();
-			PreviewBlock = nullptr;
+			if (i != 0 && PreviewBlocks[i])
+			{
+				PreviewBlocks[i]->Destroy();
+				PreviewBlocks[i] = nullptr;
+			}
 		}
-		FInputActionValue Dummy;
-		StartPlacingBlock(Dummy);
-	}
 
+		StartPlacingBlock(FInputActionValue());
+	}
 }
+
 
 void ABrickCharacter::SelectBlock2(const FInputActionValue& value)
 {
 	if (value.Get<bool>())
 	{
 		SelectedBlockIndex = 1;
-		if (PreviewBlock)
+		for (int i = 0; i < PreviewBlocks.Num(); i++)
 		{
-			PreviewBlock->Destroy();
-			PreviewBlock = nullptr;
+			if (i != SelectedBlockIndex && PreviewBlocks[i])
+			{
+				PreviewBlocks[i]->Destroy();
+				PreviewBlocks[i] = nullptr;
+			}
 		}
-		FInputActionValue Dummy;
-		StartPlacingBlock(Dummy);
-	}
 
+		StartPlacingBlock(FInputActionValue());
+	}
 }
 
-void ABrickCharacter::SelectBlock3(const FInputActionValue& value)
-{
-	if (value.Get<bool>())
-	{
-		SelectedBlockIndex = 2;
-		if (PreviewBlock)
-		{
-			PreviewBlock->Destroy();
-			PreviewBlock = nullptr;
-		}
-		FInputActionValue Dummy;
-		StartPlacingBlock(Dummy);
-	}
-
-}
 
 void ABrickCharacter::RotatePreviewBlock(const FInputActionValue& Value)
 {
-	if (!PreviewBlock) return;
+	AActor* CurrentPreview = PreviewBlocks[SelectedBlockIndex];
+	if (!CurrentPreview) return;
+
 	float ScrollValue = Value.Get<float>();
 	if (FMath::IsNearlyZero(ScrollValue)) return;
-	FRotator CurrentRotation = PreviewBlock->GetActorRotation();
+
+	FRotator CurrentRotation = CurrentPreview->GetActorRotation();
 	CurrentRotation.Yaw += ScrollValue * 15.0f;
-	PreviewBlock->SetActorRotation(CurrentRotation);
+	CurrentPreview->SetActorRotation(CurrentRotation);
 }
+
 
 void ABrickCharacter::DeleteBlock(const FInputActionValue& Value)
 {
@@ -231,47 +230,21 @@ void ABrickCharacter::DeleteBlock(const FInputActionValue& Value)
 
 void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 {
-	if (!PreviewBlock || !BlockClasses.IsValidIndex(SelectedBlockIndex)) return;
+	AActor* CurrentPreview = PreviewBlocks[SelectedBlockIndex];
+	if (!CurrentPreview || !BlockClasses.IsValidIndex(SelectedBlockIndex)) return;
 
 	FVector Origin, Extent;
-	PreviewBlock->GetActorBounds(false, Origin, Extent);
+	CurrentPreview->GetActorBounds(false, Origin, Extent);
 
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-	Params.AddIgnoredActor(PreviewBlock);
-
-	TArray<UPrimitiveComponent*> PrimComponents;
-	PreviewBlock->GetComponents<UPrimitiveComponent>(PrimComponents);
-	for (UPrimitiveComponent* PrimComp : PrimComponents)
-	{
-		Params.AddIgnoredComponent(PrimComp);
-	}
-
-	bool bOverlaps = GetWorld()->OverlapAnyTestByChannel(
-		Origin, FQuat::Identity, ECC_WorldStatic,
-		FCollisionShape::MakeBox(Extent), Params
-	);
-
-	if (bOverlaps)
-	{
-		return;
-	}
+	// 겹침 검사 제거됨
 
 	FVector SpawnLocation = Origin - FVector(0, 0, Extent.Z);
-	FRotator SpawnRotation = PreviewBlock->GetActorRotation();
+	FRotator SpawnRotation = CurrentPreview->GetActorRotation();
 
+	ServerPlaceBlock(SpawnLocation, SpawnRotation);
 
-	if (HasAuthority())
-	{
-		ServerPlaceBlock(SpawnLocation, SpawnRotation);
-	}
-	else
-	{
-		ServerPlaceBlock(SpawnLocation, SpawnRotation);
-	}
-
-	PreviewBlock->Destroy();
-	PreviewBlock = nullptr;
+	CurrentPreview->Destroy();
+	PreviewBlocks[SelectedBlockIndex] = nullptr;
 }
 
 void ABrickCharacter::MulticastPlayVictoryMontage_Implementation()
@@ -299,7 +272,8 @@ void ABrickCharacter::MulticastPlayDefeatMontage_Implementation()
 
 void ABrickCharacter::UpdatePreviewBlock()
 {
-	if (!PreviewBlock) return;
+	AActor* CurrentPreview = PreviewBlocks[SelectedBlockIndex];
+	if (!CurrentPreview) return;
 
 	FHitResult Hit;
 	APlayerController* PC = Cast<APlayerController>(GetController());
@@ -308,14 +282,14 @@ void ABrickCharacter::UpdatePreviewBlock()
 		if (Hit.bBlockingHit)
 		{
 			FVector Origin, Extent;
-			PreviewBlock->GetActorBounds(true, Origin, Extent);
+			CurrentPreview->GetActorBounds(true, Origin, Extent);
 			FVector Adjusted = Hit.ImpactPoint;
 			Adjusted.Z += Extent.Z;
-			PreviewBlock->SetActorLocation(Adjusted);
+			CurrentPreview->SetActorLocation(Adjusted);
 		}
 	}
-
 }
+
 
 
 
