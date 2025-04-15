@@ -12,6 +12,18 @@
 				"Engine",
 				"UMG"
 			]
+		},
+		{
+			"Name": "Core",
+			"Type": "Runtime"
+		},
+		{
+			"Name": "Slate",
+			"Type": "Runtime"
+		},
+		{
+			"Name": "SlateCore",
+			"Type": "Runtime"
 		}
 	],
 	"Plugins": [

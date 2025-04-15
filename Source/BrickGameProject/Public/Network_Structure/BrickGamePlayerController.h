@@ -11,6 +11,8 @@ class UInputAction;
 class ULobbyUserWidget;
 class UInGameHUD;
 class UHubUserWidget;
+class UTrapSettingUserWidget;
+class ATrapBase;
 
 UCLASS()
 class BRICKGAMEPROJECT_API ABrickGamePlayerController : public APlayerController
@@ -55,6 +57,17 @@ public:
 	UPROPERTY()
 	UHubUserWidget* HubWidget;
 
+	// TrapSetting UI
+	UPROPERTY(EditDefaultsOnly, Category = "UI|Hub")
+	TSubclassOf<UTrapSettingUserWidget> TrapSettingWidgetClass;
+
+	UPROPERTY()
+	UTrapSettingUserWidget* TrapSettingWidget;
+
+	TArray<ACameraActor*> Cameras;
+	int32 CurrentCameraIndex = 0;
+	FTimerHandle CameraSwitchTimerHandle;
+
 	//InGame UI
 	UPROPERTY(EditDefaultsOnly, Category = "UI|InGame")
 	TSubclassOf<UInGameHUD> InGameHUDClass;
@@ -68,6 +81,20 @@ public:
 	void InitLobbyUI();
 	void InitInGameUI();
 	void InitHubUI();
+	void InitTrapSettingUI();
+
+	// Phase
+	void PlayIntroCameraSequence();
+	void PlayPlacementCameraSequence(bool bNext);
+	void ReturnToPawnCamera();
+	void FindCamerasByTag(FName TagName);
+	void ResetCameras();
+
+	UFUNCTION(BlueprintCallable)
+	void HandleTrapDrop(FVector2D ScreenPosition, TSubclassOf<ATrapBase> TrapClass);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnTrap(FVector Location, TSubclassOf<ATrapBase> TrapClass);
 
 protected:
 	//IMC
