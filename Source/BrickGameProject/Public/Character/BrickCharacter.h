@@ -155,4 +155,18 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastPlayDefeatMontage();
+
+	UFUNCTION(BlueprintCallable)
+	void ApplyKnockback(const FVector& Direction, float Strength = 1000.f);
+
+	void EnableMovementAfterKnockback();
+
+	UFUNCTION()
+	void OnHitByObstacle(
+		AActor* SelfActor,
+		AActor* OtherActor,
+		FVector NormalImpulse,
+		const FHitResult& Hit
+	);
+
 };
