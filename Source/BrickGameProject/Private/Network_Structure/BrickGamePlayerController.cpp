@@ -195,6 +195,8 @@ void ABrickGamePlayerController::InitInGameUI()
 	InGameHUDWidget = CreateWidget<UInGameHUD>(this, InGameHUDClass);
 	if (InGameHUDWidget)
 	{
+		InGameHUDWidget->AddToViewport();
+
 		FInputModeGameOnly InputMode;
 		SetInputMode(InputMode);
 		SetShowMouseCursor(false);
