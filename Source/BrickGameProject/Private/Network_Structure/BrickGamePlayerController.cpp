@@ -60,7 +60,7 @@ void ABrickGamePlayerController::BeginPlay()
 		if (IsLocalPlayerController())
 		{
 			FString MapName = GetWorld()->GetMapName();
-			if (MapName.Contains("InGameLevel"))
+			if (MapName.Contains("TestLevel"))
 			{
 				UE_LOG(LogTemp, Warning, TEXT("LoadingUIInit"));
 				InitLoadingUI();
@@ -97,7 +97,7 @@ void ABrickGamePlayerController::PostNetInit()
 	if (IsLocalPlayerController())
 	{
 		FString MapName = GetWorld()->GetMapName();
-		if (MapName.Contains("InGameLevel"))
+		if (MapName.Contains("TestLevel"))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("LoadingUIInit"));
 			InitLoadingUI();

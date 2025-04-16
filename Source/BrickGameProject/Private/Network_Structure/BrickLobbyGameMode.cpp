@@ -85,7 +85,7 @@ void ABrickLobbyGameMode::TryNotifyStartAvailable()
 
 void ABrickLobbyGameMode::StartGame()
 {
-	FString TargetMap = TEXT("/Game/Maps/InGameLevel?listen");
+	FString TargetMap = TEXT("/Game/Maps/TestLevel?listen");
 	GetWorld()->ServerTravel(TargetMap);
 }
 
