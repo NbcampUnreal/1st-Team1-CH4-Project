@@ -14,6 +14,7 @@ ABrickInGameMode::ABrickInGameMode()
 {
     bUseSeamlessTravel = true;
 	MaxGameTime = 30.f; 
+	PlacementPhaseTime = 20.f; 
 
 }
 
@@ -192,7 +193,7 @@ void ABrickInGameMode::EnterPlacementPhase()
         GS->SetGamePhase(EGamePhase::Placement);
     }
 
-    GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ABrickInGameMode::EnterCountdownPhase, 20.0f, false);
+    GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ABrickInGameMode::EnterCountdownPhase, PlacementPhaseTime, false);
 }
 
 void ABrickInGameMode::EnterGameplayPhase()

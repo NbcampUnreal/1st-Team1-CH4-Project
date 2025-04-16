@@ -51,7 +51,6 @@ void ABrickInGameState::Tick(float DeltaTime)
 				float ProgressRatio = (Character->GetActorLocation().Y - StartY) / (GoalY - StartY);
 				ProgressRatio = FMath::Clamp(ProgressRatio, 0.0f, 1.0f);
 				BrickPS->SetProgressRatio(ProgressRatio);
-				UE_LOG(LogTemp, Warning, TEXT("Progress Ratio: %f"), ProgressRatio);
 			}
 		}
 	}
