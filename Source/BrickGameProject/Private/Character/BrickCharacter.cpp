@@ -242,11 +242,11 @@ void ABrickCharacter::DeleteBlock(const FInputActionValue& Value)
 
 void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 {
-<<<<<<< Updated upstream
+
 	if (!bCanUseSkill) return;
-=======
+
 	if (!PreviewBlocks.IsValidIndex(SelectedBlockIndex)) return;
->>>>>>> Stashed changes
+
 
 	AActor* CurrentPreview = PreviewBlocks[SelectedBlockIndex];
 	if (!CurrentPreview || !BlockClasses.IsValidIndex(SelectedBlockIndex)) return;
