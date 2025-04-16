@@ -146,14 +146,14 @@ void ABrickInGameState::OnRep_GamePhase()
 				UE_LOG(LogTemp, Warning, TEXT("EGamePhase : Loading"));
 				if (BPC->IsLocalPlayerController())
 				{
-					BPC->SetIgnoreMoveInput(true);
-					if (APawn* Pawn = BPC->GetPawn())
+					//BPC->SetIgnoreMoveInput(true);
+					/*if (APawn* Pawn = BPC->GetPawn())
 					{
 						if (ABrickCharacter* MyCharacter = Cast<ABrickCharacter>(Pawn))
 						{
 							MyCharacter->SetCanUseSkill(false);
 						}
-					}
+					}*/
 				}
 			}
 			else if (CurrentPhase == EGamePhase::Intro)
