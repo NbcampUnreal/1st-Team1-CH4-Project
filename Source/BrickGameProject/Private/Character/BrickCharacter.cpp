@@ -23,7 +23,7 @@ ABrickCharacter::ABrickCharacter()
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArmComp->SetupAttachment(RootComponent);
-	SpringArmComp->TargetArmLength = 300.0f;
+	SpringArmComp->TargetArmLength = 400.0f;
 	SpringArmComp->bUsePawnControlRotation = true;
 	SpringArmComp->bDoCollisionTest = false; // 임시 비활성화
 	SpringArmComp->ProbeSize = 16.0f;
@@ -64,6 +64,7 @@ void ABrickCharacter::Tick(float DeltaTime)
 	{
 		UpdatePreviewBlock();
 	}
+
 }
 
 // Called to bind functionality to input
@@ -184,6 +185,7 @@ void ABrickCharacter::SelectBlock1(const FInputActionValue& value)
 	}
 }
 
+
 void ABrickCharacter::SelectBlock2(const FInputActionValue& value)
 {
 	if (!bCanUseSkill) return;
@@ -199,7 +201,6 @@ void ABrickCharacter::SelectBlock2(const FInputActionValue& value)
 				PreviewBlocks[i] = nullptr;
 			}
 		}
-
 		StartPlacingBlock(FInputActionValue());
 	}
 }
@@ -242,11 +243,8 @@ void ABrickCharacter::DeleteBlock(const FInputActionValue& Value)
 
 void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 {
-
 	if (!bCanUseSkill) return;
-
 	if (!PreviewBlocks.IsValidIndex(SelectedBlockIndex)) return;
-
 
 	AActor* CurrentPreview = PreviewBlocks[SelectedBlockIndex];
 	if (!CurrentPreview || !BlockClasses.IsValidIndex(SelectedBlockIndex)) return;
@@ -261,7 +259,10 @@ void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 
 	CurrentPreview->Destroy();
 	PreviewBlocks[SelectedBlockIndex] = nullptr;
+
 }
+
+
 void ABrickCharacter::MulticastPlayVictoryMontage_Implementation()
 {
 	if (VictoryMontage && GetMesh() && GetMesh()->GetAnimInstance())
@@ -458,4 +459,5 @@ void ABrickCharacter::OnHitByObstacle(AActor* SelfActor, AActor* OtherActor, FVe
 		ApplyKnockback(KnockbackDir, 1500.f);
 	}
 }
+
 
