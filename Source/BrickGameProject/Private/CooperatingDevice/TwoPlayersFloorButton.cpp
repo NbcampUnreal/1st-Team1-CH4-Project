@@ -2,6 +2,7 @@
 
 
 #include "CooperatingDevice/TwoPlayersFloorButton.h"
+#include "Kismet/GameplayStatics.h"
 #include "CooperatingDevice/FloorButtonSet.h"
 
 void ATwoPlayersFloorButton::UpdateButtonState()
@@ -20,4 +21,9 @@ void ATwoPlayersFloorButton::LockButton()
 
 	StaticMeshButtonComp->SetRelativeLocation(PressedButtonLocation);
 	SetButtonMaterial(CompletedMaterial);
+
+	if (ButtonPressSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ButtonPressSound, GetActorLocation());
+	}
 }

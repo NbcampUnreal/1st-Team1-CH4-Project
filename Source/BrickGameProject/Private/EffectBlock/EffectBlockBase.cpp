@@ -53,7 +53,7 @@ void AEffectBlockBase::ApplyEffect(ACharacter* Target)
 
 void AEffectBlockBase::DestoryBlock()
 {
-	//Destroy(); // TODO : 추후 주석 풀기
+	Destroy();
 }
 
 void AEffectBlockBase::InitCollsion(bool bIsBox)

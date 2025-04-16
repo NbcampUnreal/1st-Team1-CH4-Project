@@ -25,4 +25,8 @@ public:
 	float EffectDuration;
 
 	virtual void ApplyEffect(ACharacter* Target) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SFX")
+	USoundBase* BoostSound;
+
 };

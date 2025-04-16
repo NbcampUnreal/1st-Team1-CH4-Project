@@ -60,7 +60,7 @@ void ABrickGamePlayerController::BeginPlay()
 		if (IsLocalPlayerController())
 		{
 			FString MapName = GetWorld()->GetMapName();
-			if (MapName.Contains("InGameLevel"))
+			if (MapName.Contains("TestLevel"))
 			{
 				UE_LOG(LogTemp, Warning, TEXT("LoadingUIInit"));
 				InitLoadingUI();
@@ -97,7 +97,7 @@ void ABrickGamePlayerController::PostNetInit()
 	if (IsLocalPlayerController())
 	{
 		FString MapName = GetWorld()->GetMapName();
-		if (MapName.Contains("InGameLevel"))
+		if (MapName.Contains("TestLevel"))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("LoadingUIInit"));
 			InitLoadingUI();
@@ -312,11 +312,11 @@ void ABrickGamePlayerController::PlayIntroCameraSequence()
 
 	if (Cameras.Num() == 0 && CurrentCameraIndex == 0)
 	{
-		FindCamerasByTag("IntroViewCamera"); // ÅÂ±×·Î Ä«¸Þ¶ó ¸ðÀ¸±â
+		FindCamerasByTag("IntroViewCamera"); // ï¿½Â±×·ï¿½ Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		CurrentCameraIndex = 0;
 	}
 
-	// Ä«¸Þ¶ó ÀüÈ¯
+	// Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½È¯
 	if (CurrentCameraIndex < Cameras.Num())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("CameraChange"));
@@ -346,7 +346,7 @@ void ABrickGamePlayerController::PlayPlacementCameraSequence(bool bNext)
 				CameraTag = FName(*FString::Printf(TEXT("PlacementCamera_Blue")));
 			}
 			
-			FindCamerasByTag(CameraTag); // ÅÂ±×·Î Ä«¸Þ¶ó ¸ðÀ¸±â
+			FindCamerasByTag(CameraTag); // ï¿½Â±×·ï¿½ Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			CurrentCameraIndex = 0;
 			SetViewTarget(Cast<AActor>(Cameras[CurrentCameraIndex]));
 			return;
@@ -436,10 +436,10 @@ void ABrickGamePlayerController::HandleTrapDrop(FVector2D ScreenPosition, TSubcl
 	FVector WorldOrigin;
 	FVector WorldDirection;
 
-	// 1. ¸¶¿ì½º À§Ä¡ ±âÁØÀ¸·Î ¿ùµå ¹æÇâ °è»ê
+	// 1. ï¿½ï¿½ï¿½ì½º ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 	if (DeprojectScreenPositionToWorld(ScreenPosition.X, ScreenPosition.Y, WorldOrigin, WorldDirection))
 	{
-		// 2. Ä«¸Þ¶ó À§Ä¡ ±âÁØÀ¸·Î ½ÃÀÛÁ¡ ¼³Á¤
+		// 2. Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		FVector CameraLocation;
 		FRotator CameraRotation;
 		GetPlayerViewPoint(CameraLocation, CameraRotation);

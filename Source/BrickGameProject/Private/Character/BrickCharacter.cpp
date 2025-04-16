@@ -23,13 +23,17 @@ ABrickCharacter::ABrickCharacter()
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArmComp->SetupAttachment(RootComponent);
-	SpringArmComp->TargetArmLength = 300.0f;
+	SpringArmComp->TargetArmLength = 400.0f;
 	SpringArmComp->bUsePawnControlRotation = true;
-	SpringArmComp->bDoCollisionTest = false; // 임시 비활성화
-	SpringArmComp->ProbeSize = 16.0f;
+	SpringArmComp->bDoCollisionTest = true;
+	SpringArmComp->ProbeSize = 26.0f;
 	SpringArmComp->ProbeChannel = ECC_Camera;
 	SpringArmComp->bEnableCameraLag = true;
-	SpringArmComp->CameraLagSpeed = 10.0f;
+	SpringArmComp->CameraLagSpeed = 6.0f; // 조절 가능
+
+	SpringArmComp->SocketOffset = FVector(0.f, 0.f, 60.f); // 시야 위로
+
+
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
@@ -39,6 +43,7 @@ ABrickCharacter::ABrickCharacter()
 
 
 	PreviewBlocks.SetNum(2);
+	PreviewBlockClasses.SetNum(2);    // 미리보기용
 }
 
 
@@ -64,7 +69,24 @@ void ABrickCharacter::Tick(float DeltaTime)
 	{
 		UpdatePreviewBlock();
 	}
+
+	// SpringArm 길이 보정 로직
+	const float DesiredArmLength = 400.f;
+	const float MinArmLength = 250.f;
+
+	float CurrentArmLength = SpringArmComp->TargetArmLength;
+
+	// 만약 너무 가까워져 있으면, 최소 거리까지 부드럽게 회복
+	if (CurrentArmLength < MinArmLength)
+	{
+		SpringArmComp->TargetArmLength = FMath::FInterpTo(CurrentArmLength, MinArmLength, DeltaTime, 5.f);
+	}
+	else if (CurrentArmLength < DesiredArmLength)
+	{
+		SpringArmComp->TargetArmLength = FMath::FInterpTo(CurrentArmLength, DesiredArmLength, DeltaTime, 2.f);
+	}
 }
+
 
 // Called to bind functionality to input
 void ABrickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -109,8 +131,15 @@ void ABrickCharacter::Move(const FInputActionValue& value)
 
 void ABrickCharacter::StartJump(const FInputActionValue& value)
 {
-	if (value.Get<bool>()) Jump();
+	if (value.Get<bool>())
+	{
+		Jump();
 
+		if (JumpSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, JumpSound, GetActorLocation());
+		}
+	}
 }
 
 void ABrickCharacter::StopJump(const FInputActionValue& value)
@@ -170,6 +199,7 @@ void ABrickCharacter::SelectBlock1(const FInputActionValue& value)
 	if (value.Get<bool>())
 	{
 		SelectedBlockIndex = 0;
+		ServerSetSelectedBlockIndex(0); // ⭐ 서버에 알리기
 
 		for (int i = 0; i < PreviewBlocks.Num(); i++)
 		{
@@ -190,6 +220,7 @@ void ABrickCharacter::SelectBlock2(const FInputActionValue& value)
 	if (value.Get<bool>())
 	{
 		SelectedBlockIndex = 1;
+		ServerSetSelectedBlockIndex(1); // ⭐ 서버에 알리기
 
 		for (int i = 0; i < PreviewBlocks.Num(); i++)
 		{
@@ -242,11 +273,8 @@ void ABrickCharacter::DeleteBlock(const FInputActionValue& Value)
 
 void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 {
-
 	if (!bCanUseSkill) return;
-
 	if (!PreviewBlocks.IsValidIndex(SelectedBlockIndex)) return;
-
 
 	AActor* CurrentPreview = PreviewBlocks[SelectedBlockIndex];
 	if (!CurrentPreview || !BlockClasses.IsValidIndex(SelectedBlockIndex)) return;
@@ -257,11 +285,15 @@ void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 	FVector SpawnLocation = Origin - FVector(0, 0, Extent.Z);
 	FRotator SpawnRotation = CurrentPreview->GetActorRotation();
 
-	ServerPlaceBlock(SpawnLocation, SpawnRotation);
+	// 수정된 부분: 현재 선택된 블록 인덱스를 서버에 명시적으로 넘긴다
+	ServerPlaceBlock(SelectedBlockIndex, SpawnLocation, SpawnRotation);
 
 	CurrentPreview->Destroy();
 	PreviewBlocks[SelectedBlockIndex] = nullptr;
 }
+
+
+
 void ABrickCharacter::MulticastPlayVictoryMontage_Implementation()
 {
 	if (VictoryMontage && GetMesh() && GetMesh()->GetAnimInstance())
@@ -417,20 +449,6 @@ void ABrickCharacter::MulticastApplyFinalPose_Implementation(FRotator ActorRot, 
 		GetMesh()->SetRelativeRotation(MeshRot);
 	}
 }
-void ABrickCharacter::ServerPlaceBlock_Implementation(FVector SpawnLocation, FRotator SpawnRotation)
-{
-	if (BlockClasses.IsValidIndex(SelectedBlockIndex))
-	{
-		AActor* SpawnedBlock = GetWorld()->SpawnActor<AActor>(
-			BlockClasses[SelectedBlockIndex], SpawnLocation, SpawnRotation
-		);
-
-		if (ClickSound)
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, ClickSound, GetActorLocation());
-		}
-	}
-}
 void ABrickCharacter::ApplyKnockback(const FVector& Direction, float Strength)
 {
 	if (!Controller || !GetCharacterMovement()) return;
@@ -458,4 +476,22 @@ void ABrickCharacter::OnHitByObstacle(AActor* SelfActor, AActor* OtherActor, FVe
 		ApplyKnockback(KnockbackDir, 1500.f);
 	}
 }
+void ABrickCharacter::ServerSetSelectedBlockIndex_Implementation(int32 NewIndex)
+{
+	SelectedBlockIndex = NewIndex;
+}
 
+void ABrickCharacter::ServerPlaceBlock_Implementation(int32 BlockIndex, FVector SpawnLocation, FRotator SpawnRotation)
+{
+	if (BlockClasses.IsValidIndex(BlockIndex))
+	{
+		AActor* SpawnedBlock = GetWorld()->SpawnActor<AActor>(
+			BlockClasses[BlockIndex], SpawnLocation, SpawnRotation
+		);
+
+		if (ClickSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, ClickSound, GetActorLocation());
+		}
+	}
+}

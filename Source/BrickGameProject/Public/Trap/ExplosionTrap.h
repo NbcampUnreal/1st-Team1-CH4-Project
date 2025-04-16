@@ -39,7 +39,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ExplosionTrap|Effect")
 	UNiagaraSystem* StarEffectNiagaraSystem;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SFX")
+	USoundBase* ExplosionSound;
 
 
 
