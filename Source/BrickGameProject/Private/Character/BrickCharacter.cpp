@@ -29,7 +29,11 @@ ABrickCharacter::ABrickCharacter()
 	SpringArmComp->ProbeSize = 26.0f;
 	SpringArmComp->ProbeChannel = ECC_Camera;
 	SpringArmComp->bEnableCameraLag = true;
-	SpringArmComp->CameraLagSpeed = 10.0f;
+	SpringArmComp->CameraLagSpeed = 6.0f; // 조절 가능
+
+	SpringArmComp->SocketOffset = FVector(0.f, 0.f, 60.f); // 시야 위로
+
+
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
@@ -65,7 +69,23 @@ void ABrickCharacter::Tick(float DeltaTime)
 		UpdatePreviewBlock();
 	}
 
+	// SpringArm 길이 보정 로직
+	const float DesiredArmLength = 400.f;
+	const float MinArmLength = 250.f;
+
+	float CurrentArmLength = SpringArmComp->TargetArmLength;
+
+	// 만약 너무 가까워져 있으면, 최소 거리까지 부드럽게 회복
+	if (CurrentArmLength < MinArmLength)
+	{
+		SpringArmComp->TargetArmLength = FMath::FInterpTo(CurrentArmLength, MinArmLength, DeltaTime, 5.f);
+	}
+	else if (CurrentArmLength < DesiredArmLength)
+	{
+		SpringArmComp->TargetArmLength = FMath::FInterpTo(CurrentArmLength, DesiredArmLength, DeltaTime, 2.f);
+	}
 }
+
 
 // Called to bind functionality to input
 void ABrickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -78,7 +98,7 @@ void ABrickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 			EnhancedInput->BindAction(PlayerController->GetMoveAction(), ETriggerEvent::Triggered, this, &ABrickCharacter::Move);
 			EnhancedInput->BindAction(PlayerController->GetJumpAction(), ETriggerEvent::Triggered, this, &ABrickCharacter::StartJump);
-			EnhancedInput->BindAction(PlayerController->GetJumpAction(), ETriggerEvent::Completed, this, &ABrickCharacter::StopJump);
+			EnhancedInput->BindAction(PlayerController->GetJumpAction(), ETriggerEvent::Completed, this, &ABrickCdharacter::StopJump);
 			EnhancedInput->BindAction(PlayerController->GetLookAction(), ETriggerEvent::Triggered, this, &ABrickCharacter::Look);
 			EnhancedInput->BindAction(PlayerController->GetBlock1Action(), ETriggerEvent::Triggered, this, &ABrickCharacter::SelectBlock1);
 			EnhancedInput->BindAction(PlayerController->GetBlock2Action(), ETriggerEvent::Triggered, this, &ABrickCharacter::SelectBlock2);
