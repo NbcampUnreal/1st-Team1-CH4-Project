@@ -17,6 +17,8 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "InGame/CountdownUserWidget.h"
 #include "Character/BrickCharacter.h"
+#include "InGame/LoadingUserWidget.h"
+#include "InGame/MapViewUserWidget.h"
 
 
 ABrickGamePlayerController::ABrickGamePlayerController()
@@ -42,7 +44,7 @@ ABrickGamePlayerController::ABrickGamePlayerController()
 void ABrickGamePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	if (HasAuthority())
 	{
 		if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
@@ -60,7 +62,8 @@ void ABrickGamePlayerController::BeginPlay()
 			FString MapName = GetWorld()->GetMapName();
 			if (MapName.Contains("InGameLevel"))
 			{
-				InitInGameUI();
+				UE_LOG(LogTemp, Warning, TEXT("LoadingUIInit"));
+				InitLoadingUI();
 			}
 			else if (MapName.Contains("LobbyLevel"))
 			{
@@ -96,7 +99,8 @@ void ABrickGamePlayerController::PostNetInit()
 		FString MapName = GetWorld()->GetMapName();
 		if (MapName.Contains("InGameLevel"))
 		{
-			InitInGameUI();
+			UE_LOG(LogTemp, Warning, TEXT("LoadingUIInit"));
+			InitLoadingUI();
 		}
 		else if (MapName.Contains("LobbyLevel"))
 		{
@@ -260,6 +264,41 @@ void ABrickGamePlayerController::InitCountdownUI()
 		SetInputMode(InputMode);
 		SetShowMouseCursor(false);
 		FSlateApplication::Get().CancelDragDrop();
+	}
+}
+
+void ABrickGamePlayerController::InitLoadingUI()
+{
+	if (LobbyWidget)
+	{
+		LobbyWidget->RemoveFromParent();
+		LobbyWidget = nullptr;
+	}
+
+	LoadingWidget = CreateWidget<ULoadingUserWidget>(this, LoadingWidgetClass);
+	if (LoadingWidget)
+	{
+		LoadingWidget->AddToViewport();
+		FInputModeUIOnly InputMode;
+		SetInputMode(InputMode);
+		SetShowMouseCursor(false);
+	}
+}
+
+void ABrickGamePlayerController::InitMapViewUI()
+{
+	if (LoadingWidget)
+	{
+		LoadingWidget->RemoveFromParent();
+		LoadingWidget = nullptr;
+	}
+	MapViewWidget = CreateWidget<UMapViewUserWidget>(this, MapViewWidgetClass);
+	if (MapViewWidget)
+	{
+		MapViewWidget->AddToViewport();
+		FInputModeUIOnly InputMode;
+		SetInputMode(InputMode);
+		SetShowMouseCursor(false);
 	}
 }
 
