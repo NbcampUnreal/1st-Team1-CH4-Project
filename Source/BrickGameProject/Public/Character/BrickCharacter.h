@@ -112,10 +112,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "State")
 	bool bIsDefeated = false;
 
-	UFUNCTION(Server, Reliable)
-	void ServerPlaceBlock(FVector SpawnLocation, FRotator SpawnRotation);
-	void ServerPlaceBlock_Implementation(FVector SpawnLocation, FRotator SpawnRotation);
-
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastPlayVictoryMontage();
 	UFUNCTION(NetMulticast, Reliable)
@@ -134,5 +130,6 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerSetSelectedBlockIndex(int32 NewIndex);
 
-
+	UFUNCTION(Server, Reliable)
+	void ServerPlaceBlock(int32 BlockIndex, FVector SpawnLocation, FRotator SpawnRotation);
 };
