@@ -14,6 +14,8 @@ class UHubUserWidget;
 class UTrapSettingUserWidget;
 class UCountdownUserWidget;
 class ATrapBase;
+class ULoadingUserWidget;
+class UMapViewUserWidget;
 
 UCLASS()
 class BRICKGAMEPROJECT_API ABrickGamePlayerController : public APlayerController
@@ -60,7 +62,7 @@ public:
 	UHubUserWidget* HubWidget;
 
 	// TrapSetting UI
-	UPROPERTY(EditDefaultsOnly, Category = "UI|TrapSetting")
+	UPROPERTY(EditDefaultsOnly, Category = "UI|InGame")
 	TSubclassOf<UTrapSettingUserWidget> TrapSettingWidgetClass;
 
 	UPROPERTY()
@@ -71,7 +73,7 @@ public:
 	FTimerHandle CameraSwitchTimerHandle;
 
 	// Countdown UI
-	UPROPERTY(EditDefaultsOnly, Category="UI|Countdown")
+	UPROPERTY(EditDefaultsOnly, Category="UI|InGame")
 	TSubclassOf<UCountdownUserWidget> CountdownWidgetClass;
 
 	UPROPERTY()
@@ -84,14 +86,27 @@ public:
 	UPROPERTY()
 	UInGameHUD* InGameHUDWidget;
 
+	// Loading UI
+	UPROPERTY(EditDefaultsOnly, Category = "UI|InGame")
+	TSubclassOf<ULoadingUserWidget> LoadingWidgetClass;
 
+	UPROPERTY()
+	ULoadingUserWidget* LoadingWidget;
 
+	// MapView UI
+	UPROPERTY(EditDefaultsOnly, Category = "UI|InGame")
+	TSubclassOf<UMapViewUserWidget> MapViewWidgetClass;
+
+	UPROPERTY()
+	UMapViewUserWidget* MapViewWidget;
 
 	void InitLobbyUI();
 	void InitInGameUI();
 	void InitHubUI();
 	void InitTrapSettingUI();
 	void InitCountdownUI();
+	void InitLoadingUI();
+	void InitMapViewUI();
 
 	// Phase
 	void PlayIntroCameraSequence();

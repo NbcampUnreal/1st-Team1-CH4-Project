@@ -146,6 +146,7 @@ void ABrickInGameState::OnRep_GamePhase()
 				UE_LOG(LogTemp, Warning, TEXT("EGamePhase : Loading"));
 				if (BPC->IsLocalPlayerController())
 				{
+					BPC->InitLoadingUI();
 					//BPC->SetIgnoreMoveInput(true);
 					/*if (APawn* Pawn = BPC->GetPawn())
 					{
@@ -161,6 +162,7 @@ void ABrickInGameState::OnRep_GamePhase()
 				UE_LOG(LogTemp, Warning, TEXT("EGamePhase : Intro"));
 				if (BPC->IsLocalPlayerController())
 				{
+					BPC->InitMapViewUI();
 					BPC->PlayIntroCameraSequence(); // 로컬 플레이어만 카메라 전환
 				}
 			}
