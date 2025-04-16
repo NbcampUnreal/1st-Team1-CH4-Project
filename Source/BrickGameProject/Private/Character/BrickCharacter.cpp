@@ -43,6 +43,7 @@ ABrickCharacter::ABrickCharacter()
 
 
 	PreviewBlocks.SetNum(2);
+	PreviewBlockClasses.SetNum(2);    // 미리보기용
 }
 
 
@@ -98,7 +99,7 @@ void ABrickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 			EnhancedInput->BindAction(PlayerController->GetMoveAction(), ETriggerEvent::Triggered, this, &ABrickCharacter::Move);
 			EnhancedInput->BindAction(PlayerController->GetJumpAction(), ETriggerEvent::Triggered, this, &ABrickCharacter::StartJump);
-			EnhancedInput->BindAction(PlayerController->GetJumpAction(), ETriggerEvent::Completed, this, &ABrickCdharacter::StopJump);
+			EnhancedInput->BindAction(PlayerController->GetJumpAction(), ETriggerEvent::Completed, this, &ABrickCharacter::StopJump);
 			EnhancedInput->BindAction(PlayerController->GetLookAction(), ETriggerEvent::Triggered, this, &ABrickCharacter::Look);
 			EnhancedInput->BindAction(PlayerController->GetBlock1Action(), ETriggerEvent::Triggered, this, &ABrickCharacter::SelectBlock1);
 			EnhancedInput->BindAction(PlayerController->GetBlock2Action(), ETriggerEvent::Triggered, this, &ABrickCharacter::SelectBlock2);
@@ -198,6 +199,7 @@ void ABrickCharacter::SelectBlock1(const FInputActionValue& value)
 	if (value.Get<bool>())
 	{
 		SelectedBlockIndex = 0;
+		ServerSetSelectedBlockIndex(0); // ⭐ 서버에 알리기
 
 		for (int i = 0; i < PreviewBlocks.Num(); i++)
 		{
@@ -212,13 +214,13 @@ void ABrickCharacter::SelectBlock1(const FInputActionValue& value)
 	}
 }
 
-
 void ABrickCharacter::SelectBlock2(const FInputActionValue& value)
 {
 	if (!bCanUseSkill) return;
 	if (value.Get<bool>())
 	{
 		SelectedBlockIndex = 1;
+		ServerSetSelectedBlockIndex(1); // ⭐ 서버에 알리기
 
 		for (int i = 0; i < PreviewBlocks.Num(); i++)
 		{
@@ -228,6 +230,7 @@ void ABrickCharacter::SelectBlock2(const FInputActionValue& value)
 				PreviewBlocks[i] = nullptr;
 			}
 		}
+
 		StartPlacingBlock(FInputActionValue());
 	}
 }
@@ -282,12 +285,13 @@ void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 	FVector SpawnLocation = Origin - FVector(0, 0, Extent.Z);
 	FRotator SpawnRotation = CurrentPreview->GetActorRotation();
 
-	ServerPlaceBlock(SpawnLocation, SpawnRotation);
+	// 수정된 부분: 현재 선택된 블록 인덱스를 서버에 명시적으로 넘긴다
+	ServerPlaceBlock(SelectedBlockIndex, SpawnLocation, SpawnRotation);
 
 	CurrentPreview->Destroy();
 	PreviewBlocks[SelectedBlockIndex] = nullptr;
-
 }
+
 
 
 void ABrickCharacter::MulticastPlayVictoryMontage_Implementation()
@@ -445,20 +449,6 @@ void ABrickCharacter::MulticastApplyFinalPose_Implementation(FRotator ActorRot, 
 		GetMesh()->SetRelativeRotation(MeshRot);
 	}
 }
-void ABrickCharacter::ServerPlaceBlock_Implementation(FVector SpawnLocation, FRotator SpawnRotation)
-{
-	if (BlockClasses.IsValidIndex(SelectedBlockIndex))
-	{
-		AActor* SpawnedBlock = GetWorld()->SpawnActor<AActor>(
-			BlockClasses[SelectedBlockIndex], SpawnLocation, SpawnRotation
-		);
-
-		if (ClickSound)
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, ClickSound, GetActorLocation());
-		}
-	}
-}
 void ABrickCharacter::ApplyKnockback(const FVector& Direction, float Strength)
 {
 	if (!Controller || !GetCharacterMovement()) return;
@@ -486,5 +476,22 @@ void ABrickCharacter::OnHitByObstacle(AActor* SelfActor, AActor* OtherActor, FVe
 		ApplyKnockback(KnockbackDir, 1500.f);
 	}
 }
+void ABrickCharacter::ServerSetSelectedBlockIndex_Implementation(int32 NewIndex)
+{
+	SelectedBlockIndex = NewIndex;
+}
 
+void ABrickCharacter::ServerPlaceBlock_Implementation(int32 BlockIndex, FVector SpawnLocation, FRotator SpawnRotation)
+{
+	if (BlockClasses.IsValidIndex(BlockIndex))
+	{
+		AActor* SpawnedBlock = GetWorld()->SpawnActor<AActor>(
+			BlockClasses[BlockIndex], SpawnLocation, SpawnRotation
+		);
 
+		if (ClickSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, ClickSound, GetActorLocation());
+		}
+	}
+}

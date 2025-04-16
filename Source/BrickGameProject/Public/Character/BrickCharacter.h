@@ -131,4 +131,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SFX")
 	USoundBase* JumpSound;
 
+	UFUNCTION(Server, Reliable)
+	void ServerSetSelectedBlockIndex(int32 NewIndex);
+
+
 };
