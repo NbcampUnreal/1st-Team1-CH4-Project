@@ -16,7 +16,6 @@
 // Sets default values
 ABrickCharacter::ABrickCharacter()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -32,14 +31,16 @@ ABrickCharacter::ABrickCharacter()
 	SpringArmComp->bEnableCameraLag = true;
 	SpringArmComp->CameraLagSpeed = 10.0f;
 
-
-
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 	CameraComp->bUsePawnControlRotation = false;
 
 	PreviewPivotToBottom = 0.0f;
+
+
+	PreviewBlocks.SetNum(2);
 }
+
 
 // Called when the game starts or when spawned
 void ABrickCharacter::BeginPlay()
@@ -169,9 +170,10 @@ void ABrickCharacter::SelectBlock1(const FInputActionValue& value)
 	if (value.Get<bool>())
 	{
 		SelectedBlockIndex = 0;
-		for (int i = 0; i < 2; i++)
+
+		for (int i = 0; i < PreviewBlocks.Num(); i++)
 		{
-			if (i != 0 && PreviewBlocks[i])
+			if (i != SelectedBlockIndex && PreviewBlocks[i])
 			{
 				PreviewBlocks[i]->Destroy();
 				PreviewBlocks[i] = nullptr;
@@ -182,13 +184,13 @@ void ABrickCharacter::SelectBlock1(const FInputActionValue& value)
 	}
 }
 
-
 void ABrickCharacter::SelectBlock2(const FInputActionValue& value)
 {
 	if (!bCanUseSkill) return;
 	if (value.Get<bool>())
 	{
 		SelectedBlockIndex = 1;
+
 		for (int i = 0; i < PreviewBlocks.Num(); i++)
 		{
 			if (i != SelectedBlockIndex && PreviewBlocks[i])
@@ -204,6 +206,8 @@ void ABrickCharacter::SelectBlock2(const FInputActionValue& value)
 
 void ABrickCharacter::RotatePreviewBlock(const FInputActionValue& Value)
 {
+	if (!PreviewBlocks.IsValidIndex(SelectedBlockIndex)) return;
+
 	AActor* CurrentPreview = PreviewBlocks[SelectedBlockIndex];
 	if (!CurrentPreview) return;
 
@@ -214,7 +218,6 @@ void ABrickCharacter::RotatePreviewBlock(const FInputActionValue& Value)
 	CurrentRotation.Yaw += ScrollValue * 15.0f;
 	CurrentPreview->SetActorRotation(CurrentRotation);
 }
-
 
 void ABrickCharacter::DeleteBlock(const FInputActionValue& Value)
 {
@@ -239,15 +242,17 @@ void ABrickCharacter::DeleteBlock(const FInputActionValue& Value)
 
 void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 {
+<<<<<<< Updated upstream
 	if (!bCanUseSkill) return;
+=======
+	if (!PreviewBlocks.IsValidIndex(SelectedBlockIndex)) return;
+>>>>>>> Stashed changes
 
 	AActor* CurrentPreview = PreviewBlocks[SelectedBlockIndex];
 	if (!CurrentPreview || !BlockClasses.IsValidIndex(SelectedBlockIndex)) return;
 
 	FVector Origin, Extent;
 	CurrentPreview->GetActorBounds(false, Origin, Extent);
-
-	// 겹침 검사 제거됨
 
 	FVector SpawnLocation = Origin - FVector(0, 0, Extent.Z);
 	FRotator SpawnRotation = CurrentPreview->GetActorRotation();
@@ -257,7 +262,6 @@ void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 	CurrentPreview->Destroy();
 	PreviewBlocks[SelectedBlockIndex] = nullptr;
 }
-
 void ABrickCharacter::MulticastPlayVictoryMontage_Implementation()
 {
 	if (VictoryMontage && GetMesh() && GetMesh()->GetAnimInstance())
@@ -283,6 +287,8 @@ void ABrickCharacter::MulticastPlayDefeatMontage_Implementation()
 
 void ABrickCharacter::UpdatePreviewBlock()
 {
+	if (!PreviewBlocks.IsValidIndex(SelectedBlockIndex)) return;
+
 	AActor* CurrentPreview = PreviewBlocks[SelectedBlockIndex];
 	if (!CurrentPreview) return;
 
