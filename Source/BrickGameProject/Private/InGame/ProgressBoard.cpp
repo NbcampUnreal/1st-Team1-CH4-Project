@@ -31,7 +31,7 @@ void UProgressBoard::NativeConstruct()
 		{
 			MarkerMap.Add(PS->GetBrickPlayerID(), MarkerImages[i]);
 
-			MarkerImages[i]->SetColorAndOpacity(GetColorByTeam(PS->GetTeam()));
+			/*MarkerImages[i]->SetColorAndOpacity(GetColorByTeam(PS->GetTeam()));*/
 		}
 	}
 
@@ -64,7 +64,7 @@ void UProgressBoard::InitializeProgressLineYBounds()
 	{
 		FVector2D RenderSize = Image_ProgressLine->GetCachedGeometry().GetLocalSize();
 
-		float DotHalfSize = 10.f;
+		float DotHalfSize = 20.f;
 		ProgressLineTopY = 0.f + DotHalfSize;
 		ProgressLineBottomY = RenderSize.Y - DotHalfSize;
 
@@ -75,7 +75,8 @@ void UProgressBoard::UpdateMarkerPositions()
 {
 	for (int32 i = 0; i < CachedPlayerStates.Num(); ++i)
 	{
-		float ProgressRatio = CachedPlayerStates[i]->GetProgressRatio();
+		ABrickGamePlayerState* BrickPS = CachedPlayerStates[i];
+		float ProgressRatio = BrickPS->GetProgressRatio();
 		float MarkerY = FMath::Lerp(ProgressLineBottomY, ProgressLineTopY, ProgressRatio);
 
 		if (UCanvasPanelSlot* MarkerSlot = Cast<UCanvasPanelSlot>(MarkerImages[i]->Slot))
@@ -83,6 +84,18 @@ void UProgressBoard::UpdateMarkerPositions()
 			FVector2D Pos = MarkerSlot->GetPosition();
 			Pos.Y = MarkerY;
 			MarkerSlot->SetPosition(Pos);
+
+			// Arrow 
+			int32 MyPlayerId = GetOwningPlayerState<ABrickGamePlayerState>()->GetBrickPlayerID();
+			if (BrickPS->GetBrickPlayerID() == MyPlayerId && Image_Arrow)
+			{
+				if (UCanvasPanelSlot* ArrowSlot = Cast<UCanvasPanelSlot>(Image_Arrow->Slot))
+				{
+					float ArrowOffsetX = 20.f; // 필요 시 조절
+					FVector2D ArrowPos = Pos + FVector2D(ArrowOffsetX, 0.f);
+					ArrowSlot->SetPosition(ArrowPos);
+				}
+			}
 		}
 	}
 }
