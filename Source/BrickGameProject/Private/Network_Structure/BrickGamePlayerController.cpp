@@ -228,10 +228,10 @@ void ABrickGamePlayerController::InitHubUI()
 
 void ABrickGamePlayerController::InitTrapSettingUI()
 {
-	if (LobbyWidget)
+	if (MapViewWidget)
 	{
-		LobbyWidget->RemoveFromParent();
-		LobbyWidget = nullptr;
+		MapViewWidget->RemoveFromParent();
+		MapViewWidget = nullptr;
 	}
 
 	TrapSettingWidget = CreateWidget<UTrapSettingUserWidget>(this, TrapSettingWidgetClass);
@@ -294,6 +294,7 @@ void ABrickGamePlayerController::InitMapViewUI()
 		LoadingWidget->RemoveFromParent();
 		LoadingWidget = nullptr;
 	}
+
 	MapViewWidget = CreateWidget<UMapViewUserWidget>(this, MapViewWidgetClass);
 	if (MapViewWidget)
 	{
