@@ -51,7 +51,6 @@ void ABrickInGameState::Tick(float DeltaTime)
 				float ProgressRatio = (Character->GetActorLocation().Y - StartY) / (GoalY - StartY);
 				ProgressRatio = FMath::Clamp(ProgressRatio, 0.0f, 1.0f);
 				BrickPS->SetProgressRatio(ProgressRatio);
-				UE_LOG(LogTemp, Warning, TEXT("Progress Ratio: %f"), ProgressRatio);
 			}
 		}
 	}
@@ -146,6 +145,7 @@ void ABrickInGameState::OnRep_GamePhase()
 				UE_LOG(LogTemp, Warning, TEXT("EGamePhase : Loading"));
 				if (BPC->IsLocalPlayerController())
 				{
+					BPC->InitLoadingUI();
 					//BPC->SetIgnoreMoveInput(true);
 					/*if (APawn* Pawn = BPC->GetPawn())
 					{
@@ -161,6 +161,7 @@ void ABrickInGameState::OnRep_GamePhase()
 				UE_LOG(LogTemp, Warning, TEXT("EGamePhase : Intro"));
 				if (BPC->IsLocalPlayerController())
 				{
+					BPC->InitMapViewUI();
 					BPC->PlayIntroCameraSequence(); // 로컬 플레이어만 카메라 전환
 				}
 			}
