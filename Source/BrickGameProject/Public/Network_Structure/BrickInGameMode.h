@@ -26,6 +26,10 @@ public:
 	FTimerHandle ResultTravelHandle;
 	FTimerHandle PhaseTimerHandle;
 
+	//Timer Time
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayTime")
+	float PlacementPhaseTime;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayTime")
 	float MaxGameTime; 
 

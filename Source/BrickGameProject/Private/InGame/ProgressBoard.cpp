@@ -9,17 +9,7 @@ void UProgressBoard::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-
-	if (UCanvasPanelSlot* LineSlot = Cast<UCanvasPanelSlot>(Image_ProgressLine->Slot))
-	{
-		const FVector2D LinePos = LineSlot->GetPosition();
-		const FVector2D LineSize = LineSlot->GetSize();
-
-		ProgressLineTopY = LinePos.Y;
-		ProgressLineBottomY = LinePos.Y + LineSize.Y;
-	}
-
-
+	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UProgressBoard::InitializeProgressLineYBounds);
 
 	MarkerImages = { Image_Marker1, Image_Marker2, Image_Marker3, Image_Marker4 };
 
@@ -65,6 +55,19 @@ FLinearColor UProgressBoard::GetColorByTeam(EGameTeam Team) const
 		return FLinearColor::Blue;
 	default:
 		return FLinearColor::White;
+	}
+}
+
+void UProgressBoard::InitializeProgressLineYBounds()
+{
+	if (UCanvasPanelSlot* LineSlot = Cast<UCanvasPanelSlot>(Image_ProgressLine->Slot))
+	{
+		FVector2D RenderSize = Image_ProgressLine->GetCachedGeometry().GetLocalSize();
+
+		float DotHalfSize = 10.f;
+		ProgressLineTopY = 0.f + DotHalfSize;
+		ProgressLineBottomY = RenderSize.Y - DotHalfSize;
+
 	}
 }
 

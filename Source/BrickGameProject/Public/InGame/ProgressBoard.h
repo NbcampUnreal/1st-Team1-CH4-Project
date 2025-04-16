@@ -17,6 +17,7 @@ public:
 	virtual void NativeConstruct() override;
 
 	FLinearColor GetColorByTeam(EGameTeam Team) const;
+	void InitializeProgressLineYBounds();
 	void UpdateMarkerPositions();
 
 	UPROPERTY(meta = (BindWidget))
