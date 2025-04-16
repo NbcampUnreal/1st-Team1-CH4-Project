@@ -63,6 +63,8 @@ void ABrickInGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ABrickInGameState, RemainingTime);
 	DOREPLIFETIME(ABrickInGameState, CurrentPhase);
 	DOREPLIFETIME(ABrickInGameState, Countdown);
+	DOREPLIFETIME(ABrickInGameState, StartY);
+	DOREPLIFETIME(ABrickInGameState, GoalY);
 }
 
 
@@ -132,6 +134,16 @@ void ABrickInGameState::CountdownTick()
 	}
 
 	OnRep_Countdown(); // For Client
+}
+
+void ABrickInGameState::OnRep_StartY()
+{
+	UE_LOG(LogTemp, Warning, TEXT("StartY replicated: %f"), StartY);
+}
+
+void ABrickInGameState::OnRep_GoalY()
+{
+	UE_LOG(LogTemp, Warning, TEXT("GoalY replicated: %f"), GoalY);
 }
 
 void ABrickInGameState::OnRep_GamePhase()

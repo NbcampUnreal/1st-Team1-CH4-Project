@@ -53,6 +53,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EGameTeam WinningTeam;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float ShowWiningUITime;
+
 	TMap<EGameTeam, ABrickPlayerStart*> StartPointsMap;
+
 
 };

@@ -15,8 +15,8 @@ class BRICKGAMEPROJECT_API UProgressBoard : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
-	FLinearColor GetColorByTeam(EGameTeam Team) const;
 	void InitializeProgressLineYBounds();
 	void UpdateMarkerPositions();
 
@@ -41,9 +41,10 @@ public:
 
 	FTimerHandle UpdateTimerHandle;
 
+	bool bLineInitialized = false;
 
 
-
+	float DotHalfSize = 20.f;
 	float ProgressLineTopY;
 	float ProgressLineBottomY;
 };

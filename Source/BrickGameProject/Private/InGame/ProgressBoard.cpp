@@ -9,7 +9,7 @@ void UProgressBoard::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UProgressBoard::InitializeProgressLineYBounds);
+
 
 	MarkerImages = { Image_Marker1, Image_Marker2, Image_Marker3, Image_Marker4 };
 
@@ -31,7 +31,6 @@ void UProgressBoard::NativeConstruct()
 		{
 			MarkerMap.Add(PS->GetBrickPlayerID(), MarkerImages[i]);
 
-			/*MarkerImages[i]->SetColorAndOpacity(GetColorByTeam(PS->GetTeam()));*/
 		}
 	}
 
@@ -44,19 +43,27 @@ void UProgressBoard::NativeConstruct()
 	);
 }
 
-
-FLinearColor UProgressBoard::GetColorByTeam(EGameTeam Team) const
+void UProgressBoard::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-	switch (Team)
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	if (!bLineInitialized)
 	{
-	case EGameTeam::Red:
-		return FLinearColor::Red;
-	case EGameTeam::Blue:
-		return FLinearColor::Blue;
-	default:
-		return FLinearColor::White;
+		FVector2D Size = Image_ProgressLine->GetCachedGeometry().GetLocalSize();
+
+		if (Size.Y > 10.f) // 또는 0.f 초과
+		{
+			ProgressLineTopY = DotHalfSize;
+			ProgressLineBottomY = Size.Y - DotHalfSize;
+
+			bLineInitialized = true;
+
+			UpdateMarkerPositions(); // 정확한 좌표로 표시
+		}
 	}
 }
+
+
 
 void UProgressBoard::InitializeProgressLineYBounds()
 {
@@ -64,7 +71,6 @@ void UProgressBoard::InitializeProgressLineYBounds()
 	{
 		FVector2D RenderSize = Image_ProgressLine->GetCachedGeometry().GetLocalSize();
 
-		float DotHalfSize = 20.f;
 		ProgressLineTopY = 0.f + DotHalfSize;
 		ProgressLineBottomY = RenderSize.Y - DotHalfSize;
 
@@ -91,7 +97,7 @@ void UProgressBoard::UpdateMarkerPositions()
 			{
 				if (UCanvasPanelSlot* ArrowSlot = Cast<UCanvasPanelSlot>(Image_Arrow->Slot))
 				{
-					float ArrowOffsetX = 20.f; // 필요 시 조절
+					float ArrowOffsetX = 30.f; // 필요 시 조절
 					FVector2D ArrowPos = Pos + FVector2D(ArrowOffsetX, 0.f);
 					ArrowSlot->SetPosition(ArrowPos);
 				}

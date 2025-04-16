@@ -46,10 +46,10 @@ protected:
 
 	TMap<EGameTeam, int32> TeamGoalCount;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Progress")
+	UPROPERTY(Replicated, ReplicatedUsing = OnRep_StartY, EditAnywhere, BlueprintReadWrite, Category = "Progress")
 	float StartY = 0.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Progress")
+	UPROPERTY(Replicated, ReplicatedUsing = OnRep_GoalY, EditAnywhere, BlueprintReadWrite, Category = "Progress")
 	float GoalY = 1000.f; // ¿¹½Ã°ª
 
 	UPROPERTY(ReplicatedUsing = OnRep_GamePhase, BlueprintReadOnly)
@@ -67,6 +67,12 @@ protected:
 	void OnRep_Countdown();
 
 	void CountdownTick();
+
+	UFUNCTION()
+	void OnRep_StartY();
+
+	UFUNCTION()
+	void OnRep_GoalY();
 
 public:
 	UFUNCTION()

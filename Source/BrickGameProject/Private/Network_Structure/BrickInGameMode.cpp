@@ -15,6 +15,7 @@ ABrickInGameMode::ABrickInGameMode()
     bUseSeamlessTravel = true;
 	MaxGameTime = 30.f; 
 	PlacementPhaseTime = 20.f; 
+    ShowWiningUITime = 10.f;
 
 }
 
@@ -107,7 +108,7 @@ void ABrickInGameMode::HandleTeamWin(EGameTeam WinnerTeam)
         ResultTravelHandle,
         this,
         &ABrickInGameMode::TravelToResultLevel,
-        5.0f,
+        ShowWiningUITime,
         false
     );
 }
@@ -160,7 +161,7 @@ void ABrickInGameMode::HandleWinByDistance()
                 if (ABrickCharacter* Character = Cast<ABrickCharacter>(Pawn))
                 {
                     FVector Location = Character->GetActorLocation();
-                    if (Location.Y > MaxDistance) // Y�� ����
+                    if (Location.Y > MaxDistance) 
                     {
                         MaxDistance = Location.Y;
                         FurthestCharacter = Character;
