@@ -25,7 +25,7 @@ ABrickCharacter::ABrickCharacter()
 	SpringArmComp->SetupAttachment(RootComponent);
 	SpringArmComp->TargetArmLength = 300.0f;
 	SpringArmComp->bUsePawnControlRotation = true;
-	SpringArmComp->bDoCollisionTest = true;
+	SpringArmComp->bDoCollisionTest = false; // 임시 비활성화
 	SpringArmComp->ProbeSize = 16.0f;
 	SpringArmComp->ProbeChannel = ECC_Camera;
 	SpringArmComp->bEnableCameraLag = true;
