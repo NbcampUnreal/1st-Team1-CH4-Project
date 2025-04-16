@@ -130,20 +130,30 @@ void ABrickCharacter::Look(const FInputActionValue& value)
 
 void ABrickCharacter::StartPlacingBlock(const FInputActionValue& Value)
 {
-	if (!PreviewBlockClasses.IsValidIndex(SelectedBlockIndex)) return;
+	UE_LOG(LogTemp, Warning, TEXT("📦 StartPlacingBlock called! Index: %d"), SelectedBlockIndex);
 
+	if (!PreviewBlockClasses.IsValidIndex(SelectedBlockIndex))
+	{
+		UE_LOG(LogTemp, Error, TEXT("❌ Invalid PreviewBlockClass for index %d"), SelectedBlockIndex);
+		return;
+	}
+
+	// 기존 프리뷰 제거
 	if (PreviewBlocks.IsValidIndex(SelectedBlockIndex) && PreviewBlocks[SelectedBlockIndex])
 	{
 		PreviewBlocks[SelectedBlockIndex]->Destroy();
 		PreviewBlocks[SelectedBlockIndex] = nullptr;
 	}
 
+	// 스폰
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	AActor* Spawned = GetWorld()->SpawnActor<AActor>(PreviewBlockClasses[SelectedBlockIndex], FVector::ZeroVector, FRotator::ZeroRotator, Params);
 
 	if (Spawned)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("✅ PreviewBlock Spawned: %s"), *Spawned->GetName());
+
 		TArray<UPrimitiveComponent*> PrimComponents;
 		Spawned->GetComponents<UPrimitiveComponent>(PrimComponents);
 		for (auto Comp : PrimComponents)
@@ -151,6 +161,7 @@ void ABrickCharacter::StartPlacingBlock(const FInputActionValue& Value)
 			Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			Comp->SetSimulatePhysics(false);
 		}
+
 		if (SelectedBlockIndex == 1)
 		{
 			FRotator Rot = Spawned->GetActorRotation();
@@ -160,8 +171,12 @@ void ABrickCharacter::StartPlacingBlock(const FInputActionValue& Value)
 
 		PreviewBlocks[SelectedBlockIndex] = Spawned;
 	}
-
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("❌ Failed to spawn PreviewBlock for index %d"), SelectedBlockIndex);
+	}
 }
+
 
 
 void ABrickCharacter::SelectBlock1(const FInputActionValue& value)
@@ -242,11 +257,11 @@ void ABrickCharacter::DeleteBlock(const FInputActionValue& Value)
 
 void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 {
-<<<<<<< Updated upstream
+
 	if (!bCanUseSkill) return;
-=======
+
 	if (!PreviewBlocks.IsValidIndex(SelectedBlockIndex)) return;
->>>>>>> Stashed changes
+
 
 	AActor* CurrentPreview = PreviewBlocks[SelectedBlockIndex];
 	if (!CurrentPreview || !BlockClasses.IsValidIndex(SelectedBlockIndex)) return;
@@ -302,10 +317,14 @@ void ABrickCharacter::UpdatePreviewBlock()
 			CurrentPreview->GetActorBounds(true, Origin, Extent);
 			FVector Adjusted = Hit.ImpactPoint;
 			Adjusted.Z += Extent.Z;
+
+			UE_LOG(LogTemp, Warning, TEXT("📍 Moving PreviewBlock to: %s"), *Adjusted.ToString());
+
 			CurrentPreview->SetActorLocation(Adjusted);
 		}
 	}
 }
+
 
 
 
