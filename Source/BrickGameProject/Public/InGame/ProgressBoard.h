@@ -30,12 +30,18 @@ public:
 	UImage* Image_Marker3;
 	UPROPERTY(meta = (BindWidget)) 
 	UImage* Image_Marker4;
+	UPROPERTY(meta = (BindWidget))
+	UImage* Image_Arrow;
+
+
 
 	TArray<UImage*> MarkerImages;
 	TArray<ABrickGamePlayerState*> CachedPlayerStates;
 	TMap<int32, UImage*> MarkerMap;
 
 	FTimerHandle UpdateTimerHandle;
+
+
 
 
 	float ProgressLineTopY;
