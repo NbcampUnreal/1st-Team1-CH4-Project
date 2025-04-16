@@ -15,6 +15,8 @@ class BRICKGAMEPROJECT_API AOnePlayerFloorButton : public AFloorButton
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door")
 	ADoorActor* Door;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SFX")
+	USoundBase* ButtonToggleSound;
 
 	virtual void UpdateButtonState() override;
 };

@@ -30,6 +30,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	UAnimMontage* StandUpMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SFX")
+	USoundBase* SlipSound;
 
 
 public:

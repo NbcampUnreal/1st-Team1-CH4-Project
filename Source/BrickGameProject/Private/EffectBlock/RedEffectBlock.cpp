@@ -5,6 +5,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 //#include "Character/LegoCharacter.h"
 
@@ -21,7 +22,7 @@ void ARedEffectBlock::ApplyEffect(ACharacter* Target)
 {
 	if (!Target) return;
 
-	static TMap<ACharacter*, FTimerHandle> ActiveEffects; // ÇÔ¼ö ¾È¿¡ ÀÖÁö¸¸, staticÀÌ¶ó Àü¿ªÀûÀ¸·Î À¯ÁöµÊ!
+	static TMap<ACharacter*, FTimerHandle> ActiveEffects; // ï¿½Ô¼ï¿½ ï¿½È¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, staticï¿½Ì¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!
 
 	
 
@@ -34,7 +35,7 @@ void ARedEffectBlock::ApplyEffect(ACharacter* Target)
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("Overlap First Speed : %f"), MovementComp->MaxWalkSpeed));
 	if (ActiveEffects.Contains(Target))
 	{
-		// ±âÁ¸ È¿°ú¸¦ ¿ø·¡´ë·Î µÇµ¹¸®°í, Å¸ÀÌ¸Ó ÃÊ±âÈ­
+		// ï¿½ï¿½ï¿½ï¿½ È¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Çµï¿½ï¿½ï¿½ï¿½ï¿½, Å¸ï¿½Ì¸ï¿½ ï¿½Ê±ï¿½È­
 		if (MovementComp)
 		{
 			MovementComp->MaxWalkSpeed /= SpeedBoostValue;
@@ -47,15 +48,19 @@ void ARedEffectBlock::ApplyEffect(ACharacter* Target)
 	float OriginalSpeed = MovementComp->MaxWalkSpeed;
 	float NewSpeed = OriginalSpeed * SpeedBoostValue;
 
-	// ¾ÕÀ¸·Î ¹Ð¾îÁÖ±â
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ð¾ï¿½ï¿½Ö±ï¿½
 	FVector LaunchDirection = PlayerCharacter->GetActorForwardVector() * LaunchPower;
 	PlayerCharacter->LaunchCharacter(LaunchDirection, true, true);
+	if (BoostSound && PlayerCharacter)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, BoostSound, PlayerCharacter->GetActorLocation());
+	}
 
-	// ¼Óµµ º¯°æ
+	// ï¿½Óµï¿½ ï¿½ï¿½ï¿½ï¿½
 	MovementComp->MaxWalkSpeed = NewSpeed;
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Change Speed : %f"), MovementComp->MaxWalkSpeed));
 
-	// Ä³¸¯ÅÍ¿¡ FX ºÙ¿©¼­ ½ÇÇà
+	// Ä³ï¿½ï¿½ï¿½Í¿ï¿½ FX ï¿½Ù¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	//if (ALegoCharacter* LegoChar = Cast<ALegoCharacter>(PlayerCharacter))
 	//{
 	//	if (LegoChar->SpeedFXTemplate)
@@ -64,8 +69,8 @@ void ARedEffectBlock::ApplyEffect(ACharacter* Target)
 	//			LegoChar->SpeedFXTemplate,
 	//			LegoChar->CameraComp,
 	//			NAME_None,
-	//			FVector(250.0f, 0.f, -30.f),       // ´õ ¾Õ¿¡¼­ ½ÃÀÛ
-	//			FRotator(-90.f, 180.f, 0.f),      // À§¡æ¾Õ ¹æÇâ È¸Àü
+	//			FVector(250.0f, 0.f, -30.f),       // ï¿½ï¿½ ï¿½Õ¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	//			FRotator(-90.f, 180.f, 0.f),      // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È¸ï¿½ï¿½
 	//			EAttachLocation::KeepRelativeOffset,
 	//			true
 	//		);
@@ -96,8 +101,8 @@ void ARedEffectBlock::ApplyEffect(ACharacter* Target)
 	//	}
 	//}
 
-	// ¼Óµµ ¿øº¹
-	TWeakObjectPtr<ACharacter> WeakPlayerCharacter = PlayerCharacter; // ¾ÈÀüÇÑ ÂüÁ¶¸¦ À§ÇÔ
+	// ï¿½Óµï¿½ ï¿½ï¿½ï¿½ï¿½
+	TWeakObjectPtr<ACharacter> WeakPlayerCharacter = PlayerCharacter; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	FTimerHandle EffectTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(EffectTimerHandle, [WeakPlayerCharacter, OriginalSpeed]()
 		{
@@ -110,7 +115,7 @@ void ARedEffectBlock::ApplyEffect(ACharacter* Target)
 					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Timer - Reset : %f"), ResetMovement->MaxWalkSpeed));
 				}
 			}
-			// ActiveEffects¿¡¼­ Á¦°Å
+			// ActiveEffectsï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			ActiveEffects.Remove(WeakPlayerCharacter.Get());
 
 		}, EffectDuration, false);
