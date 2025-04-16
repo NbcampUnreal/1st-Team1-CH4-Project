@@ -25,8 +25,8 @@ ABrickCharacter::ABrickCharacter()
 	SpringArmComp->SetupAttachment(RootComponent);
 	SpringArmComp->TargetArmLength = 400.0f;
 	SpringArmComp->bUsePawnControlRotation = true;
-	SpringArmComp->bDoCollisionTest = false; // 임시 비활성화
-	SpringArmComp->ProbeSize = 16.0f;
+	SpringArmComp->bDoCollisionTest = true;
+	SpringArmComp->ProbeSize = 26.0f;
 	SpringArmComp->ProbeChannel = ECC_Camera;
 	SpringArmComp->bEnableCameraLag = true;
 	SpringArmComp->CameraLagSpeed = 10.0f;
@@ -110,8 +110,15 @@ void ABrickCharacter::Move(const FInputActionValue& value)
 
 void ABrickCharacter::StartJump(const FInputActionValue& value)
 {
-	if (value.Get<bool>()) Jump();
+	if (value.Get<bool>())
+	{
+		Jump();
 
+		if (JumpSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, JumpSound, GetActorLocation());
+		}
+	}
 }
 
 void ABrickCharacter::StopJump(const FInputActionValue& value)

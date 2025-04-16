@@ -128,4 +128,7 @@ public:
 	UFUNCTION()
 	void OnHitByObstacle(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SFX")
+	USoundBase* JumpSound;
+
 };
