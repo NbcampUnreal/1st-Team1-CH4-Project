@@ -322,7 +322,7 @@ void ABrickGamePlayerController::PlayIntroCameraSequence()
 		UE_LOG(LogTemp, Warning, TEXT("CameraChange"));
 		SetViewTarget(Cast<AActor>(Cameras[CurrentCameraIndex]));
 		CurrentCameraIndex++;
-		SetViewTargetWithBlend(Cast<AActor>(Cameras[CurrentCameraIndex]), 5.0f);
+		SetViewTargetWithBlend(Cast<AActor>(Cameras[CurrentCameraIndex]), 19.0f);
 	}
 
 }
