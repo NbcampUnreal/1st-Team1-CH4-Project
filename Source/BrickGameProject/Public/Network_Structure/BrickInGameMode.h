@@ -33,9 +33,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayTime")
 	float MaxGameTime; 
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayTime")
+	float LoadingPhaseTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayTime")
+	float IntroPhaseTime;
+
 protected:
-	void StartGameTimer();     
-	void TickGameTimer();       
+	void StartGameTimer();
+	void TickGameTimer();
 
 	void HandleWinByDistance();
 

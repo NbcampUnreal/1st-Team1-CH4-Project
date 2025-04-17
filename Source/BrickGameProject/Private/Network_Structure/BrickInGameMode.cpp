@@ -16,7 +16,8 @@ ABrickInGameMode::ABrickInGameMode()
 	MaxGameTime = 30.f; 
 	PlacementPhaseTime = 20.f; 
     ShowWiningUITime = 10.f;
-
+    LoadingPhaseTime = 10.0f;
+    IntroPhaseTime = 20.0f;
 }
 
 
@@ -45,7 +46,7 @@ void ABrickInGameMode::BeginPlay()
         InitPlayerSpawnHandle,
         this,
         &ABrickInGameMode::AssignCheckPointForPlayers,
-        5.0f,
+        LoadingPhaseTime,
         false
     );
 }
@@ -81,7 +82,7 @@ void ABrickInGameMode::AssignCheckPointForPlayers()
         GS->SetGamePhase(EGamePhase::Intro);
     }
 
-    GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ABrickInGameMode::EnterPlacementPhase, 6.0f, false);
+    GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ABrickInGameMode::EnterPlacementPhase, IntroPhaseTime, false);
 }
 
 void ABrickInGameMode::HandleTeamWin(EGameTeam WinnerTeam)

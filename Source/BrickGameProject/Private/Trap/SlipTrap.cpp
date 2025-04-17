@@ -60,12 +60,14 @@ void ASlipTrap::ActiveTrap(ACharacter* Target)
         {
             FTimerHandle TimerHandle;
             FTimerDelegate TimerDelegate;
+            TWeakObjectPtr<ACharacter> WeakPlayerCharacter = PlayerCharacter;
+            TWeakObjectPtr<ASlipTrap> WeakThis = this;
 
-            TimerDelegate.BindLambda([PlayerCharacter, this]()
+            TimerDelegate.BindLambda([WeakPlayerCharacter, WeakThis]()
                 {
-                    if (PlayerCharacter && StandUpMontage)
+                    if (WeakThis.IsValid() && WeakPlayerCharacter.IsValid() && WeakPlayerCharacter->StandUpMontage)
                     {
-                        PlayerCharacter->PlayAnimMontage(StandUpMontage);
+                        WeakPlayerCharacter->PlayAnimMontage(WeakPlayerCharacter->StandUpMontage);
                     }
                 });
 
