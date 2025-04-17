@@ -6,6 +6,7 @@
 #include "NiagaraSystem.h"
 #include "Camera/CameraComponent.h"  
 #include "Animation/AnimInstance.h"
+#include "Network_Structure/EGameTeam.h"
 #include "BrickCharacter.generated.h"
 
 struct FInputActionValue;
@@ -47,6 +48,7 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void OnRep_PlayerState() override;
 
 	// Input Functions
 	UFUNCTION() void Move(const FInputActionValue& value);
@@ -96,6 +98,9 @@ public:
 
 	UPROPERTY() TArray<AActor*> PreviewBlocks;
 	void UpdatePreviewBlock();
+
+	UFUNCTION(BlueprintCallable)
+	void ApplyTeamColor(EGameTeam Team);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastFixMeshRotation(FRotator NewRotation);

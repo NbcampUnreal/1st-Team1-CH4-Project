@@ -10,6 +10,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "DrawDebugHelpers.h"
 #include "Network_Structure/BrickGamePlayerController.h"
+#include "Network_Structure/BrickGamePlayerState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -51,6 +52,15 @@ ABrickCharacter::ABrickCharacter()
 void ABrickCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (HasAuthority())
+	{
+		if (ABrickGamePlayerState* PS = GetPlayerState<ABrickGamePlayerState>())
+		{
+			ApplyTeamColor(PS->GetTeam());
+		}
+	}
+
 	OnActorHit.AddDynamic(this, &ABrickCharacter::OnHitByObstacle);
 	APlayerController* PC = Cast<APlayerController>(GetController());
 	if (PC)
@@ -111,6 +121,16 @@ void ABrickCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		}
 	}
 
+}
+
+void ABrickCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	if (ABrickGamePlayerState* PS = GetPlayerState<ABrickGamePlayerState>())
+	{
+		ApplyTeamColor(PS->GetTeam());
+	}
 }
 
 
@@ -341,6 +361,26 @@ void ABrickCharacter::UpdatePreviewBlock()
 			Adjusted.Z += Extent.Z;
 			CurrentPreview->SetActorLocation(Adjusted);
 		}
+	}
+}
+
+void ABrickCharacter::ApplyTeamColor(EGameTeam Team)
+{
+	UMaterialInterface* TeamMaterial = nullptr;
+
+	switch (Team)
+	{
+	case EGameTeam::Red:
+		TeamMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/KnockoutCharacter/Materials/Character/MI_Character_Misc_10.MI_Character_Misc_10"));
+		break;
+	case EGameTeam::Blue:
+		TeamMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/KnockoutCharacter/Materials/Character/MI_Character_Misc_11.MI_Character_Misc_11"));
+		break;
+	}
+
+	if (TeamMaterial)
+	{
+		GetMesh()->SetMaterial(0, TeamMaterial); 
 	}
 }
 
