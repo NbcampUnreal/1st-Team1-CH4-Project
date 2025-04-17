@@ -27,10 +27,31 @@ void UProgressBoard::NativeConstruct()
 	for (int32 i = 0; i < CachedPlayerStates.Num(); ++i)
 	{
 		ABrickGamePlayerState* PS = CachedPlayerStates[i];
-		if (MarkerImages.IsValidIndex(i))
-		{
-			MarkerMap.Add(PS->GetBrickPlayerID(), MarkerImages[i]);
+		EGameTeam Team = PS->GetTeam();
 
+		if (UImage* Marker = MarkerImages[i])
+		{
+			UTexture2D* NewTexture = nullptr;
+
+			switch (Team)
+			{
+			case EGameTeam::Red:
+				NewTexture = RedDotTexture;
+
+				break;
+			case EGameTeam::Blue:
+				NewTexture = BlueDotTexture;
+				break;
+			default:
+				NewTexture = nullptr;
+				break;
+			}
+
+			if (NewTexture)
+			{
+				Marker->SetBrushFromTexture(NewTexture);
+				Marker->SetVisibility(ESlateVisibility::Visible);
+			}
 		}
 	}
 
