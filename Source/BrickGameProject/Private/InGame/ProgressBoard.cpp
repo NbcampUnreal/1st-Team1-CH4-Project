@@ -79,11 +79,18 @@ void UProgressBoard::InitializeProgressLineYBounds()
 
 void UProgressBoard::UpdateMarkerPositions()
 {
+	ABrickGamePlayerState* MyPS = GetOwningPlayerState<ABrickGamePlayerState>();
+	if (!MyPS) return;
+
+	const int32 MyPlayerId = MyPS->GetBrickPlayerID();
+
 	for (int32 i = 0; i < CachedPlayerStates.Num(); ++i)
 	{
 		ABrickGamePlayerState* BrickPS = CachedPlayerStates[i];
-		float ProgressRatio = BrickPS->GetProgressRatio();
-		float MarkerY = FMath::Lerp(ProgressLineBottomY, ProgressLineTopY, ProgressRatio);
+		if (!BrickPS || !MarkerImages.IsValidIndex(i) || !MarkerImages[i]) continue;
+
+		const float ProgressRatio = BrickPS->GetProgressRatio();
+		const float MarkerY = FMath::Lerp(ProgressLineBottomY, ProgressLineTopY, ProgressRatio);
 
 		if (UCanvasPanelSlot* MarkerSlot = Cast<UCanvasPanelSlot>(MarkerImages[i]->Slot))
 		{
@@ -91,14 +98,13 @@ void UProgressBoard::UpdateMarkerPositions()
 			Pos.Y = MarkerY;
 			MarkerSlot->SetPosition(Pos);
 
-			// Arrow 
-			int32 MyPlayerId = GetOwningPlayerState<ABrickGamePlayerState>()->GetBrickPlayerID();
+			// Arrow 위치 갱신 (내 캐릭터일 경우만)
 			if (BrickPS->GetBrickPlayerID() == MyPlayerId && Image_Arrow)
 			{
 				if (UCanvasPanelSlot* ArrowSlot = Cast<UCanvasPanelSlot>(Image_Arrow->Slot))
 				{
-					float ArrowOffsetX = 30.f; // 필요 시 조절
-					FVector2D ArrowPos = Pos + FVector2D(ArrowOffsetX, 0.f);
+					const float ArrowOffsetX = 30.f;
+					const FVector2D ArrowPos = Pos + FVector2D(ArrowOffsetX, 0.f);
 					ArrowSlot->SetPosition(ArrowPos);
 				}
 			}
