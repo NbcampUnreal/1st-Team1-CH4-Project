@@ -17,8 +17,18 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void CopyProperties(APlayerState* PlayerState) override;
 
+	UFUNCTION()
+	void OnRep_ProgressRatio();
+	UFUNCTION()
+	void OnRep_Team();
+
+	UPROPERTY()
+	bool bIsTeamReplicated = false;
 
 protected:
+
+
+
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "PlayerState")
 	int32 BrickPlayerID;
 
@@ -36,6 +46,9 @@ protected:
 	UPROPERTY(Replicated)
 	FVector CurrentCheckPoint;
 
+	UPROPERTY(Replicated, ReplicatedUsing = OnRep_ProgressRatio)
+	float ProgressRatio;
+
 	UPROPERTY(Replicated)
 	bool bHasFinished;
 
@@ -43,19 +56,33 @@ protected:
 	int32 FinishOrder;
 
 public:
+	UFUNCTION(BlueprintCallable)
 	int32 GetBrickPlayerID() const { return BrickPlayerID; }
+	UFUNCTION(BlueprintCallable)
 	void SetBrickPlayerID(int32 InPlayerId) { BrickPlayerID = InPlayerId; }
 
+	UFUNCTION(BlueprintCallable)
 	bool IsHost() const { return bIsHost; }
+	UFUNCTION(BlueprintCallable)
 	void SetHost(bool InIsHost) { bIsHost = InIsHost; }
 
+	UFUNCTION(BlueprintCallable)
 	EGameTeam GetTeam() const { return Team; }
-	void SetTeam(EGameTeam InTeam) { Team = InTeam; }
-
+	UFUNCTION(BlueprintCallable)
+	void SetTeam(EGameTeam NewTeam);
+	UFUNCTION(BlueprintCallable)
 	bool IsReady() const { return bIsReady; }
+	UFUNCTION(BlueprintCallable)
 	void SetReady(bool bReady);
 
+	UFUNCTION(BlueprintCallable)
 	FVector GetCurrentCheckPoint() const { return CurrentCheckPoint; }
+	UFUNCTION(BlueprintCallable)
 	void SetCurrentCheckPoint(const FVector& Location);
+
+	UFUNCTION(BlueprintCallable)
+	float GetProgressRatio() const { return ProgressRatio; }
+	UFUNCTION(BlueprintCallable)
+	void SetProgressRatio(float InProgressRatio) { ProgressRatio = InProgressRatio; }
 
 };

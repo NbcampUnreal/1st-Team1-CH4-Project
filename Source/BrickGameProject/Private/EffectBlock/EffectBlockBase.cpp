@@ -3,6 +3,7 @@
 
 #include "EffectBlock/EffectBlockBase.h"
 #include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
 
 // Sets default values
@@ -15,12 +16,8 @@ AEffectBlockBase::AEffectBlockBase()
 	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(SceneComp);
 
-	// Box Component
-	BoxColliderComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollider"));
-	BoxColliderComp->SetupAttachment(SceneComp);
-	BoxColliderComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-	BoxColliderComp->OnComponentBeginOverlap.AddDynamic(this, &AEffectBlockBase::OnCharacterOverlap);
-	BoxColliderComp->OnComponentEndOverlap.AddDynamic(this, &AEffectBlockBase::OnCharacterEndOverlap);
+	// Collision
+	CollisionComp = nullptr;
 
 	// Static Mesh Component
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
@@ -56,6 +53,29 @@ void AEffectBlockBase::ApplyEffect(ACharacter* Target)
 
 void AEffectBlockBase::DestoryBlock()
 {
-	//Destroy(); // TODO : 추후 주석 풀기
+	Destroy();
+}
+
+void AEffectBlockBase::InitCollsion(bool bIsBox)
+{
+	if (bIsBox)
+	{
+		UBoxComponent* Box = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
+		CollisionComp = Box;
+	}
+	else
+	{
+		USphereComponent* Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
+		CollisionComp = Sphere;
+	}
+
+	if (CollisionComp)
+	{
+		CollisionComp->SetupAttachment(SceneComp);
+
+		CollisionComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+		CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AEffectBlockBase::OnCharacterOverlap);
+		CollisionComp->OnComponentEndOverlap.AddDynamic(this, &AEffectBlockBase::OnCharacterEndOverlap);
+	}
 }
 

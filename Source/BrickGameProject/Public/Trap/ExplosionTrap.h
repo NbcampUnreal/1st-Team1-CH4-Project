@@ -14,7 +14,7 @@ UCLASS()
 class BRICKGAMEPROJECT_API AExplosionTrap : public ATrapBase
 {
 	GENERATED_BODY()
-
+	
 public:
 	AExplosionTrap();
 
@@ -39,6 +39,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ExplosionTrap|Effect")
 	UNiagaraSystem* StarEffectNiagaraSystem;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SFX")
+	USoundBase* ExplosionSound;
+
+
 
 
 	virtual void ActiveTrap(ACharacter* Target) override;

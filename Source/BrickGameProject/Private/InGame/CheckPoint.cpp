@@ -1,6 +1,7 @@
 #include "InGame/CheckPoint.h"
 #include "Network_Structure/BrickGamePlayerState.h"
 #include "GameFramework/Character.h"
+
 //Components
 #include "Components/BoxComponent.h"
 
@@ -34,15 +35,43 @@ void ACheckPoint::OnOverlapBegin(
     const FHitResult& SweepResult)
 {
     if (!HasAuthority()) return;
+
     ACharacter* Character = Cast<ACharacter>(OtherActor);
-    if (Character)
+    if (Character && !TriggeredCharacters.Contains(Character))
     {
+        TriggeredCharacters.Add(Character);
+
         ABrickGamePlayerState* PS = Character->GetPlayerState<ABrickGamePlayerState>();
         if (PS)
         {
             UE_LOG(LogTemp, Warning, TEXT("PS Exist"));
             PS->SetCurrentCheckPoint(GetActorLocation());
         }
+
+        MulticastSpawnCheckpointEffect(Character->GetActorLocation());
+        MulticastPlayCheckpointSound(Character->GetActorLocation());
     }
 }
 
+void ACheckPoint::MulticastSpawnCheckpointEffect_Implementation(FVector Location)
+{
+    if (CheckPointEffectClass)
+    {
+        FActorSpawnParameters Params;
+        Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+        AActor* Effect = GetWorld()->SpawnActor<AActor>(CheckPointEffectClass, Location, FRotator::ZeroRotator, Params);
+        if (Effect)
+        {
+            Effect->SetLifeSpan(2.0f);
+        }
+    }
+}
+
+void ACheckPoint::MulticastPlayCheckpointSound_Implementation(FVector Location)
+{
+    if (CheckPointSound)
+    {
+        UGameplayStatics::PlaySoundAtLocation(this, CheckPointSound, Location);
+    }
+}

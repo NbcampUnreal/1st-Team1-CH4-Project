@@ -4,18 +4,30 @@
 #include "Network_Structure/BrickGamePlayerState.h"
 #include "Network_Structure/BrickGameInstance.h"
 #include "Network_Structure/EGameTeam.h"
+#include "Character/BrickCharacter.h"
 #include "InGame/BrickPlayerStart.h"
 #include "EngineUtils.h"
 
 ABrickInGameMode::ABrickInGameMode()
+	:bGameOver(false)
+	, WinningTeam(EGameTeam::None)
 {
     bUseSeamlessTravel = true;
+	MaxGameTime = 30.f; 
+	PlacementPhaseTime = 20.f; 
+    ShowWiningUITime = 10.f;
+
 }
 
 
 void ABrickInGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+    if (ABrickInGameState* GS = GetGameState<ABrickInGameState>())
+    {
+        GS->SetGamePhase(EGamePhase::Loading);
+    }
 
     for (TActorIterator<ABrickPlayerStart> It(GetWorld()); It; ++It)
     {
@@ -33,7 +45,7 @@ void ABrickInGameMode::BeginPlay()
         InitPlayerSpawnHandle,
         this,
         &ABrickInGameMode::AssignCheckPointForPlayers,
-        1.0f,
+        5.0f,
         false
     );
 }
@@ -56,9 +68,152 @@ void ABrickInGameMode::AssignCheckPointForPlayers()
                     {
                         Pawn->SetActorLocation(StartPoint->GetActorLocation());
 						PS->SetCurrentCheckPoint(StartPoint->GetActorLocation());
+                        
                     }
                 }
             }
         }
     }
+
+    // Update GamePhase(Intro)
+    if (ABrickInGameState* GS = GetGameState<ABrickInGameState>())
+    {
+        GS->SetGamePhase(EGamePhase::Intro);
+    }
+
+    GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ABrickInGameMode::EnterPlacementPhase, 6.0f, false);
 }
+
+void ABrickInGameMode::HandleTeamWin(EGameTeam WinnerTeam)
+{
+    if (!bGameOver) return;
+
+	bGameOver = true;
+
+    if (ABrickInGameState* GS = GetWorld()->GetGameState<ABrickInGameState>())
+    {
+        GS->SetWinningTeam(WinnerTeam);
+    }
+
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        if (APlayerController* PC = It->Get())
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Team %d wins!"), (int32)WinnerTeam);
+			//Client RPC to show the winning UI
+        }
+    }
+
+    GetWorldTimerManager().SetTimer(
+        ResultTravelHandle,
+        this,
+        &ABrickInGameMode::TravelToResultLevel,
+        ShowWiningUITime,
+        false
+    );
+}
+
+
+
+void ABrickInGameMode::StartGameTimer()
+{
+    if (ABrickInGameState* GS = GetGameState<ABrickInGameState>())
+    {
+        GS->SetRemainingTime(MaxGameTime);
+    }
+
+    GetWorld()->GetTimerManager().SetTimer(TimerHandle_GameTimer, this, &ABrickInGameMode::TickGameTimer, 0.1f, true);
+}
+
+void ABrickInGameMode::TickGameTimer()
+{
+    if (ABrickInGameState* GS = GetGameState<ABrickInGameState>())
+    {
+        float RemainingTime = GS->GetRemainingTime();
+        RemainingTime -= 0.1f;
+
+		GS->SetRemainingTime(RemainingTime);
+
+		if (RemainingTime <= 0.0f)
+		{
+            UE_LOG(LogTemp, Warning, TEXT("Time Over"));
+
+			bGameOver = true;
+            GetWorld()->GetTimerManager().ClearTimer(TimerHandle_GameTimer);
+
+            HandleWinByDistance(); 
+		}
+    }
+}
+
+void ABrickInGameMode::HandleWinByDistance()
+{
+    ABrickCharacter* FurthestCharacter = nullptr;
+    float MaxDistance = -FLT_MAX;
+
+    if (ABrickInGameState* GS = GetGameState<ABrickInGameState>())
+    {
+        for (APlayerState* PS : GS->PlayerArray)
+        {
+            if (ABrickGamePlayerState* BrickPS = Cast<ABrickGamePlayerState>(PS))
+            {
+                APawn* Pawn = BrickPS->GetPawn();
+                if (ABrickCharacter* Character = Cast<ABrickCharacter>(Pawn))
+                {
+                    FVector Location = Character->GetActorLocation();
+                    if (Location.Y > MaxDistance) 
+                    {
+                        MaxDistance = Location.Y;
+                        FurthestCharacter = Character;
+                    }
+                }
+            }
+        }
+    }
+
+    if (FurthestCharacter)
+    {
+        ABrickGamePlayerState* PS = Cast<ABrickGamePlayerState>(FurthestCharacter->GetPlayerState());
+        if (PS)
+        {
+            WinningTeam = PS->GetTeam();
+			HandleTeamWin(WinningTeam);
+        }
+    }
+}
+
+void ABrickInGameMode::TravelToResultLevel()
+{
+    GetWorld()->ServerTravel("/Game/Maps/ResultLevel?listen");
+}
+
+void ABrickInGameMode::EnterPlacementPhase()
+{
+    if (ABrickInGameState* GS = GetGameState<ABrickInGameState>())
+    {
+        GS->SetGamePhase(EGamePhase::Placement);
+    }
+
+    GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ABrickInGameMode::EnterCountdownPhase, PlacementPhaseTime, false);
+}
+
+void ABrickInGameMode::EnterGameplayPhase()
+{
+    if (ABrickInGameState* GS = GetGameState<ABrickInGameState>())
+    {
+        GS->SetGamePhase(EGamePhase::Gameplay);
+    }
+
+    StartGameTimer();
+}
+
+void ABrickInGameMode::EnterCountdownPhase()
+{
+    if (ABrickInGameState* GS = GetGameState<ABrickInGameState>())
+    {
+        GS->SetGamePhase(EGamePhase::Countdown);
+        GS->StartCountdown();
+    }
+}
+
+

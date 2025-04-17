@@ -22,5 +22,12 @@ public:
 	UArrowComponent* ArrowComponent;
 	float JumpBoostValue;
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UStaticMeshComponent* StaticMeshComp2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SFX")
+	USoundBase* JumpPadSound;
+
+
 	virtual void ApplyEffect(ACharacter* Target) override;
 };

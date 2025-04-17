@@ -20,11 +20,10 @@ public:
 	void TryNotifyStartAvailable();
 	UFUNCTION()
 	void StartGame();
-
 protected:
 	void AssignTeam(APlayerController* NewPlayer);
 	bool CheckAllPlayersReady();
-
+	bool CheckTeamsFull();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Game Setup")
 	int32 MaxPlayerCount;

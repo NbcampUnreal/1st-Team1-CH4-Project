@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Character/BrickCharacter.h"
+#include "Components/WidgetComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 
 AExplosionTrap::AExplosionTrap()
@@ -31,8 +34,7 @@ void AExplosionTrap::ActiveTrap(ACharacter* Target)
         StaticMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     }
     InitCollision(false, false);
-
-    // 폭발 비주얼 이펙트 재생
+    // 폭발 이펙트 재생
     if (ExplosionNiagaraSystem)
     {
         UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
@@ -46,6 +48,12 @@ void AExplosionTrap::ActiveTrap(ACharacter* Target)
         {
             NiagaraComponent->OnSystemFinished.AddDynamic(this, &AExplosionTrap::OnExplosionFinished);
         }
+    }
+
+    // 🔊 폭발 사운드 재생
+    if (ExplosionSound)
+    {
+        UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
     }
 
 
@@ -75,6 +83,32 @@ void AExplosionTrap::ActiveTrap(ACharacter* Target)
                     }),
                 8.0f, false
             );
+        }
+
+    }
+    if (Target && Target->IsPlayerControlled())
+    {
+        UUserWidget* Widget = nullptr;
+
+        Widget = Cast<UUserWidget>(Target->FindComponentByClass<UWidgetComponent>());
+
+        if (!Widget)
+        {
+            
+            ABrickCharacter* MyChar = Cast<ABrickCharacter>(Target);
+            if (MyChar && MyChar->DamageInstance)
+            {
+                Widget = MyChar->DamageInstance;
+            }
+        }
+
+        if (Widget)
+        {
+            UFunction* FlashFunc = Widget->FindFunction(TEXT("PlayFlash"));
+            if (FlashFunc)
+            {
+                Widget->ProcessEvent(FlashFunc, nullptr);
+            }
         }
     }
 }

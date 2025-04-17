@@ -22,6 +22,10 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	UMaterialInterface* CompletedMaterial;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SFX")
+	USoundBase* ButtonPressSound;
+
+
 	virtual void UpdateButtonState() override;
 	void LockButton();
 	

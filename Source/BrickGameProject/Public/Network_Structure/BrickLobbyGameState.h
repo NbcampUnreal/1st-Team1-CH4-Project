@@ -13,6 +13,9 @@ class BRICKGAMEPROJECT_API ABrickLobbyGameState : public AGameState
 public:
 	ABrickLobbyGameState();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticast_UpdateLobbyUI();
+
 protected:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

@@ -4,12 +4,19 @@
 #include "EffectBlock/GreenEffectBlock.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/ArrowComponent.h"
 
 AGreenEffectBlock::AGreenEffectBlock()
 {
+	InitCollsion(false);
+
+	// Static Mesh Component
+	StaticMeshComp2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh2"));
+	StaticMeshComp2->SetupAttachment(StaticMeshComp);
+
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
-	ArrowComponent->SetupAttachment(RootComponent); // ·çÆ®¿¡ ºÎÂø
+	ArrowComponent->SetupAttachment(RootComponent); // ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	BlockLifeTime = 3.0f;
 	JumpBoostValue = 1.5f;
@@ -25,5 +32,12 @@ void AGreenEffectBlock::ApplyEffect(ACharacter* Target)
 		{
 			MovementComp->AddImpulse(FVector(0.0f, 0.0f, 1000.0f), true);
 		}
+
+		// ðŸ”Š ì í”„ëŒ€ íš¨ê³¼ìŒ ìž¬ìƒ
+		if (JumpPadSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, JumpPadSound, PlayerCharacter->GetActorLocation());
+		}
 	}
 }
+

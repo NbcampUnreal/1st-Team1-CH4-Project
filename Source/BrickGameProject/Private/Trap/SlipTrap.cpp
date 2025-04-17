@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Animation/AnimMontage.h"
 #include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 
 ASlipTrap::ASlipTrap()
@@ -43,6 +44,11 @@ void ASlipTrap::ActiveTrap(ACharacter* Target)
             MovementComp->MaxWalkSpeed = OriginMaxWalkSpeed * 1.5f;
         }
 
+        if (SlipSound)
+        {
+            UGameplayStatics::PlaySoundAtLocation(this, SlipSound, PlayerCharacter->GetActorLocation());
+        }
+
         // 넘어지는 몽타주 재생
         if (FallDownMontage)
         {
@@ -66,6 +72,7 @@ void ASlipTrap::ActiveTrap(ACharacter* Target)
             GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 3.0f, false);
         }
     }
+
 }
 
 

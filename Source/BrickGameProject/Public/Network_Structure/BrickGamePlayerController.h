@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
@@ -9,7 +9,13 @@ class ABrickGamePlayerState;
 class UInputMappingContext;
 class UInputAction;
 class ULobbyUserWidget;
-class UInGameUserWidget;
+class UInGameHUD;
+class UHubUserWidget;
+class UTrapSettingUserWidget;
+class UCountdownUserWidget;
+class ATrapBase;
+class ULoadingUserWidget;
+class UMapViewUserWidget;
 
 UCLASS()
 class BRICKGAMEPROJECT_API ABrickGamePlayerController : public APlayerController
@@ -24,6 +30,7 @@ public:
 
 
 	//RPC
+
 	//Server
 	UFUNCTION(Server, Reliable)
 	void Server_SetPlayerID(int32 PlayerID);
@@ -47,15 +54,73 @@ public:
 	UPROPERTY()
 	ULobbyUserWidget* LobbyWidget;
 
-	//InGame UI
-	/*uproperty(editdefaultsonly, category = "ui|ingame")
-	subclassof<uingameuserwidget> ingamewidgetclass;
+	// Hub UI
+	UPROPERTY(EditDefaultsOnly, Category = "UI|Hub")
+	TSubclassOf<UHubUserWidget> HubWidgetClass;
 
-	uproperty()
-	uingameuserwidget* ingamewidget;*/
+	UPROPERTY()
+	UHubUserWidget* HubWidget;
+
+	// TrapSetting UI
+	UPROPERTY(EditDefaultsOnly, Category = "UI|InGame")
+	TSubclassOf<UTrapSettingUserWidget> TrapSettingWidgetClass;
+
+	UPROPERTY()
+	UTrapSettingUserWidget* TrapSettingWidget;
+
+	TArray<ACameraActor*> Cameras;
+	int32 CurrentCameraIndex = 0;
+	FTimerHandle CameraSwitchTimerHandle;
+
+	// Countdown UI
+	UPROPERTY(EditDefaultsOnly, Category="UI|InGame")
+	TSubclassOf<UCountdownUserWidget> CountdownWidgetClass;
+
+	UPROPERTY()
+	UCountdownUserWidget* CountdownWidget;
+
+	//InGame UI
+	UPROPERTY(EditDefaultsOnly, Category = "UI|InGame")
+	TSubclassOf<UInGameHUD> InGameHUDClass;
+
+	UPROPERTY()
+	UInGameHUD* InGameHUDWidget;
+
+	// Loading UI
+	UPROPERTY(EditDefaultsOnly, Category = "UI|InGame")
+	TSubclassOf<ULoadingUserWidget> LoadingWidgetClass;
+
+	UPROPERTY()
+	ULoadingUserWidget* LoadingWidget;
+
+	// MapView UI
+	UPROPERTY(EditDefaultsOnly, Category = "UI|InGame")
+	TSubclassOf<UMapViewUserWidget> MapViewWidgetClass;
+
+	UPROPERTY()
+	UMapViewUserWidget* MapViewWidget;
 
 	void InitLobbyUI();
 	void InitInGameUI();
+	void InitHubUI();
+	void InitTrapSettingUI();
+	void InitCountdownUI();
+	void InitLoadingUI();
+	void InitMapViewUI();
+
+	// Phase
+	void PlayIntroCameraSequence();
+	void PlayPlacementCameraSequence(bool bNext);
+	void ReturnToPawnCamera();
+	void FindCamerasByTag(FName TagName);
+	void ResetCameras();
+	void UpdateCountdownUI(int32 InCountdown);
+
+	UFUNCTION(BlueprintCallable)
+	void HandleTrapDrop(FVector2D ScreenPosition, TSubclassOf<ATrapBase> TrapClass);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnTrap(FVector Location, TSubclassOf<ATrapBase> TrapClass);
 
 protected:
 	//IMC
