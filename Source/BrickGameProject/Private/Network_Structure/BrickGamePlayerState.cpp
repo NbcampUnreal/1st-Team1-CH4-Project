@@ -4,6 +4,7 @@
 #include "Network_Structure/BrickInGameMode.h"
 #include "Network_Structure/BrickGamePlayerController.h"
 #include "Network_Structure/LobbyUserWidget.h"
+#include "Character/BrickCharacter.h"
 #include "Net/UnrealNetwork.h"
 
 ABrickGamePlayerState::ABrickGamePlayerState()
@@ -77,6 +78,7 @@ void ABrickGamePlayerState::SetTeam(EGameTeam NewTeam)
 			GM->TryNotifyStartAvailable();
 		}
 	}
+
 }
 
 void ABrickGamePlayerState::SetReady(bool bReady)

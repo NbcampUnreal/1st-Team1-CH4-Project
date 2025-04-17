@@ -34,6 +34,12 @@ public:
 	UImage* Image_Arrow;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Marker")
+	UTexture2D* RedDotTexture;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Marker")
+	UTexture2D* BlueDotTexture;
+
 
 	TArray<UImage*> MarkerImages;
 	TArray<ABrickGamePlayerState*> CachedPlayerStates;

@@ -51,6 +51,19 @@ void ABrickInGameMode::BeginPlay()
     );
 }
 
+void ABrickInGameMode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+    Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+
+    if (ABrickGamePlayerState* PS = NewPlayer->GetPlayerState<ABrickGamePlayerState>())
+    {
+        if (ABrickCharacter* Char = Cast<ABrickCharacter>(NewPlayer->GetPawn()))
+        {
+            Char->ApplyTeamColor(PS->GetTeam());
+        }
+    }
+}
+
 
 void ABrickInGameMode::AssignCheckPointForPlayers()
 {
