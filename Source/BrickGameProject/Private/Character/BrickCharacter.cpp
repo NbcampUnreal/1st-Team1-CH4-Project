@@ -131,11 +131,11 @@ void ABrickCharacter::Move(const FInputActionValue& value)
 
 void ABrickCharacter::StartJump(const FInputActionValue& value)
 {
-	if (value.Get<bool>())
+	if (value.Get<bool>() && GetCharacterMovement()->IsMovingOnGround())
 	{
 		Jump();
 
-		if (JumpSound)
+		if (JumpSound) 
 		{
 			UGameplayStatics::PlaySoundAtLocation(this, JumpSound, GetActorLocation());
 		}
@@ -285,7 +285,12 @@ void ABrickCharacter::OnLeftClick(const FInputActionValue& Value)
 	FVector SpawnLocation = Origin - FVector(0, 0, Extent.Z);
 	FRotator SpawnRotation = CurrentPreview->GetActorRotation();
 
-	// 수정된 부분: 현재 선택된 블록 인덱스를 서버에 명시적으로 넘긴다
+	// 🔊 로컬에서 사운드 재생
+	if (ClickSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ClickSound, GetActorLocation());
+	}
+
 	ServerPlaceBlock(SelectedBlockIndex, SpawnLocation, SpawnRotation);
 
 	CurrentPreview->Destroy();
@@ -485,13 +490,9 @@ void ABrickCharacter::ServerPlaceBlock_Implementation(int32 BlockIndex, FVector 
 {
 	if (BlockClasses.IsValidIndex(BlockIndex))
 	{
-		AActor* SpawnedBlock = GetWorld()->SpawnActor<AActor>(
+		GetWorld()->SpawnActor<AActor>(
 			BlockClasses[BlockIndex], SpawnLocation, SpawnRotation
 		);
-
-		if (ClickSound)
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, ClickSound, GetActorLocation());
-		}
 	}
 }
+
