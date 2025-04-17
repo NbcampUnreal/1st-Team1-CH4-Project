@@ -129,8 +129,10 @@ void ABrickCharacter::OnRep_PlayerState()
 
 	if (ABrickGamePlayerState* PS = GetPlayerState<ABrickGamePlayerState>())
 	{
+		// 클라이언트에서 자기 자신만 처리
 		ApplyTeamColor(PS->GetTeam());
 	}
+	
 }
 
 
@@ -383,9 +385,6 @@ void ABrickCharacter::ApplyTeamColor(EGameTeam Team)
 		GetMesh()->SetMaterial(0, TeamMaterial); 
 	}
 }
-
-
-
 
 void ABrickCharacter::PlayFKeyAnimationStart(const FInputActionValue& Value)
 {
