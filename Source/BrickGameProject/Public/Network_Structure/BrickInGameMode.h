@@ -16,6 +16,7 @@ public:
 	ABrickInGameMode();
 
 	virtual void BeginPlay() override;
+	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 
 	void AssignCheckPointForPlayers();
 	void HandleTeamWin(EGameTeam WinningTeam);
